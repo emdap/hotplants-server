@@ -1,0 +1,242 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Perenual Plant API",
+    "version": "1.0.0",
+    "description": "API for accessing plant species data, care guides, hardiness maps, diseases, etc."
+  },
+  "servers": [
+    {
+      "url": "https://perenual.com/api",
+      "description": "Production server"
+    }
+  ],
+  "paths": {
+    "/v2/species-list": {
+      "get": {
+        "summary": "List plant species",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": { "type": "integer", "default": 1 }
+          },
+          { "name": "q", "in": "query", "schema": { "type": "string" } },
+          { "name": "edible", "in": "query", "schema": { "type": "boolean" } },
+          {
+            "name": "poisonous",
+            "in": "query",
+            "schema": { "type": "boolean" }
+          },
+          {
+            "name": "cycle",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": ["perennial", "annual", "biennial", "biannual"]
+            }
+          },
+          { "name": "watering", "in": "query", "schema": { "type": "string" } },
+          { "name": "sunlight", "in": "query", "schema": { "type": "string" } },
+          { "name": "indoor", "in": "query", "schema": { "type": "boolean" } },
+          {
+            "name": "hardiness",
+            "in": "query",
+            "schema": { "type": "integer", "minimum": 1, "maximum": 13 }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A paginated list of species",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/SpeciesListItem"
+                      }
+                    },
+                    "pagination": { "$ref": "#/components/schemas/Pagination" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/species/details/{species_id}": {
+      "get": {
+        "summary": "Get detailed info for a species",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "species_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Detailed species info",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/SpeciesDetail" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/species-care-guide-list": {
+      "get": {
+        "summary": "Get care guides for a species",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "species_id",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "integer" }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": { "type": "integer", "default": 1 }
+          },
+          { "name": "q", "in": "query", "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of care guides",
+            "content": {
+              "application/json": { "schema": { "type": "object" } }
+            }
+          }
+        }
+      }
+    },
+    "/hardiness-map": {
+      "get": {
+        "summary": "Get hardiness zone map for a species",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "species_id",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "integer" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Hardiness map data",
+            "content": {
+              "application/json": { "schema": { "type": "object" } }
+            }
+          }
+        }
+      }
+    },
+    "/pest-disease-list": {
+      "get": {
+        "summary": "Get pest/disease list",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": { "type": "integer", "default": 1 }
+          },
+          { "name": "q", "in": "query", "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of pests and diseases",
+            "content": {
+              "application/json": { "schema": { "type": "object" } }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "SpeciesListItem": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "common_name": { "type": "string" },
+          "scientific_name": { "type": "string" },
+          "cycle": { "type": "string" },
+          "sunlight": { "type": "string" }
+        }
+      },
+      "Pagination": {
+        "type": "object",
+        "properties": {
+          "current_page": { "type": "integer" },
+          "total_pages": { "type": "integer" },
+          "total": { "type": "integer" }
+        }
+      },
+      "SpeciesDetail": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "common_name": { "type": "string" },
+          "scientific_name": { "type": "string" },
+          "edible": { "type": "boolean" },
+          "poisonous": { "type": "boolean" },
+          "watering": { "type": "string" },
+          "sunlight": { "type": "string" },
+          "dimensions": {
+            "type": "object",
+            "properties": {
+              "min_height_cm": { "type": "number" },
+              "max_height_cm": { "type": "number" },
+              "spread_cm": { "type": "number" }
+            }
+          },
+          "flowering_season": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "flower_color": { "type": "array", "items": { "type": "string" } },
+          "foliage_color": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    }
+  }
+}
