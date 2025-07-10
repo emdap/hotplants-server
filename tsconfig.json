@@ -1,0 +1,8 @@
+{
+  "extends": "./tsconfig.node20.json",
+  "compilerOptions": {
+    "module": "Node16",
+    "outDir": "./dist"
+  },
+  "include": ["src"]
+}
