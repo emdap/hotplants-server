@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "ts-node src/main.ts",
-    "dev": "ts-node-dev src/main.ts",
+    "start": "ts-node src/index.ts",
+    "dev": "ts-node-dev src/index.ts",
     "generate-perenual-types": "npx openapi-typescript src/schemas/perenual-schema.json -o src/schemas/perenual.d.ts"
   },
   "keywords": [],
@@ -12,13 +12,17 @@
   "license": "ISC",
   "description": "",
   "devDependencies": {
+    "@types/node": "^24.1.0",
     "openapi-typescript": "^7.8.0",
     "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.8.3"
   },
   "dependencies": {
+    "@apollo/datasource-rest": "^6.4.1",
+    "@apollo/server": "^5.0.0",
     "dotenv": "^17.2.0",
+    "graphql": "^16.11.0",
     "openapi-fetch": "^0.14.0"
   }
 }
