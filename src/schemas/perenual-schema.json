@@ -12,7 +12,7 @@
     }
   ],
   "paths": {
-    "/v2/species-list": {
+    "/species-list": {
       "get": {
         "summary": "List plant species",
         "parameters": [
@@ -199,6 +199,7 @@
           "id": { "type": "integer" },
           "common_name": { "type": "string" },
           "scientific_name": { "type": "string" },
+          "species_epithet": { "type": "string" },
           "cycle": { "type": "string" },
           "sunlight": { "type": "string" }
         }

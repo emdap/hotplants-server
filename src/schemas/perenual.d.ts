@@ -4,7 +4,7 @@
  */
 
 export interface paths {
-    "/v2/species-list": {
+    "/species-list": {
         parameters: {
             query?: never;
             header?: never;
@@ -222,6 +222,7 @@ export interface components {
             id?: number;
             common_name?: string;
             scientific_name?: string;
+            species_epithet?: string;
             cycle?: string;
             sunlight?: string;
         };
