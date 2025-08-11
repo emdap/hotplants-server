@@ -10,8 +10,8 @@ export type PlantData = {
   is_perennial?: boolean;
   maturity_time?: string;
   habitat?: string;
-  soil?: string;
-  light?: string;
+  soil_type?: string[];
+  light_level?: string[];
   hardiness?: number;
   height?: PlantSizeData;
   spread?: PlantSizeData;
