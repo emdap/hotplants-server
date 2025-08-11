@@ -12,15 +12,50 @@ const PLANT_FIELD_MAPPING: Record<string, keyof PlantData> = {
 
 const trimArrayItems = (array: string[]) => array.map((item) => item.trim());
 
+const plantPageFound = (document: Document) => {
+  const plantTitle = document.getElementById(
+    "contentplaceholder1_lbldisplatinname"
+  );
+  return Boolean(plantTitle?.textContent);
+};
+
+const scrapeCareIcons = (document: Document) => {
+  const careIconsTable = document.getElementById(
+    "contentplaceholder1_tblicons"
+  );
+  if (!careIconsTable) {
+    return;
+  }
+
+  const soilType: string[] = [];
+  const lightLevel: string[] = [];
+  const careIconTitles = Array.from(careIconsTable.querySelectorAll("img")).map(
+    (imgElement) => imgElement.title
+  );
+  careIconTitles.forEach((title) => {
+    if (title.match(/soil|water/g)) {
+      soilType.push(title);
+    } else if (title.match(/sun|shade/g)) {
+      lightLevel.push(title);
+    }
+  });
+
+  const plantData: Partial<PlantData> = {};
+  if (soilType.length) plantData.soil_type = soilType;
+  if (lightLevel.length) plantData.light_level = lightLevel;
+
+  return plantData;
+};
+
 const scrapeStructuredFields = (document: Document) => {
-  const plantData = [];
+  const plantData: [string, unknown][] = [];
   const trElements = Array.from(document.querySelectorAll("tr"));
 
   trElements.forEach((element) => {
     const cells = element.querySelectorAll("td");
-    const rowLabel = cells[0]?.textContent.trim();
-    const rowValue = cells[1]?.textContent.trim();
-    const plantKey = PLANT_FIELD_MAPPING[rowLabel];
+    const rowLabel = cells[0]?.textContent?.trim();
+    const rowValue = cells[1]?.textContent?.trim();
+    const plantKey = rowLabel ? PLANT_FIELD_MAPPING[rowLabel] : null;
     if (plantKey && rowValue) {
       if (rowValue.includes(", ")) {
         plantData.push([plantKey, trimArrayItems(rowValue.split(", "))]);
@@ -35,27 +70,24 @@ const scrapeStructuredFields = (document: Document) => {
     }
   });
 
-  return Object.fromEntries(plantData) as PlantData;
+  return Object.fromEntries(plantData) as Partial<PlantData>;
 };
 
-const extractPlantSummary = (document: Document) => {
-  const plantData = [];
+const scrapePlantSummary = (document: Document) => {
+  const plantData: [string, unknown][] = [];
   const plantSummary = document.getElementById(
     "contentplaceholder1_txtsummary"
   );
 
-  if (plantSummary) {
-    const summaryItems = plantSummary.textContent.split(".");
-    summaryItems.forEach((item) => {
-      const data = item.split(":");
-      const plantKey = PLANT_FIELD_MAPPING[data[0].trim()];
-      if (plantKey && data[1]) {
-        plantData.push([plantKey, trimArrayItems(data[1].split(", "))]);
-      }
-    });
-  }
+  plantSummary?.textContent?.split(".").forEach((item) => {
+    const data = item.split(":");
+    const plantKey = PLANT_FIELD_MAPPING[data[0].trim()];
+    if (plantKey && data[1]) {
+      plantData.push([plantKey, trimArrayItems(data[1].split(", "))]);
+    }
+  });
 
-  return Object.fromEntries(plantData) as PlantData;
+  return Object.fromEntries(plantData) as Partial<PlantData>;
 };
 
 const extractPlantSize = (plantCharData: string) => {
@@ -77,7 +109,7 @@ const extractPlantSize = (plantCharData: string) => {
   return plantData;
 };
 
-const extractPlantPhysicalChars = (document: Document) => {
+const scrapePlantPhysicalChars = (document: Document) => {
   let plantData: Partial<PlantData> = {};
   const plantCharData = document.getElementById(
     "contentplaceholder1_lblphystatment"
@@ -85,14 +117,15 @@ const extractPlantPhysicalChars = (document: Document) => {
 
   if (plantCharData) {
     plantData.is_perennial = plantCharData.indexOf("perennial") !== -1;
-    console.log(plantCharData);
     plantData = { ...plantData, ...extractPlantSize(plantCharData) };
   }
 
   return plantData;
 };
 
-const scrapePFAF = async (scientificName: string): Promise<PlantData> => {
+const scrapePFAF = async (
+  scientificName: string
+): Promise<PlantData | null> => {
   const baseUrl = "https://pfaf.org/user/Plant.aspx?LatinName=";
 
   const response = await fetch(
@@ -102,11 +135,16 @@ const scrapePFAF = async (scientificName: string): Promise<PlantData> => {
 
   const document = new JSDOM(html).window.document;
 
+  if (!plantPageFound(document)) {
+    return null;
+  }
+
   const scrapedData: PlantData = {
     scientific_name: scientificName,
     ...scrapeStructuredFields(document),
-    ...extractPlantSummary(document),
-    ...extractPlantPhysicalChars(document),
+    ...scrapeCareIcons(document),
+    ...scrapePlantSummary(document),
+    ...scrapePlantPhysicalChars(document),
   };
 
   return scrapedData;
@@ -115,10 +153,12 @@ const scrapePFAF = async (scientificName: string): Promise<PlantData> => {
 export const getPlantCharacteristics = async (
   scientificName: string,
   overwrite?: boolean
-): Promise<PlantData> => {
+): Promise<PlantData | null> => {
   const lowercaseName = scientificName.toLowerCase();
-  const existingPlantQuery = { scientific_name: lowercaseName };
-  const existingData = await plantCharacterstics.findOne(existingPlantQuery);
+  const existingData = await plantCharacterstics.findOne({
+    scientific_name: lowercaseName,
+  });
+  console.log(overwrite);
 
   if (existingData && !overwrite) {
     const { _id, ...plantData } = existingData;
@@ -126,10 +166,17 @@ export const getPlantCharacteristics = async (
   }
 
   const scrapedData = await scrapePFAF(lowercaseName);
-  if (existingData) {
-    await plantCharacterstics.updateOne(existingPlantQuery, scrapedData);
-  } else {
-    await plantCharacterstics.insertOne(scrapedData);
+  if (!scrapedData) {
+    return null;
   }
+
+  await plantCharacterstics.updateOne(
+    { _id: existingData?._id },
+    { $set: scrapedData },
+    {
+      upsert: true,
+    }
+  );
+
   return scrapedData;
 };
