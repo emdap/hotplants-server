@@ -5,24 +5,26 @@
   "scripts": {
     "start": "ts-node src/index.ts",
     "dev": "ts-node-dev src/index.ts",
-    "generate-perenual-types": "npx openapi-typescript src/schemas/perenual-schema.json -o src/schemas/perenual.d.ts"
+    "generate-gbif-types": "npx openapi-typescript src/schemas/gbif-schema.json -o src/schemas/gbif.d.ts"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
+  "dependencies": {
+    "@types/express": "^5.0.3",
+    "dotenv": "^17.2.0",
+    "express": "^5.1.0",
+    "jsdom": "^26.1.0",
+    "mongodb": "^6.18.0",
+    "openapi-fetch": "^0.14.0"
+  },
   "devDependencies": {
+    "@types/jsdom": "^21.1.7",
     "@types/node": "^24.1.0",
     "openapi-typescript": "^7.8.0",
     "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.8.3"
-  },
-  "dependencies": {
-    "@apollo/datasource-rest": "^6.4.1",
-    "@apollo/server": "^5.0.0",
-    "dotenv": "^17.2.0",
-    "graphql": "^16.11.0",
-    "openapi-fetch": "^0.14.0"
   }
 }

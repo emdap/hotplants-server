@@ -1,43 +1,25 @@
-import { PlantsApi } from "./dataFetchers";
+import { MongoClient } from "mongodb";
 
-export const graphqlTypes = `#graphql
-  type Plant {
-    scientific_name: String
-    common_names: [String]
-    flower_colors: [String]
-    height_cm: Int
-  }
+type PlantSizeData = { amount: number; unit: "m" | "cm" | string };
 
-  type GbifPlant {
-    acceptedScientificName: String
-  }
-
-  type Query {
-    plants: [Plant]
-    gbifPlants: [GbifPlant]
-  }
-`;
-
-export const plants = [
-  {
-    scientific_name: "scientific poppy",
-    common_names: ["poppy"],
-    flower_colors: ["red", "orange"],
-    height_cm: 50,
-  },
-];
-
-export interface ContextValue {
-  dataSources: {
-    plantsApi: PlantsApi;
-  };
-}
-
-export const resolvers = {
-  Query: {
-    plants: () => plants,
-    gbifPlants: async (_: any, __: any, { dataSources }: ContextValue) => {
-      return dataSources.plantsApi.getPlants();
-    },
-  },
+export type PlantData = {
+  scientific_name: string;
+  common_name?: string | string[];
+  bloom_color?: string;
+  bloom_time?: string;
+  is_perennial?: boolean;
+  maturity_time?: string;
+  habitat?: string;
+  soil?: string;
+  light?: string;
+  hardiness?: number;
+  height?: PlantSizeData;
+  spread?: PlantSizeData;
+  uses?: string[];
+  other_traits?: Record<string, string>;
 };
+
+const client = new MongoClient(process.env.MONGODB_CONNECTION_STRING!);
+export const plantCharacterstics = client
+  .db("plants")
+  .collection<PlantData>("plant_characteristics");
