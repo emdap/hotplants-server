@@ -8,24 +8,18 @@ const port = 3000;
 const app = express();
 app.use(express.json());
 
-app.get("/api/plants/:scientific_name", async ({ params }, res) => {
-  const plantCharacterstics = await getPlantCharacteristics(
-    params.scientific_name
-  );
-  res.json(plantCharacterstics);
-});
-
-app.get("/api/plants/update/:scientific_name", async ({ params }, res) => {
+app.get("/api/plants/:scientific_name", async ({ params, query }, res) => {
   const plantCharacterstics = await getPlantCharacteristics(
     params.scientific_name,
-    true
+    !!query["update"]
   );
+
+  if (!plantCharacterstics) {
+    res.status(404);
+  }
+
   res.json(plantCharacterstics);
 });
-
-// const gbifClient = createClient<paths>({
-//   baseUrl: "https://perenual.com/api/v2/",
-// });
 
 app.listen(port, hostname, async () => {
   console.log("i'm listening here");
