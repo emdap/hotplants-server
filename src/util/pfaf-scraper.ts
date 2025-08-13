@@ -1,5 +1,5 @@
 import { JSDOM } from "jsdom";
-import { plantCharacterstics, PlantData } from "../fixtures";
+import { plantCharacterstics, PlantData } from "../mongodb-fixtures";
 
 const PLANT_FIELD_MAPPING: Record<string, keyof PlantData> = {
   "common name": "common_name",
@@ -123,7 +123,7 @@ const scrapePlantPhysicalChars = (document: Document) => {
   return plantData;
 };
 
-const scrapePFAF = async (
+export const scrapePFAF = async (
   scientificName: string
 ): Promise<PlantData | null> => {
   const baseUrl = "https://pfaf.org/user/Plant.aspx?LatinName=";
@@ -150,15 +150,15 @@ const scrapePFAF = async (
   return scrapedData;
 };
 
-export const getPlantCharacteristics = async (
+export const getPlantData = async (
   scientificName: string,
   overwrite?: boolean
 ): Promise<PlantData | null> => {
   const lowercaseName = scientificName.toLowerCase();
+
   const existingData = await plantCharacterstics.findOne({
     scientific_name: lowercaseName,
   });
-  console.log(overwrite);
 
   if (existingData && !overwrite) {
     const { _id, ...plantData } = existingData;
