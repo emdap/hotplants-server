@@ -1,5 +1,5 @@
 import { JSDOM } from "jsdom";
-import { plantCharacterstics, PlantData } from "../mongodb-fixtures";
+import { plantCharacterstics, PlantData } from "../internal-db/mongo-config";
 
 const PLANT_FIELD_MAPPING: Record<string, keyof PlantData> = {
   "common name": "common_name",

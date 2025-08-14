@@ -5,7 +5,7 @@
   "scripts": {
     "start": "ts-node src/index.ts",
     "dev": "ts-node-dev src/index.ts",
-    "generate-gbif-types": "npx openapi-typescript src/schemas/gbif-schema.json -o src/schemas/gbif.d.ts"
+    "generate-gbif-types": "npx openapi-typescript src/gbif/schema/gbif-schema.json -o src/gbif/schema/gbif.d.ts"
   },
   "keywords": [],
   "author": "",

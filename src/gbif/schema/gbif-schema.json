@@ -61,6 +61,423 @@
     }
   ],
   "paths": {
+    "/species/search": {
+      "get": {
+        "tags": ["Searching names"],
+        "summary": "Full text search over name usages",
+        "description": "Full-text search of name usages covering the scientific and vernacular names, the species description, distribution and the entire classification across all name usages of all or some checklists.\n\nResults are ordered by relevance as this search usually returns a lot of results.",
+        "operationId": "searchNames",
+        "parameters": [
+          {
+            "name": "datasetKey",
+            "in": "query",
+            "description": "A UUID of a checklist dataset.",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "example": "d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+          },
+          {
+            "name": "constituentKey",
+            "in": "query",
+            "description": "The (sub)dataset constituent key as a UUID. Useful to query larger assembled datasets such as the GBIF Backbone or the Catalogue of Life",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "rank",
+            "in": "query",
+            "description": "Filters by taxonomic rank as given in our https://api.gbif.org/v1/enumeration/basic/Rank[Rank enum].",
+            "schema": {
+              "type": "string",
+              "externalDocs": {
+                "description": "Darwin Core definition",
+                "url": "https://rs.tdwg.org/dwc/terms/taxonRank"
+              },
+              "enum": [
+                "DOMAIN",
+                "SUPERKINGDOM",
+                "KINGDOM",
+                "SUBKINGDOM",
+                "INFRAKINGDOM",
+                "SUPERPHYLUM",
+                "PHYLUM",
+                "SUBPHYLUM",
+                "INFRAPHYLUM",
+                "SUPERCLASS",
+                "CLASS",
+                "SUBCLASS",
+                "INFRACLASS",
+                "PARVCLASS",
+                "SUPERLEGION",
+                "LEGION",
+                "SUBLEGION",
+                "INFRALEGION",
+                "SUPERCOHORT",
+                "COHORT",
+                "SUBCOHORT",
+                "INFRACOHORT",
+                "MAGNORDER",
+                "SUPERORDER",
+                "GRANDORDER",
+                "ORDER",
+                "SUBORDER",
+                "INFRAORDER",
+                "PARVORDER",
+                "SUPERFAMILY",
+                "FAMILY",
+                "SUBFAMILY",
+                "INFRAFAMILY",
+                "SUPERTRIBE",
+                "TRIBE",
+                "SUBTRIBE",
+                "INFRATRIBE",
+                "SUPRAGENERIC_NAME",
+                "GENUS",
+                "SUBGENUS",
+                "INFRAGENUS",
+                "SECTION",
+                "SUBSECTION",
+                "SERIES",
+                "SUBSERIES",
+                "INFRAGENERIC_NAME",
+                "SPECIES_AGGREGATE",
+                "SPECIES",
+                "INFRASPECIFIC_NAME",
+                "GREX",
+                "SUBSPECIES",
+                "CULTIVAR_GROUP",
+                "CONVARIETY",
+                "INFRASUBSPECIFIC_NAME",
+                "PROLES",
+                "RACE",
+                "NATIO",
+                "ABERRATION",
+                "MORPH",
+                "VARIETY",
+                "SUBVARIETY",
+                "FORM",
+                "SUBFORM",
+                "PATHOVAR",
+                "BIOVAR",
+                "CHEMOVAR",
+                "MORPHOVAR",
+                "PHAGOVAR",
+                "SEROVAR",
+                "CHEMOFORM",
+                "FORMA_SPECIALIS",
+                "CULTIVAR",
+                "STRAIN",
+                "OTHER",
+                "UNRANKED"
+              ]
+            }
+          },
+          {
+            "name": "higherTaxonKey",
+            "in": "query",
+            "description": "Filters by any of the higher Linnean rank keys. Note this is within the respective checklist and not searching NUB keys across all checklists."
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "description": "Filters by the taxonomic status as given in our https://api.gbif.org/v1/enumeration/basic/TaxonomicStatus[TaxonomicStatus enum].",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "ACCEPTED",
+                "DOUBTFUL",
+                "SYNONYM",
+                "HETEROTYPIC_SYNONYM",
+                "HOMOTYPIC_SYNONYM",
+                "PROPARTE_SYNONYM",
+                "MISAPPLIED"
+              ]
+            }
+          },
+          {
+            "name": "isExtinct",
+            "in": "query",
+            "description": "Filters by extinction status.",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "habitat",
+            "in": "query",
+            "description": "Filters by the habitat. Currently only 3 major biomes are accepted in our https://api.gbif.org/v1/enumeration/basic/Habitat[Habitat enum].",
+            "schema": {
+              "type": "string",
+              "enum": ["MARINE", "FRESHWATER", "TERRESTRIAL"]
+            }
+          },
+          {
+            "name": "threat",
+            "in": "query",
+            "description": "Filters by the taxonomic threat status as given in our https://api.gbif.org/v1/enumeration/basic/ThreatStatus[ThreatStatus enum].",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "EXTINCT",
+                "EXTINCT_IN_THE_WILD",
+                "REGIONALLY_EXTINCT",
+                "CRITICALLY_ENDANGERED",
+                "ENDANGERED",
+                "VULNERABLE",
+                "NEAR_THREATENED",
+                "LEAST_CONCERN",
+                "DATA_DEFICIENT",
+                "NOT_APPLICABLE",
+                "NOT_EVALUATED"
+              ]
+            }
+          },
+          {
+            "name": "nameType",
+            "in": "query",
+            "description": "Filters by the name type as given in our https://api.gbif.org/v1/enumeration/basic/NameType[NameType enum].",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "SCIENTIFIC",
+                "VIRUS",
+                "HYBRID",
+                "INFORMAL",
+                "CULTIVAR",
+                "CANDIDATUS",
+                "OTU",
+                "DOUBTFUL",
+                "PLACEHOLDER",
+                "NO_NAME",
+                "BLACKLISTED"
+              ]
+            }
+          },
+          {
+            "name": "nomenclaturalStatus",
+            "in": "query",
+            "description": "Filters by the nomenclatural status as given in our https://api.gbif.org/v1/enumeration/basic/NomenclaturalStatus[Nomenclatural Status enum].",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "LEGITIMATE",
+                "VALIDLY_PUBLISHED",
+                "NEW_COMBINATION",
+                "REPLACEMENT",
+                "CONSERVED",
+                "PROTECTED",
+                "CORRECTED",
+                "ORIGINAL_COMBINATION",
+                "NEW_SPECIES",
+                "NEW_GENUS",
+                "ALTERNATIVE",
+                "OBSCURE",
+                "CONSERVED_PROPOSED",
+                "PROVISIONAL",
+                "SUBNUDUM",
+                "REJECTED_PROPOSED",
+                "REJECTED_OUTRIGHT_PROPOSED",
+                "DOUBTFUL",
+                "AMBIGUOUS",
+                "CONFUSED",
+                "FORGOTTEN",
+                "ABORTED",
+                "ORTHOGRAPHIC_VARIANT",
+                "SUPERFLUOUS",
+                "NUDUM",
+                "NULL_NAME",
+                "SUPPRESSED",
+                "REJECTED_OUTRIGHT",
+                "REJECTED",
+                "ILLEGITIMATE",
+                "INVALID",
+                "DENIED"
+              ]
+            }
+          },
+          {
+            "name": "origin",
+            "in": "query",
+            "description": "Filters for name usages with a specific origin.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "SOURCE",
+                "DENORMED_CLASSIFICATION",
+                "VERBATIM_PARENT",
+                "VERBATIM_ACCEPTED",
+                "VERBATIM_BASIONYM",
+                "PROPARTE",
+                "AUTONYM",
+                "IMPLICIT_NAME",
+                "MISSING_ACCEPTED",
+                "BASIONYM_PLACEHOLDER",
+                "EX_AUTHOR_SYNONYM",
+                "OTHER"
+              ]
+            }
+          },
+          {
+            "name": "issue",
+            "in": "query",
+            "description": "A specific indexing issue as defined in our https://api.gbif.org/v1/enumeration/basic/NameUsageIssue[NameUsageIssue enum].",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "PARENT_NAME_USAGE_ID_INVALID",
+                "ACCEPTED_NAME_USAGE_ID_INVALID",
+                "ORIGINAL_NAME_USAGE_ID_INVALID",
+                "ACCEPTED_NAME_MISSING",
+                "RANK_INVALID",
+                "NOMENCLATURAL_STATUS_INVALID",
+                "TAXONOMIC_STATUS_INVALID",
+                "SCIENTIFIC_NAME_ASSEMBLED",
+                "CHAINED_SYNOYM",
+                "BASIONYM_AUTHOR_MISMATCH",
+                "TAXONOMIC_STATUS_MISMATCH",
+                "PARENT_CYCLE",
+                "CLASSIFICATION_RANK_ORDER_INVALID",
+                "CLASSIFICATION_NOT_APPLIED",
+                "VERNACULAR_NAME_INVALID",
+                "DESCRIPTION_INVALID",
+                "DISTRIBUTION_INVALID",
+                "SPECIES_PROFILE_INVALID",
+                "MULTIMEDIA_INVALID",
+                "BIB_REFERENCE_INVALID",
+                "ALT_IDENTIFIER_INVALID",
+                "BACKBONE_MATCH_NONE",
+                "BACKBONE_MATCH_FUZZY",
+                "BACKBONE_MATCH_AGGREGATE",
+                "ACCEPTED_NAME_NOT_UNIQUE",
+                "PARENT_NAME_NOT_UNIQUE",
+                "ORIGINAL_NAME_NOT_UNIQUE",
+                "RELATIONSHIP_MISSING",
+                "ORIGINAL_NAME_DERIVED",
+                "CONFLICTING_BASIONYM_COMBINATION",
+                "NO_SPECIES",
+                "NAME_PARENT_MISMATCH",
+                "ORTHOGRAPHIC_VARIANT",
+                "HOMONYM",
+                "PUBLISHED_BEFORE_GENUS",
+                "UNPARSABLE",
+                "PARTIALLY_PARSABLE"
+              ]
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "description": "Simple full text search parameter. The value for this parameter can be a simple word or a phrase. Wildcards are not supported",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "hl",
+            "in": "query",
+            "description": "Set `hl=true` to highlight terms matching the query when in fulltext search fields. The highlight will be an emphasis tag of class `gbifHl`.",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Controls the number of results in the page. Using too high a value will be overwritten with the default maximum threshold, depending on the service. Sensible defaults are used so this may be omitted.",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Determines the offset for the search results. A limit of 20 and offset of 40 will get the third page of 20 results. Some services have a maximum offset.",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "facet",
+            "in": "query",
+            "description": "A facet name used to retrieve the most frequent values for a field. This parameter may be repeated to request multiple facets.",
+            "explode": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "facetMincount",
+            "in": "query",
+            "description": "Used in combination with the facet parameter. Set `facetMincount={#}` to exclude facets with a count less than `{#}`.",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "facetMultiselect",
+            "in": "query",
+            "description": "Used in combination with the facet parameter. Set `facetMultiselect=true` to still return counts for values that are not currently filtered.",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "facetLimit",
+            "in": "query",
+            "description": "Facet parameters allow paging requests using the parameters facetOffset and facetLimit",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "facetOffset",
+            "in": "query",
+            "description": "Facet parameters allow paging requests using the parameters facetOffset and facetLimit",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Invalid query"
+          },
+          "200": {
+            "description": "Name usages found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SearchResponseNameUsageSearchResultNameUsageSearchParameter"
+                }
+              },
+              "application/x-javascript": {
+                "schema": {
+                  "$ref": "#/components/schemas/SearchResponseNameUsageSearchResultNameUsageSearchParameter"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Name usage not found"
+          }
+        },
+        "x-Order": {
+          "Order": "0110"
+        }
+      }
+    },
     "/occurrence/search": {
       "get": {
         "tags": ["Searching occurrences"],
@@ -7476,6 +7893,1146 @@
   },
   "components": {
     "schemas": {
+      "SearchResponseNameUsageSearchResultNameUsageSearchParameter": {
+        "type": "object",
+        "properties": {
+          "offset": {
+            "minimum": 0,
+            "type": "integer",
+            "description": "The offset of the results within all the search results.\n\nSubsequent pages can be retrieved by using `offset + count` as the new offset.",
+            "format": "int64"
+          },
+          "limit": {
+            "minimum": 0,
+            "type": "integer",
+            "description": "The limit used.  Note the limit returned may be lower than the limit requested.",
+            "format": "int32"
+          },
+          "endOfRecords": {
+            "type": "boolean",
+            "description": "True if this page of search results is the final page."
+          },
+          "count": {
+            "type": "integer",
+            "description": "The total number of records returned by the search.",
+            "format": "int64"
+          },
+          "results": {
+            "type": "array",
+            "description": "Search results.",
+            "items": {
+              "$ref": "#/components/schemas/NameUsageSearchResult"
+            }
+          }
+        }
+      },
+      "NameUsageSearchResult": {
+        "required": [
+          "descriptions",
+          "higherClassificationMap",
+          "vernacularNames"
+        ],
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "nameKey": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "datasetKey": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "constituentKey": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "nubKey": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "parentKey": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "parent": {
+            "type": "string"
+          },
+          "acceptedKey": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "accepted": {
+            "type": "string"
+          },
+          "basionymKey": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "basionym": {
+            "type": "string"
+          },
+          "kingdom": {
+            "type": "string"
+          },
+          "phylum": {
+            "type": "string"
+          },
+          "order": {
+            "type": "string"
+          },
+          "family": {
+            "type": "string"
+          },
+          "genus": {
+            "type": "string"
+          },
+          "subgenus": {
+            "type": "string"
+          },
+          "species": {
+            "type": "string"
+          },
+          "kingdomKey": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "phylumKey": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "classKey": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "orderKey": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "familyKey": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "genusKey": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "subgenusKey": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "speciesKey": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "scientificName": {
+            "type": "string"
+          },
+          "canonicalName": {
+            "type": "string"
+          },
+          "authorship": {
+            "type": "string"
+          },
+          "publishedIn": {
+            "type": "string"
+          },
+          "accordingTo": {
+            "type": "string"
+          },
+          "nameType": {
+            "type": "string",
+            "enum": [
+              "SCIENTIFIC",
+              "VIRUS",
+              "HYBRID",
+              "INFORMAL",
+              "CULTIVAR",
+              "CANDIDATUS",
+              "OTU",
+              "DOUBTFUL",
+              "PLACEHOLDER",
+              "NO_NAME",
+              "BLACKLISTED"
+            ]
+          },
+          "taxonomicStatus": {
+            "type": "string",
+            "enum": [
+              "ACCEPTED",
+              "DOUBTFUL",
+              "SYNONYM",
+              "HETEROTYPIC_SYNONYM",
+              "HOMOTYPIC_SYNONYM",
+              "PROPARTE_SYNONYM",
+              "MISAPPLIED"
+            ]
+          },
+          "rank": {
+            "type": "string",
+            "externalDocs": {
+              "description": "Darwin Core definition",
+              "url": "https://rs.tdwg.org/dwc/terms/taxonRank"
+            },
+            "enum": [
+              "DOMAIN",
+              "SUPERKINGDOM",
+              "KINGDOM",
+              "SUBKINGDOM",
+              "INFRAKINGDOM",
+              "SUPERPHYLUM",
+              "PHYLUM",
+              "SUBPHYLUM",
+              "INFRAPHYLUM",
+              "SUPERCLASS",
+              "CLASS",
+              "SUBCLASS",
+              "INFRACLASS",
+              "PARVCLASS",
+              "SUPERLEGION",
+              "LEGION",
+              "SUBLEGION",
+              "INFRALEGION",
+              "SUPERCOHORT",
+              "COHORT",
+              "SUBCOHORT",
+              "INFRACOHORT",
+              "MAGNORDER",
+              "SUPERORDER",
+              "GRANDORDER",
+              "ORDER",
+              "SUBORDER",
+              "INFRAORDER",
+              "PARVORDER",
+              "SUPERFAMILY",
+              "FAMILY",
+              "SUBFAMILY",
+              "INFRAFAMILY",
+              "SUPERTRIBE",
+              "TRIBE",
+              "SUBTRIBE",
+              "INFRATRIBE",
+              "SUPRAGENERIC_NAME",
+              "GENUS",
+              "SUBGENUS",
+              "INFRAGENUS",
+              "SECTION",
+              "SUBSECTION",
+              "SERIES",
+              "SUBSERIES",
+              "INFRAGENERIC_NAME",
+              "SPECIES_AGGREGATE",
+              "SPECIES",
+              "INFRASPECIFIC_NAME",
+              "GREX",
+              "SUBSPECIES",
+              "CULTIVAR_GROUP",
+              "CONVARIETY",
+              "INFRASUBSPECIFIC_NAME",
+              "PROLES",
+              "RACE",
+              "NATIO",
+              "ABERRATION",
+              "MORPH",
+              "VARIETY",
+              "SUBVARIETY",
+              "FORM",
+              "SUBFORM",
+              "PATHOVAR",
+              "BIOVAR",
+              "CHEMOVAR",
+              "MORPHOVAR",
+              "PHAGOVAR",
+              "SEROVAR",
+              "CHEMOFORM",
+              "FORMA_SPECIALIS",
+              "CULTIVAR",
+              "STRAIN",
+              "OTHER",
+              "UNRANKED"
+            ]
+          },
+          "origin": {
+            "type": "string",
+            "enum": [
+              "SOURCE",
+              "DENORMED_CLASSIFICATION",
+              "VERBATIM_PARENT",
+              "VERBATIM_ACCEPTED",
+              "VERBATIM_BASIONYM",
+              "PROPARTE",
+              "AUTONYM",
+              "IMPLICIT_NAME",
+              "MISSING_ACCEPTED",
+              "BASIONYM_PLACEHOLDER",
+              "EX_AUTHOR_SYNONYM",
+              "OTHER"
+            ]
+          },
+          "numDescendants": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "numOccurrences": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "taxonID": {
+            "type": "string"
+          },
+          "extinct": {
+            "type": "boolean"
+          },
+          "habitats": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": ["MARINE", "FRESHWATER", "TERRESTRIAL"]
+            }
+          },
+          "nomenclaturalStatus": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "LEGITIMATE",
+                "VALIDLY_PUBLISHED",
+                "NEW_COMBINATION",
+                "REPLACEMENT",
+                "CONSERVED",
+                "PROTECTED",
+                "CORRECTED",
+                "ORIGINAL_COMBINATION",
+                "NEW_SPECIES",
+                "NEW_GENUS",
+                "ALTERNATIVE",
+                "OBSCURE",
+                "CONSERVED_PROPOSED",
+                "PROVISIONAL",
+                "SUBNUDUM",
+                "REJECTED_PROPOSED",
+                "REJECTED_OUTRIGHT_PROPOSED",
+                "DOUBTFUL",
+                "AMBIGUOUS",
+                "CONFUSED",
+                "FORGOTTEN",
+                "ABORTED",
+                "ORTHOGRAPHIC_VARIANT",
+                "SUPERFLUOUS",
+                "NUDUM",
+                "NULL_NAME",
+                "SUPPRESSED",
+                "REJECTED_OUTRIGHT",
+                "REJECTED",
+                "ILLEGITIMATE",
+                "INVALID",
+                "DENIED"
+              ]
+            }
+          },
+          "threatStatuses": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "EXTINCT",
+                "EXTINCT_IN_THE_WILD",
+                "REGIONALLY_EXTINCT",
+                "CRITICALLY_ENDANGERED",
+                "ENDANGERED",
+                "VULNERABLE",
+                "NEAR_THREATENED",
+                "LEAST_CONCERN",
+                "DATA_DEFICIENT",
+                "NOT_APPLICABLE",
+                "NOT_EVALUATED"
+              ]
+            }
+          },
+          "descriptions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Description"
+            }
+          },
+          "vernacularNames": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VernacularName"
+            }
+          },
+          "synonym": {
+            "type": "boolean"
+          },
+          "higherClassificationMap": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "class": {
+            "type": "string"
+          }
+        },
+        "description": "Search results."
+      },
+      "Description": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "integer",
+            "description": "A unique GBIF identifier for the description.\n\nThis key is used in the table of contents to retrieve the detailed description.",
+            "format": "int32"
+          },
+          "taxonKey": {
+            "type": "integer",
+            "description": "The name usage “taxon“ key to which this species profile belongs.",
+            "format": "int32"
+          },
+          "type": {
+            "type": "string",
+            "description": "The type used to categorize paragraphs of a taxon description.\n\nSee the [Description Type vocabulary](http://rs.gbif.org/vocabulary/gbif/descriptionType)."
+          },
+          "language": {
+            "type": "string",
+            "description": "ISO 639-1 language code used for the description.",
+            "enum": [
+              "abk",
+              "aar",
+              "afr",
+              "aka",
+              "sqi",
+              "amh",
+              "ara",
+              "arg",
+              "hye",
+              "asm",
+              "ava",
+              "ave",
+              "aym",
+              "aze",
+              "bam",
+              "bak",
+              "eus",
+              "bel",
+              "ben",
+              "bih",
+              "bis",
+              "bos",
+              "bre",
+              "bul",
+              "mya",
+              "cat",
+              "cha",
+              "che",
+              "zho",
+              "chu",
+              "chv",
+              "cor",
+              "cos",
+              "cre",
+              "hrv",
+              "ces",
+              "dan",
+              "div",
+              "nld",
+              "dzo",
+              "eng",
+              "epo",
+              "est",
+              "ewe",
+              "fao",
+              "fij",
+              "fin",
+              "fra",
+              "fry",
+              "ful",
+              "glg",
+              "lug",
+              "kat",
+              "deu",
+              "ell",
+              "kal",
+              "grn",
+              "guj",
+              "hat",
+              "hau",
+              "heb",
+              "her",
+              "hin",
+              "hmo",
+              "hun",
+              "isl",
+              "ido",
+              "ibo",
+              "ind",
+              "ina",
+              "ile",
+              "iku",
+              "ipk",
+              "gle",
+              "ita",
+              "jpn",
+              "jav",
+              "kan",
+              "kau",
+              "kas",
+              "kaz",
+              "khm",
+              "kik",
+              "kin",
+              "kir",
+              "kom",
+              "kon",
+              "kor",
+              "kur",
+              "kua",
+              "lao",
+              "lat",
+              "lav",
+              "lim",
+              "lin",
+              "lit",
+              "lub",
+              "ltz",
+              "mkd",
+              "mlg",
+              "msa",
+              "mal",
+              "mlt",
+              "glv",
+              "mri",
+              "mar",
+              "mah",
+              "mol",
+              "mon",
+              "nau",
+              "nav",
+              "ndo",
+              "nep",
+              "nde",
+              "sme",
+              "nob",
+              "nno",
+              "nor",
+              "nya",
+              "oci",
+              "oji",
+              "ori",
+              "orm",
+              "oss",
+              "pli",
+              "pan",
+              "fas",
+              "pol",
+              "por",
+              "pus",
+              "que",
+              "roh",
+              "ron",
+              "run",
+              "rus",
+              "smo",
+              "sag",
+              "san",
+              "srd",
+              "gla",
+              "srp",
+              "sna",
+              "iii",
+              "snd",
+              "sin",
+              "slk",
+              "slv",
+              "som",
+              "nbl",
+              "sot",
+              "spa",
+              "sun",
+              "swa",
+              "ssw",
+              "swe",
+              "tgl",
+              "tah",
+              "tgk",
+              "tam",
+              "tat",
+              "tel",
+              "tha",
+              "bod",
+              "tir",
+              "ton",
+              "tso",
+              "tsn",
+              "tur",
+              "tuk",
+              "twi",
+              "uig",
+              "ukr",
+              "urd",
+              "uzb",
+              "ven",
+              "vie",
+              "vol",
+              "wln",
+              "cym",
+              "wol",
+              "xho",
+              "yid",
+              "yor",
+              "zha",
+              "zul",
+              ""
+            ]
+          },
+          "description": {
+            "type": "string",
+            "description": "Any descriptive, free text matching the category given as dc:type.\n\nThe text should be either plain text or HTML."
+          },
+          "source": {
+            "type": "string",
+            "description": "Bibliographic citation referencing a source for the description."
+          },
+          "sourceTaxonKey": {
+            "type": "integer",
+            "description": "The name usage key of the taxon in the checklist including this description.",
+            "format": "int32"
+          },
+          "creator": {
+            "type": "string",
+            "description": "The author(s) of the textual information provided for a description."
+          },
+          "contributor": {
+            "type": "string",
+            "description": "An entity responsible for making contributions to the textual information provided for a description."
+          },
+          "license": {
+            "type": "string",
+            "description": "Official permission to do something with the resource."
+          }
+        },
+        "description": "Search results."
+      },
+      "VernacularName": {
+        "required": ["vernacularName"],
+        "type": "object",
+        "properties": {
+          "taxonKey": {
+            "type": "integer",
+            "description": "The name usage “taxon“ key to which this vernacular name belongs.",
+            "format": "int32"
+          },
+          "vernacularName": {
+            "type": "string",
+            "description": "A common or vernacular name."
+          },
+          "language": {
+            "type": "string",
+            "description": "The language (from ISO 639-1) of the vernacular name.",
+            "enum": [
+              "abk",
+              "aar",
+              "afr",
+              "aka",
+              "sqi",
+              "amh",
+              "ara",
+              "arg",
+              "hye",
+              "asm",
+              "ava",
+              "ave",
+              "aym",
+              "aze",
+              "bam",
+              "bak",
+              "eus",
+              "bel",
+              "ben",
+              "bih",
+              "bis",
+              "bos",
+              "bre",
+              "bul",
+              "mya",
+              "cat",
+              "cha",
+              "che",
+              "zho",
+              "chu",
+              "chv",
+              "cor",
+              "cos",
+              "cre",
+              "hrv",
+              "ces",
+              "dan",
+              "div",
+              "nld",
+              "dzo",
+              "eng",
+              "epo",
+              "est",
+              "ewe",
+              "fao",
+              "fij",
+              "fin",
+              "fra",
+              "fry",
+              "ful",
+              "glg",
+              "lug",
+              "kat",
+              "deu",
+              "ell",
+              "kal",
+              "grn",
+              "guj",
+              "hat",
+              "hau",
+              "heb",
+              "her",
+              "hin",
+              "hmo",
+              "hun",
+              "isl",
+              "ido",
+              "ibo",
+              "ind",
+              "ina",
+              "ile",
+              "iku",
+              "ipk",
+              "gle",
+              "ita",
+              "jpn",
+              "jav",
+              "kan",
+              "kau",
+              "kas",
+              "kaz",
+              "khm",
+              "kik",
+              "kin",
+              "kir",
+              "kom",
+              "kon",
+              "kor",
+              "kur",
+              "kua",
+              "lao",
+              "lat",
+              "lav",
+              "lim",
+              "lin",
+              "lit",
+              "lub",
+              "ltz",
+              "mkd",
+              "mlg",
+              "msa",
+              "mal",
+              "mlt",
+              "glv",
+              "mri",
+              "mar",
+              "mah",
+              "mol",
+              "mon",
+              "nau",
+              "nav",
+              "ndo",
+              "nep",
+              "nde",
+              "sme",
+              "nob",
+              "nno",
+              "nor",
+              "nya",
+              "oci",
+              "oji",
+              "ori",
+              "orm",
+              "oss",
+              "pli",
+              "pan",
+              "fas",
+              "pol",
+              "por",
+              "pus",
+              "que",
+              "roh",
+              "ron",
+              "run",
+              "rus",
+              "smo",
+              "sag",
+              "san",
+              "srd",
+              "gla",
+              "srp",
+              "sna",
+              "iii",
+              "snd",
+              "sin",
+              "slk",
+              "slv",
+              "som",
+              "nbl",
+              "sot",
+              "spa",
+              "sun",
+              "swa",
+              "ssw",
+              "swe",
+              "tgl",
+              "tah",
+              "tgk",
+              "tam",
+              "tat",
+              "tel",
+              "tha",
+              "bod",
+              "tir",
+              "ton",
+              "tso",
+              "tsn",
+              "tur",
+              "tuk",
+              "twi",
+              "uig",
+              "ukr",
+              "urd",
+              "uzb",
+              "ven",
+              "vie",
+              "vol",
+              "wln",
+              "cym",
+              "wol",
+              "xho",
+              "yid",
+              "yor",
+              "zha",
+              "zul",
+              ""
+            ]
+          },
+          "lifeStage": {
+            "type": "string",
+            "description": "The age class or life stage of the species for which the vernacular name applies.\n\nFor example, a juvenile *Anser anser* is called a “gosling“.",
+            "enum": [
+              "ZYGOTE",
+              "EMRYO",
+              "LARVA",
+              "JUVENILE",
+              "ADULT",
+              "SPOROPHYTE",
+              "SPORE",
+              "GAMETOPHYTE",
+              "GAMETE",
+              "PUPA"
+            ]
+          },
+          "sex": {
+            "type": "string",
+            "description": "The sex of the biological individual(s) represented in the Occurrence.\n\nFor definitions, see the [GBIF sex vocabulary](http://rs.gbif.org/vocabulary/gbif/sex)",
+            "externalDocs": {
+              "description": "Darwin Core definition",
+              "url": "https://rs.tdwg.org/dwc/terms/sex"
+            },
+            "enum": ["NONE", "MALE", "FEMALE", "HERMAPHRODITE"]
+          },
+          "country": {
+            "type": "string",
+            "description": "The country or area in which the vernacular name is used.",
+            "externalDocs": {
+              "description": "API call to retrieve all official values.",
+              "url": "https://api.gbif.org/v1/enumeration/country"
+            },
+            "enum": [
+              "AF",
+              "AX",
+              "AL",
+              "DZ",
+              "AS",
+              "AD",
+              "AO",
+              "AI",
+              "AQ",
+              "AG",
+              "AR",
+              "AM",
+              "AW",
+              "AU",
+              "AT",
+              "AZ",
+              "BS",
+              "BH",
+              "BD",
+              "BB",
+              "BY",
+              "BE",
+              "BZ",
+              "BJ",
+              "BM",
+              "BT",
+              "BO",
+              "BQ",
+              "BA",
+              "BW",
+              "BV",
+              "BR",
+              "IO",
+              "BN",
+              "BG",
+              "BF",
+              "BI",
+              "KH",
+              "CM",
+              "CA",
+              "CV",
+              "KY",
+              "CF",
+              "TD",
+              "CL",
+              "CN",
+              "CX",
+              "CC",
+              "CO",
+              "KM",
+              "CD",
+              "CG",
+              "CK",
+              "CR",
+              "CI",
+              "HR",
+              "CU",
+              "CW",
+              "CY",
+              "CZ",
+              "DK",
+              "DJ",
+              "DM",
+              "DO",
+              "EC",
+              "EG",
+              "SV",
+              "GQ",
+              "ER",
+              "EE",
+              "ET",
+              "FK",
+              "FO",
+              "FJ",
+              "FI",
+              "FR",
+              "GF",
+              "PF",
+              "TF",
+              "GA",
+              "GM",
+              "GE",
+              "DE",
+              "GH",
+              "GI",
+              "GR",
+              "GL",
+              "GD",
+              "GP",
+              "GU",
+              "GT",
+              "GG",
+              "GN",
+              "GW",
+              "GY",
+              "HT",
+              "HM",
+              "VA",
+              "HN",
+              "HK",
+              "HU",
+              "IS",
+              "IN",
+              "ID",
+              "IR",
+              "IQ",
+              "IE",
+              "IM",
+              "IL",
+              "IT",
+              "JM",
+              "JP",
+              "JE",
+              "JO",
+              "KZ",
+              "KE",
+              "KI",
+              "KP",
+              "KR",
+              "KW",
+              "KG",
+              "LA",
+              "LV",
+              "LB",
+              "LS",
+              "LR",
+              "LY",
+              "LI",
+              "LT",
+              "LU",
+              "MO",
+              "MK",
+              "MG",
+              "MW",
+              "MY",
+              "MV",
+              "ML",
+              "MT",
+              "MH",
+              "MQ",
+              "MR",
+              "MU",
+              "YT",
+              "MX",
+              "FM",
+              "MD",
+              "MC",
+              "MN",
+              "ME",
+              "MS",
+              "MA",
+              "MZ",
+              "MM",
+              "NA",
+              "NR",
+              "NP",
+              "NL",
+              "NC",
+              "NZ",
+              "NI",
+              "NE",
+              "NG",
+              "NU",
+              "NF",
+              "MP",
+              "NO",
+              "OM",
+              "PK",
+              "PW",
+              "PS",
+              "PA",
+              "PG",
+              "PY",
+              "PE",
+              "PH",
+              "PN",
+              "PL",
+              "PT",
+              "PR",
+              "QA",
+              "RE",
+              "RO",
+              "RU",
+              "RW",
+              "BL",
+              "SH",
+              "KN",
+              "LC",
+              "MF",
+              "PM",
+              "VC",
+              "WS",
+              "SM",
+              "ST",
+              "SA",
+              "SN",
+              "RS",
+              "SC",
+              "SL",
+              "SG",
+              "SX",
+              "SK",
+              "SI",
+              "SB",
+              "SO",
+              "ZA",
+              "GS",
+              "SS",
+              "ES",
+              "LK",
+              "SD",
+              "SR",
+              "SJ",
+              "SZ",
+              "SE",
+              "CH",
+              "SY",
+              "TW",
+              "TJ",
+              "TZ",
+              "TH",
+              "TL",
+              "TG",
+              "TK",
+              "TO",
+              "TT",
+              "TN",
+              "TR",
+              "TM",
+              "TC",
+              "TV",
+              "UG",
+              "UA",
+              "AE",
+              "GB",
+              "US",
+              "UM",
+              "UY",
+              "UZ",
+              "VU",
+              "VE",
+              "VN",
+              "VG",
+              "VI",
+              "WF",
+              "EH",
+              "YE",
+              "ZM",
+              "ZW",
+              "AA",
+              "XK",
+              "XZ",
+              "ZZ"
+            ]
+          },
+          "area": {
+            "type": "string",
+            "description": "The area where the vernacular name is used."
+          },
+          "source": {
+            "type": "string",
+            "description": "Bibliographic citation referencing a source where the vernacular name refers to the cited species."
+          },
+          "sourceTaxonKey": {
+            "type": "integer",
+            "description": "The name usage key of the taxon in the checklist including this vernacular name.",
+            "format": "int32"
+          },
+          "preferred": {
+            "type": "boolean",
+            "description": "This term is true if the source citing the use of this vernacular name indicates the usage has some preference or specific standing over other possible vernacular names used for the species."
+          },
+          "plural": {
+            "type": "boolean",
+            "description": "True if the vernacular name refers to a plural form of the name."
+          }
+        },
+        "description": "Search results."
+      },
       "ConjunctionPredicate": {
         "required": ["predicates"],
         "type": "object",
@@ -9785,6 +11342,14 @@
             "type": "string",
             "description": "The scientific name (including authorship) for the taxon from the [GBIF backbone](https://doi.org/10.15468/39omei) matched to this occurrence.  This could be a synonym, see also `acceptedScientificName`.",
             "example": null,
+            "externalDocs": {
+              "description": "Darwin Core definition",
+              "url": "https://rs.tdwg.org/dwc/terms/"
+            }
+          },
+          "scientificNameAuthorship": {
+            "type": "string",
+            "description": "The scientific name authorship for the taxon from the [GBIF backbone](https://doi.org/10.15468/39omei) matched to this occurrence.  This could be a synonym, see also `acceptedScientificName`.",
             "externalDocs": {
               "description": "Darwin Core definition",
               "url": "https://rs.tdwg.org/dwc/terms/"

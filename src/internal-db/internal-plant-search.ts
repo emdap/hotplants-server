@@ -1,9 +1,9 @@
-import { plantCharacterstics } from "../mongodb-fixtures";
-import { scrapePFAF } from "./pfaf-scraper";
+import { scrapePFAF } from "../util/pfaf-scraper";
+import { plantCharacterstics } from "./mongo-config";
 
-export const getPlantByName = async (
+export const lookupPlantByName = async (
   lowercaseName: string,
-  overwriteExisting: boolean
+  overwriteExisting?: boolean
 ) => {
   const existingPlantData = await plantCharacterstics.findOne({
     scientific_name: lowercaseName,
@@ -30,7 +30,7 @@ export const getPlantByName = async (
   return null;
 };
 
-export const getPlantByCoordinates = () => {
+const lookupPlantByCoordinates = () => {
   //TODO
   // const box = bboxPolygon([45, 46, -123, -122]);
   // get matching plants from existing data using user's in-depth filters

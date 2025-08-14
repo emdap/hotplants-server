@@ -4,6 +4,28 @@
  */
 
 export interface paths {
+    "/species/search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Full text search over name usages
+         * @description Full-text search of name usages covering the scientific and vernacular names, the species description, distribution and the entire classification across all name usages of all or some checklists.
+         *
+         *     Results are ordered by relevance as this search usually returns a lot of results.
+         */
+        get: operations["searchNames"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/occurrence/search": {
         parameters: {
             query?: never;
@@ -1371,6 +1393,191 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        SearchResponseNameUsageSearchResultNameUsageSearchParameter: {
+            /**
+             * Format: int64
+             * @description The offset of the results within all the search results.
+             *
+             *     Subsequent pages can be retrieved by using `offset + count` as the new offset.
+             */
+            offset?: number;
+            /**
+             * Format: int32
+             * @description The limit used.  Note the limit returned may be lower than the limit requested.
+             */
+            limit?: number;
+            /** @description True if this page of search results is the final page. */
+            endOfRecords?: boolean;
+            /**
+             * Format: int64
+             * @description The total number of records returned by the search.
+             */
+            count?: number;
+            /** @description Search results. */
+            results?: components["schemas"]["NameUsageSearchResult"][];
+        };
+        /** @description Search results. */
+        NameUsageSearchResult: {
+            /** Format: int32 */
+            key?: number;
+            /** Format: int32 */
+            nameKey?: number;
+            /** Format: uuid */
+            datasetKey?: string;
+            /** Format: uuid */
+            constituentKey?: string;
+            /** Format: int32 */
+            nubKey?: number;
+            /** Format: int32 */
+            parentKey?: number;
+            parent?: string;
+            /** Format: int32 */
+            acceptedKey?: number;
+            accepted?: string;
+            /** Format: int32 */
+            basionymKey?: number;
+            basionym?: string;
+            kingdom?: string;
+            phylum?: string;
+            order?: string;
+            family?: string;
+            genus?: string;
+            subgenus?: string;
+            species?: string;
+            /** Format: int32 */
+            kingdomKey?: number;
+            /** Format: int32 */
+            phylumKey?: number;
+            /** Format: int32 */
+            classKey?: number;
+            /** Format: int32 */
+            orderKey?: number;
+            /** Format: int32 */
+            familyKey?: number;
+            /** Format: int32 */
+            genusKey?: number;
+            /** Format: int32 */
+            subgenusKey?: number;
+            /** Format: int32 */
+            speciesKey?: number;
+            scientificName?: string;
+            canonicalName?: string;
+            authorship?: string;
+            publishedIn?: string;
+            accordingTo?: string;
+            /** @enum {string} */
+            nameType?: "SCIENTIFIC" | "VIRUS" | "HYBRID" | "INFORMAL" | "CULTIVAR" | "CANDIDATUS" | "OTU" | "DOUBTFUL" | "PLACEHOLDER" | "NO_NAME" | "BLACKLISTED";
+            /** @enum {string} */
+            taxonomicStatus?: "ACCEPTED" | "DOUBTFUL" | "SYNONYM" | "HETEROTYPIC_SYNONYM" | "HOMOTYPIC_SYNONYM" | "PROPARTE_SYNONYM" | "MISAPPLIED";
+            /** @enum {string} */
+            rank?: "DOMAIN" | "SUPERKINGDOM" | "KINGDOM" | "SUBKINGDOM" | "INFRAKINGDOM" | "SUPERPHYLUM" | "PHYLUM" | "SUBPHYLUM" | "INFRAPHYLUM" | "SUPERCLASS" | "CLASS" | "SUBCLASS" | "INFRACLASS" | "PARVCLASS" | "SUPERLEGION" | "LEGION" | "SUBLEGION" | "INFRALEGION" | "SUPERCOHORT" | "COHORT" | "SUBCOHORT" | "INFRACOHORT" | "MAGNORDER" | "SUPERORDER" | "GRANDORDER" | "ORDER" | "SUBORDER" | "INFRAORDER" | "PARVORDER" | "SUPERFAMILY" | "FAMILY" | "SUBFAMILY" | "INFRAFAMILY" | "SUPERTRIBE" | "TRIBE" | "SUBTRIBE" | "INFRATRIBE" | "SUPRAGENERIC_NAME" | "GENUS" | "SUBGENUS" | "INFRAGENUS" | "SECTION" | "SUBSECTION" | "SERIES" | "SUBSERIES" | "INFRAGENERIC_NAME" | "SPECIES_AGGREGATE" | "SPECIES" | "INFRASPECIFIC_NAME" | "GREX" | "SUBSPECIES" | "CULTIVAR_GROUP" | "CONVARIETY" | "INFRASUBSPECIFIC_NAME" | "PROLES" | "RACE" | "NATIO" | "ABERRATION" | "MORPH" | "VARIETY" | "SUBVARIETY" | "FORM" | "SUBFORM" | "PATHOVAR" | "BIOVAR" | "CHEMOVAR" | "MORPHOVAR" | "PHAGOVAR" | "SEROVAR" | "CHEMOFORM" | "FORMA_SPECIALIS" | "CULTIVAR" | "STRAIN" | "OTHER" | "UNRANKED";
+            /** @enum {string} */
+            origin?: "SOURCE" | "DENORMED_CLASSIFICATION" | "VERBATIM_PARENT" | "VERBATIM_ACCEPTED" | "VERBATIM_BASIONYM" | "PROPARTE" | "AUTONYM" | "IMPLICIT_NAME" | "MISSING_ACCEPTED" | "BASIONYM_PLACEHOLDER" | "EX_AUTHOR_SYNONYM" | "OTHER";
+            /** Format: int32 */
+            numDescendants?: number;
+            /** Format: int64 */
+            numOccurrences?: number;
+            taxonID?: string;
+            extinct?: boolean;
+            habitats?: ("MARINE" | "FRESHWATER" | "TERRESTRIAL")[];
+            nomenclaturalStatus?: ("LEGITIMATE" | "VALIDLY_PUBLISHED" | "NEW_COMBINATION" | "REPLACEMENT" | "CONSERVED" | "PROTECTED" | "CORRECTED" | "ORIGINAL_COMBINATION" | "NEW_SPECIES" | "NEW_GENUS" | "ALTERNATIVE" | "OBSCURE" | "CONSERVED_PROPOSED" | "PROVISIONAL" | "SUBNUDUM" | "REJECTED_PROPOSED" | "REJECTED_OUTRIGHT_PROPOSED" | "DOUBTFUL" | "AMBIGUOUS" | "CONFUSED" | "FORGOTTEN" | "ABORTED" | "ORTHOGRAPHIC_VARIANT" | "SUPERFLUOUS" | "NUDUM" | "NULL_NAME" | "SUPPRESSED" | "REJECTED_OUTRIGHT" | "REJECTED" | "ILLEGITIMATE" | "INVALID" | "DENIED")[];
+            threatStatuses?: ("EXTINCT" | "EXTINCT_IN_THE_WILD" | "REGIONALLY_EXTINCT" | "CRITICALLY_ENDANGERED" | "ENDANGERED" | "VULNERABLE" | "NEAR_THREATENED" | "LEAST_CONCERN" | "DATA_DEFICIENT" | "NOT_APPLICABLE" | "NOT_EVALUATED")[];
+            descriptions: components["schemas"]["Description"][];
+            vernacularNames: components["schemas"]["VernacularName"][];
+            synonym?: boolean;
+            higherClassificationMap: {
+                [key: string]: string;
+            };
+            class?: string;
+        };
+        /** @description Search results. */
+        Description: {
+            /**
+             * Format: int32
+             * @description A unique GBIF identifier for the description.
+             *
+             *     This key is used in the table of contents to retrieve the detailed description.
+             */
+            key?: number;
+            /**
+             * Format: int32
+             * @description The name usage “taxon“ key to which this species profile belongs.
+             */
+            taxonKey?: number;
+            /** @description The type used to categorize paragraphs of a taxon description.
+             *
+             *     See the [Description Type vocabulary](http://rs.gbif.org/vocabulary/gbif/descriptionType). */
+            type?: string;
+            /**
+             * @description ISO 639-1 language code used for the description.
+             * @enum {string}
+             */
+            language?: "abk" | "aar" | "afr" | "aka" | "sqi" | "amh" | "ara" | "arg" | "hye" | "asm" | "ava" | "ave" | "aym" | "aze" | "bam" | "bak" | "eus" | "bel" | "ben" | "bih" | "bis" | "bos" | "bre" | "bul" | "mya" | "cat" | "cha" | "che" | "zho" | "chu" | "chv" | "cor" | "cos" | "cre" | "hrv" | "ces" | "dan" | "div" | "nld" | "dzo" | "eng" | "epo" | "est" | "ewe" | "fao" | "fij" | "fin" | "fra" | "fry" | "ful" | "glg" | "lug" | "kat" | "deu" | "ell" | "kal" | "grn" | "guj" | "hat" | "hau" | "heb" | "her" | "hin" | "hmo" | "hun" | "isl" | "ido" | "ibo" | "ind" | "ina" | "ile" | "iku" | "ipk" | "gle" | "ita" | "jpn" | "jav" | "kan" | "kau" | "kas" | "kaz" | "khm" | "kik" | "kin" | "kir" | "kom" | "kon" | "kor" | "kur" | "kua" | "lao" | "lat" | "lav" | "lim" | "lin" | "lit" | "lub" | "ltz" | "mkd" | "mlg" | "msa" | "mal" | "mlt" | "glv" | "mri" | "mar" | "mah" | "mol" | "mon" | "nau" | "nav" | "ndo" | "nep" | "nde" | "sme" | "nob" | "nno" | "nor" | "nya" | "oci" | "oji" | "ori" | "orm" | "oss" | "pli" | "pan" | "fas" | "pol" | "por" | "pus" | "que" | "roh" | "ron" | "run" | "rus" | "smo" | "sag" | "san" | "srd" | "gla" | "srp" | "sna" | "iii" | "snd" | "sin" | "slk" | "slv" | "som" | "nbl" | "sot" | "spa" | "sun" | "swa" | "ssw" | "swe" | "tgl" | "tah" | "tgk" | "tam" | "tat" | "tel" | "tha" | "bod" | "tir" | "ton" | "tso" | "tsn" | "tur" | "tuk" | "twi" | "uig" | "ukr" | "urd" | "uzb" | "ven" | "vie" | "vol" | "wln" | "cym" | "wol" | "xho" | "yid" | "yor" | "zha" | "zul" | "";
+            /** @description Any descriptive, free text matching the category given as dc:type.
+             *
+             *     The text should be either plain text or HTML. */
+            description?: string;
+            /** @description Bibliographic citation referencing a source for the description. */
+            source?: string;
+            /**
+             * Format: int32
+             * @description The name usage key of the taxon in the checklist including this description.
+             */
+            sourceTaxonKey?: number;
+            /** @description The author(s) of the textual information provided for a description. */
+            creator?: string;
+            /** @description An entity responsible for making contributions to the textual information provided for a description. */
+            contributor?: string;
+            /** @description Official permission to do something with the resource. */
+            license?: string;
+        };
+        /** @description Search results. */
+        VernacularName: {
+            /**
+             * Format: int32
+             * @description The name usage “taxon“ key to which this vernacular name belongs.
+             */
+            taxonKey?: number;
+            /** @description A common or vernacular name. */
+            vernacularName: string;
+            /**
+             * @description The language (from ISO 639-1) of the vernacular name.
+             * @enum {string}
+             */
+            language?: "abk" | "aar" | "afr" | "aka" | "sqi" | "amh" | "ara" | "arg" | "hye" | "asm" | "ava" | "ave" | "aym" | "aze" | "bam" | "bak" | "eus" | "bel" | "ben" | "bih" | "bis" | "bos" | "bre" | "bul" | "mya" | "cat" | "cha" | "che" | "zho" | "chu" | "chv" | "cor" | "cos" | "cre" | "hrv" | "ces" | "dan" | "div" | "nld" | "dzo" | "eng" | "epo" | "est" | "ewe" | "fao" | "fij" | "fin" | "fra" | "fry" | "ful" | "glg" | "lug" | "kat" | "deu" | "ell" | "kal" | "grn" | "guj" | "hat" | "hau" | "heb" | "her" | "hin" | "hmo" | "hun" | "isl" | "ido" | "ibo" | "ind" | "ina" | "ile" | "iku" | "ipk" | "gle" | "ita" | "jpn" | "jav" | "kan" | "kau" | "kas" | "kaz" | "khm" | "kik" | "kin" | "kir" | "kom" | "kon" | "kor" | "kur" | "kua" | "lao" | "lat" | "lav" | "lim" | "lin" | "lit" | "lub" | "ltz" | "mkd" | "mlg" | "msa" | "mal" | "mlt" | "glv" | "mri" | "mar" | "mah" | "mol" | "mon" | "nau" | "nav" | "ndo" | "nep" | "nde" | "sme" | "nob" | "nno" | "nor" | "nya" | "oci" | "oji" | "ori" | "orm" | "oss" | "pli" | "pan" | "fas" | "pol" | "por" | "pus" | "que" | "roh" | "ron" | "run" | "rus" | "smo" | "sag" | "san" | "srd" | "gla" | "srp" | "sna" | "iii" | "snd" | "sin" | "slk" | "slv" | "som" | "nbl" | "sot" | "spa" | "sun" | "swa" | "ssw" | "swe" | "tgl" | "tah" | "tgk" | "tam" | "tat" | "tel" | "tha" | "bod" | "tir" | "ton" | "tso" | "tsn" | "tur" | "tuk" | "twi" | "uig" | "ukr" | "urd" | "uzb" | "ven" | "vie" | "vol" | "wln" | "cym" | "wol" | "xho" | "yid" | "yor" | "zha" | "zul" | "";
+            /**
+             * @description The age class or life stage of the species for which the vernacular name applies.
+             *
+             *     For example, a juvenile *Anser anser* is called a “gosling“.
+             * @enum {string}
+             */
+            lifeStage?: "ZYGOTE" | "EMRYO" | "LARVA" | "JUVENILE" | "ADULT" | "SPOROPHYTE" | "SPORE" | "GAMETOPHYTE" | "GAMETE" | "PUPA";
+            /**
+             * @description The sex of the biological individual(s) represented in the Occurrence.
+             *
+             *     For definitions, see the [GBIF sex vocabulary](http://rs.gbif.org/vocabulary/gbif/sex)
+             * @enum {string}
+             */
+            sex?: "NONE" | "MALE" | "FEMALE" | "HERMAPHRODITE";
+            /**
+             * @description The country or area in which the vernacular name is used.
+             * @enum {string}
+             */
+            country?: "AF" | "AX" | "AL" | "DZ" | "AS" | "AD" | "AO" | "AI" | "AQ" | "AG" | "AR" | "AM" | "AW" | "AU" | "AT" | "AZ" | "BS" | "BH" | "BD" | "BB" | "BY" | "BE" | "BZ" | "BJ" | "BM" | "BT" | "BO" | "BQ" | "BA" | "BW" | "BV" | "BR" | "IO" | "BN" | "BG" | "BF" | "BI" | "KH" | "CM" | "CA" | "CV" | "KY" | "CF" | "TD" | "CL" | "CN" | "CX" | "CC" | "CO" | "KM" | "CD" | "CG" | "CK" | "CR" | "CI" | "HR" | "CU" | "CW" | "CY" | "CZ" | "DK" | "DJ" | "DM" | "DO" | "EC" | "EG" | "SV" | "GQ" | "ER" | "EE" | "ET" | "FK" | "FO" | "FJ" | "FI" | "FR" | "GF" | "PF" | "TF" | "GA" | "GM" | "GE" | "DE" | "GH" | "GI" | "GR" | "GL" | "GD" | "GP" | "GU" | "GT" | "GG" | "GN" | "GW" | "GY" | "HT" | "HM" | "VA" | "HN" | "HK" | "HU" | "IS" | "IN" | "ID" | "IR" | "IQ" | "IE" | "IM" | "IL" | "IT" | "JM" | "JP" | "JE" | "JO" | "KZ" | "KE" | "KI" | "KP" | "KR" | "KW" | "KG" | "LA" | "LV" | "LB" | "LS" | "LR" | "LY" | "LI" | "LT" | "LU" | "MO" | "MK" | "MG" | "MW" | "MY" | "MV" | "ML" | "MT" | "MH" | "MQ" | "MR" | "MU" | "YT" | "MX" | "FM" | "MD" | "MC" | "MN" | "ME" | "MS" | "MA" | "MZ" | "MM" | "NA" | "NR" | "NP" | "NL" | "NC" | "NZ" | "NI" | "NE" | "NG" | "NU" | "NF" | "MP" | "NO" | "OM" | "PK" | "PW" | "PS" | "PA" | "PG" | "PY" | "PE" | "PH" | "PN" | "PL" | "PT" | "PR" | "QA" | "RE" | "RO" | "RU" | "RW" | "BL" | "SH" | "KN" | "LC" | "MF" | "PM" | "VC" | "WS" | "SM" | "ST" | "SA" | "SN" | "RS" | "SC" | "SL" | "SG" | "SX" | "SK" | "SI" | "SB" | "SO" | "ZA" | "GS" | "SS" | "ES" | "LK" | "SD" | "SR" | "SJ" | "SZ" | "SE" | "CH" | "SY" | "TW" | "TJ" | "TZ" | "TH" | "TL" | "TG" | "TK" | "TO" | "TT" | "TN" | "TR" | "TM" | "TC" | "TV" | "UG" | "UA" | "AE" | "GB" | "US" | "UM" | "UY" | "UZ" | "VU" | "VE" | "VN" | "VG" | "VI" | "WF" | "EH" | "YE" | "ZM" | "ZW" | "AA" | "XK" | "XZ" | "ZZ";
+            /** @description The area where the vernacular name is used. */
+            area?: string;
+            /** @description Bibliographic citation referencing a source where the vernacular name refers to the cited species. */
+            source?: string;
+            /**
+             * Format: int32
+             * @description The name usage key of the taxon in the checklist including this vernacular name.
+             */
+            sourceTaxonKey?: number;
+            /** @description This term is true if the source citing the use of this vernacular name indicates the usage has some preference or specific standing over other possible vernacular names used for the species. */
+            preferred?: boolean;
+            /** @description True if the vernacular name refers to a plural form of the name. */
+            plural?: boolean;
+        };
         /**
          * @description A logical conjunction (“AND”) of a list of sub-predicates
          * @example null
@@ -2263,6 +2470,8 @@ export interface components {
              * @example null
              */
             scientificName?: string;
+            /** @description The scientific name authorship for the taxon from the [GBIF backbone](https://doi.org/10.15468/39omei) matched to this occurrence.  This could be a synonym, see also `acceptedScientificName`. */
+            scientificNameAuthorship?: string;
             /**
              * @description The accepted scientific name (including authorship) for the taxon from the [GBIF backbone](https://doi.org/10.15468/39omei) matched to this occurrence.
              * @example null
@@ -3362,6 +3571,87 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    searchNames: {
+        parameters: {
+            query?: {
+                /**
+                 * @description A UUID of a checklist dataset.
+                 * @example d7dddbf4-2cf0-4f39-9b2a-bb099caae36c
+                 */
+                datasetKey?: string;
+                /** @description The (sub)dataset constituent key as a UUID. Useful to query larger assembled datasets such as the GBIF Backbone or the Catalogue of Life */
+                constituentKey?: string;
+                /** @description Filters by taxonomic rank as given in our https://api.gbif.org/v1/enumeration/basic/Rank[Rank enum]. */
+                rank?: "DOMAIN" | "SUPERKINGDOM" | "KINGDOM" | "SUBKINGDOM" | "INFRAKINGDOM" | "SUPERPHYLUM" | "PHYLUM" | "SUBPHYLUM" | "INFRAPHYLUM" | "SUPERCLASS" | "CLASS" | "SUBCLASS" | "INFRACLASS" | "PARVCLASS" | "SUPERLEGION" | "LEGION" | "SUBLEGION" | "INFRALEGION" | "SUPERCOHORT" | "COHORT" | "SUBCOHORT" | "INFRACOHORT" | "MAGNORDER" | "SUPERORDER" | "GRANDORDER" | "ORDER" | "SUBORDER" | "INFRAORDER" | "PARVORDER" | "SUPERFAMILY" | "FAMILY" | "SUBFAMILY" | "INFRAFAMILY" | "SUPERTRIBE" | "TRIBE" | "SUBTRIBE" | "INFRATRIBE" | "SUPRAGENERIC_NAME" | "GENUS" | "SUBGENUS" | "INFRAGENUS" | "SECTION" | "SUBSECTION" | "SERIES" | "SUBSERIES" | "INFRAGENERIC_NAME" | "SPECIES_AGGREGATE" | "SPECIES" | "INFRASPECIFIC_NAME" | "GREX" | "SUBSPECIES" | "CULTIVAR_GROUP" | "CONVARIETY" | "INFRASUBSPECIFIC_NAME" | "PROLES" | "RACE" | "NATIO" | "ABERRATION" | "MORPH" | "VARIETY" | "SUBVARIETY" | "FORM" | "SUBFORM" | "PATHOVAR" | "BIOVAR" | "CHEMOVAR" | "MORPHOVAR" | "PHAGOVAR" | "SEROVAR" | "CHEMOFORM" | "FORMA_SPECIALIS" | "CULTIVAR" | "STRAIN" | "OTHER" | "UNRANKED";
+                /** @description Filters by any of the higher Linnean rank keys. Note this is within the respective checklist and not searching NUB keys across all checklists. */
+                higherTaxonKey?: string;
+                /** @description Filters by the taxonomic status as given in our https://api.gbif.org/v1/enumeration/basic/TaxonomicStatus[TaxonomicStatus enum]. */
+                status?: "ACCEPTED" | "DOUBTFUL" | "SYNONYM" | "HETEROTYPIC_SYNONYM" | "HOMOTYPIC_SYNONYM" | "PROPARTE_SYNONYM" | "MISAPPLIED";
+                /** @description Filters by extinction status. */
+                isExtinct?: boolean;
+                /** @description Filters by the habitat. Currently only 3 major biomes are accepted in our https://api.gbif.org/v1/enumeration/basic/Habitat[Habitat enum]. */
+                habitat?: "MARINE" | "FRESHWATER" | "TERRESTRIAL";
+                /** @description Filters by the taxonomic threat status as given in our https://api.gbif.org/v1/enumeration/basic/ThreatStatus[ThreatStatus enum]. */
+                threat?: "EXTINCT" | "EXTINCT_IN_THE_WILD" | "REGIONALLY_EXTINCT" | "CRITICALLY_ENDANGERED" | "ENDANGERED" | "VULNERABLE" | "NEAR_THREATENED" | "LEAST_CONCERN" | "DATA_DEFICIENT" | "NOT_APPLICABLE" | "NOT_EVALUATED";
+                /** @description Filters by the name type as given in our https://api.gbif.org/v1/enumeration/basic/NameType[NameType enum]. */
+                nameType?: "SCIENTIFIC" | "VIRUS" | "HYBRID" | "INFORMAL" | "CULTIVAR" | "CANDIDATUS" | "OTU" | "DOUBTFUL" | "PLACEHOLDER" | "NO_NAME" | "BLACKLISTED";
+                /** @description Filters by the nomenclatural status as given in our https://api.gbif.org/v1/enumeration/basic/NomenclaturalStatus[Nomenclatural Status enum]. */
+                nomenclaturalStatus?: "LEGITIMATE" | "VALIDLY_PUBLISHED" | "NEW_COMBINATION" | "REPLACEMENT" | "CONSERVED" | "PROTECTED" | "CORRECTED" | "ORIGINAL_COMBINATION" | "NEW_SPECIES" | "NEW_GENUS" | "ALTERNATIVE" | "OBSCURE" | "CONSERVED_PROPOSED" | "PROVISIONAL" | "SUBNUDUM" | "REJECTED_PROPOSED" | "REJECTED_OUTRIGHT_PROPOSED" | "DOUBTFUL" | "AMBIGUOUS" | "CONFUSED" | "FORGOTTEN" | "ABORTED" | "ORTHOGRAPHIC_VARIANT" | "SUPERFLUOUS" | "NUDUM" | "NULL_NAME" | "SUPPRESSED" | "REJECTED_OUTRIGHT" | "REJECTED" | "ILLEGITIMATE" | "INVALID" | "DENIED";
+                /** @description Filters for name usages with a specific origin. */
+                origin?: "SOURCE" | "DENORMED_CLASSIFICATION" | "VERBATIM_PARENT" | "VERBATIM_ACCEPTED" | "VERBATIM_BASIONYM" | "PROPARTE" | "AUTONYM" | "IMPLICIT_NAME" | "MISSING_ACCEPTED" | "BASIONYM_PLACEHOLDER" | "EX_AUTHOR_SYNONYM" | "OTHER";
+                /** @description A specific indexing issue as defined in our https://api.gbif.org/v1/enumeration/basic/NameUsageIssue[NameUsageIssue enum]. */
+                issue?: "PARENT_NAME_USAGE_ID_INVALID" | "ACCEPTED_NAME_USAGE_ID_INVALID" | "ORIGINAL_NAME_USAGE_ID_INVALID" | "ACCEPTED_NAME_MISSING" | "RANK_INVALID" | "NOMENCLATURAL_STATUS_INVALID" | "TAXONOMIC_STATUS_INVALID" | "SCIENTIFIC_NAME_ASSEMBLED" | "CHAINED_SYNOYM" | "BASIONYM_AUTHOR_MISMATCH" | "TAXONOMIC_STATUS_MISMATCH" | "PARENT_CYCLE" | "CLASSIFICATION_RANK_ORDER_INVALID" | "CLASSIFICATION_NOT_APPLIED" | "VERNACULAR_NAME_INVALID" | "DESCRIPTION_INVALID" | "DISTRIBUTION_INVALID" | "SPECIES_PROFILE_INVALID" | "MULTIMEDIA_INVALID" | "BIB_REFERENCE_INVALID" | "ALT_IDENTIFIER_INVALID" | "BACKBONE_MATCH_NONE" | "BACKBONE_MATCH_FUZZY" | "BACKBONE_MATCH_AGGREGATE" | "ACCEPTED_NAME_NOT_UNIQUE" | "PARENT_NAME_NOT_UNIQUE" | "ORIGINAL_NAME_NOT_UNIQUE" | "RELATIONSHIP_MISSING" | "ORIGINAL_NAME_DERIVED" | "CONFLICTING_BASIONYM_COMBINATION" | "NO_SPECIES" | "NAME_PARENT_MISMATCH" | "ORTHOGRAPHIC_VARIANT" | "HOMONYM" | "PUBLISHED_BEFORE_GENUS" | "UNPARSABLE" | "PARTIALLY_PARSABLE";
+                /** @description Simple full text search parameter. The value for this parameter can be a simple word or a phrase. Wildcards are not supported */
+                q?: string;
+                /** @description Set `hl=true` to highlight terms matching the query when in fulltext search fields. The highlight will be an emphasis tag of class `gbifHl`. */
+                hl?: boolean;
+                /** @description Controls the number of results in the page. Using too high a value will be overwritten with the default maximum threshold, depending on the service. Sensible defaults are used so this may be omitted. */
+                limit?: number;
+                /** @description Determines the offset for the search results. A limit of 20 and offset of 40 will get the third page of 20 results. Some services have a maximum offset. */
+                offset?: number;
+                /** @description A facet name used to retrieve the most frequent values for a field. This parameter may be repeated to request multiple facets. */
+                facet?: string[];
+                /** @description Used in combination with the facet parameter. Set `facetMincount={#}` to exclude facets with a count less than `{#}`. */
+                facetMincount?: number;
+                /** @description Used in combination with the facet parameter. Set `facetMultiselect=true` to still return counts for values that are not currently filtered. */
+                facetMultiselect?: boolean;
+                /** @description Facet parameters allow paging requests using the parameters facetOffset and facetLimit */
+                facetLimit?: number;
+                /** @description Facet parameters allow paging requests using the parameters facetOffset and facetLimit */
+                facetOffset?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Name usages found */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SearchResponseNameUsageSearchResultNameUsageSearchParameter"];
+                    "application/x-javascript": components["schemas"]["SearchResponseNameUsageSearchResultNameUsageSearchParameter"];
+                };
+            };
+            /** @description Invalid query */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Name usage not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     searchOccurrence: {
         parameters: {
             query?: {
