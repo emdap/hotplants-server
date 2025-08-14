@@ -43,6 +43,7 @@ app.get(
 
     if (gbifData) {
       const plantData = await storeGbifSearchResults(gbifData);
+
       if (plantData) {
         res.json(plantData);
         return;

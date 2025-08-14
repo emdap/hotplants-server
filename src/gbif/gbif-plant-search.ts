@@ -1,9 +1,11 @@
 import { lookupPlantByName } from "../internal-db/internal-plant-search";
 import {
   gbifClient,
+  GbifOccurenceResult,
   GbifOccurrenceSearchQuery,
-  GbifOccurrenceSearchResult,
 } from "./gbif-config";
+
+type GbifResultDict = Record<string, GbifOccurenceResult>;
 
 const searchGbifSpecies = async (searchText: string) => {
   const { data } = await gbifClient.GET("/species/search", {
@@ -45,24 +47,38 @@ export const searchGbifPlants = async ({
     },
   });
 
-  return data?.results;
+  return data?.results && combineGbifPlantResults(data.results);
 };
 
-export const storeGbifSearchResults = async (
-  gbifResults: GbifOccurrenceSearchResult
-) => {
+const extractScientificName = ({
+  scientificName,
+  scientificNameAuthorship,
+}: GbifOccurenceResult) =>
+  scientificNameAuthorship
+    ? scientificName?.split(scientificNameAuthorship)[0].trim()
+    : scientificName;
+
+const combineGbifPlantResults = (gbifResults: GbifOccurenceResult[]) =>
+  gbifResults.reduce<GbifResultDict>((prev, result) => {
+    const plantKey = extractScientificName(result);
+    if (!plantKey) {
+      return prev;
+    }
+    if (prev[plantKey] && result.media) {
+      prev[plantKey].media.push(...result.media);
+    } else {
+      prev[plantKey] = result;
+    }
+
+    return prev;
+  }, {});
+
+export const storeGbifSearchResults = async (gbifResults: GbifResultDict) => {
   const fullData = await Promise.all(
-    gbifResults.map(async (plant) => {
-      if (!plant.scientificName) {
-        return null;
-      }
-
-      const lowercaseName = plant.scientificNameAuthorship
-        ? plant.scientificName?.split(plant.scientificNameAuthorship)[0].trim()
-        : plant.scientificName;
-
-      return lookupPlantByName(lowercaseName) || [];
-    })
+    Object.entries(gbifResults).map(async ([plantKey, plant]) =>
+      // TODO: save some GBIF data like coords, images
+      lookupPlantByName(plantKey)
+    )
   );
 
   return fullData.filter((plant) => !!plant);
