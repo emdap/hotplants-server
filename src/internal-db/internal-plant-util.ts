@@ -1,34 +1,20 @@
+import { WithId } from "mongodb";
 import { scrapePFAF } from "../util/pfaf-scraper";
-import { plantCharacterstics } from "./mongo-config";
+import { plantCharacterstics, PlantData } from "./mongo-config";
 
-export const lookupPlantByName = async (
-  lowercaseName: string,
-  overwriteExisting?: boolean
-) => {
-  const existingPlantData = await plantCharacterstics.findOne({
-    scientific_name: lowercaseName,
-  });
+export const lookupPlantByName = async (lowercaseName: string) =>
+  (await plantCharacterstics.findOne({
+    scientificName: lowercaseName,
+  })) ?? scrapePFAF(lowercaseName);
 
-  if (existingPlantData && !overwriteExisting) {
-    const { _id, ...plantData } = existingPlantData;
-    return plantData;
-  }
-
-  const scrapedPlantData = await scrapePFAF(lowercaseName);
-  if (scrapedPlantData) {
-    await plantCharacterstics.updateOne(
-      { _id: existingPlantData?._id },
-      { $set: scrapedPlantData },
-      {
-        upsert: true,
-      }
-    );
-
-    return scrapedPlantData;
-  }
-
-  return null;
-};
+export const storePlantData = (plantData: PlantData | WithId<PlantData>) =>
+  plantCharacterstics.updateOne(
+    { _id: "_id" in plantData ? plantData._id : undefined },
+    { $set: plantData },
+    {
+      upsert: true,
+    }
+  );
 
 const lookupPlantByCoordinates = () => {
   //TODO

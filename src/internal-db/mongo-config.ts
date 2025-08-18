@@ -3,20 +3,24 @@ import { MongoClient } from "mongodb";
 type PlantSizeData = { amount: number; unit: "m" | "cm" | string };
 
 export type PlantData = {
-  scientific_name: string;
-  common_name?: string | string[];
-  bloom_color?: string;
-  bloom_time?: string;
-  is_perennial?: boolean;
-  maturity_time?: string;
+  scientificName: string;
+  commonName?: string | string[];
+  bloomColor?: string;
+  bloomTime?: string;
+  isPerennial?: boolean;
+  maturityTime?: string;
   habitat?: string;
-  soil_type?: string[];
-  light_level?: string[];
+  soilTypes?: string[];
+  lightLevels?: string[];
   hardiness?: number;
   height?: PlantSizeData;
   spread?: PlantSizeData;
   uses?: string[];
-  other_traits?: Record<string, string>;
+  otherTraits?: Record<string, string>;
+
+  // Data from Gbif
+  occurrenceCoords?: number[][];
+  mediaUrls?: string[];
 };
 
 const client = new MongoClient(process.env.MONGODB_CONNECTION_STRING!);

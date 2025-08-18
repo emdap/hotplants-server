@@ -2,12 +2,12 @@ import { JSDOM } from "jsdom";
 import { plantCharacterstics, PlantData } from "../internal-db/mongo-config";
 
 const PLANT_FIELD_MAPPING: Record<string, keyof PlantData> = {
-  "common name": "common_name",
+  "common name": "commonName",
   "usda hardiness": "hardiness",
   habitats: "habitat",
-  "bloom color": "bloom_color",
-  "bloom time": "bloom_time",
-  "main bloom time": "bloom_time",
+  "bloom color": "bloomColor",
+  "bloom time": "bloomTime",
+  "main bloom time": "bloomTime",
 };
 
 const trimArrayItems = (array: string[]) => array.map((item) => item.trim());
@@ -41,8 +41,8 @@ const scrapeCareIcons = (document: Document) => {
   });
 
   const plantData: Partial<PlantData> = {};
-  if (soilType.length) plantData.soil_type = soilType;
-  if (lightLevel.length) plantData.light_level = lightLevel;
+  if (soilType.length) plantData.soilTypes = soilType;
+  if (lightLevel.length) plantData.lightLevels = lightLevel;
 
   return plantData;
 };
@@ -116,7 +116,7 @@ const scrapePlantPhysicalChars = (document: Document) => {
   )?.textContent;
 
   if (plantCharData) {
-    plantData.is_perennial = plantCharData.indexOf("perennial") !== -1;
+    plantData.isPerennial = plantCharData.indexOf("perennial") !== -1;
     plantData = { ...plantData, ...extractPlantSize(plantCharData) };
   }
 
@@ -140,7 +140,7 @@ export const scrapePFAF = async (
   }
 
   const scrapedData: PlantData = {
-    scientific_name: scientificName,
+    scientificName: scientificName,
     ...scrapeStructuredFields(document),
     ...scrapeCareIcons(document),
     ...scrapePlantSummary(document),
@@ -157,7 +157,7 @@ export const getPlantData = async (
   const lowercaseName = scientificName.toLowerCase();
 
   const existingData = await plantCharacterstics.findOne({
-    scientific_name: lowercaseName,
+    scientificName: lowercaseName,
   });
 
   if (existingData && !overwrite) {

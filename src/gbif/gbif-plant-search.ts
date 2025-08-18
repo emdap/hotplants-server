@@ -1,30 +1,16 @@
-import { lookupPlantByName } from "../internal-db/internal-plant-search";
+import { lookupPlantByName } from "../internal-db/internal-plant-util";
+import { gbifClient, GbifOccurrenceSearchQuery } from "./gbif-config";
 import {
-  gbifClient,
-  GbifOccurenceResult,
-  GbifOccurrenceSearchQuery,
-} from "./gbif-config";
-
-type GbifResultDict = Record<string, GbifOccurenceResult>;
-
-const searchGbifSpecies = async (searchText: string) => {
-  const { data } = await gbifClient.GET("/species/search", {
-    params: {
-      query: {
-        higherTaxonKey: "6",
-        limit: 100,
-        q: searchText,
-      },
-    },
-  });
-
-  return data?.results?.flatMap(({ key }) => key ?? []);
-};
+  combineGbifData,
+  GbifResultDict,
+  normalizeGbifPlants,
+  searchGbifSpecies,
+} from "./gbif-util";
 
 export const searchGbifPlants = async ({
   q: searchText,
   ...query
-}: GbifOccurrenceSearchQuery) => {
+}: GbifOccurrenceSearchQuery = {}) => {
   const taxonKeys = searchText
     ? await searchGbifSpecies(searchText)
     : undefined;
@@ -40,46 +26,23 @@ export const searchGbifPlants = async ({
         ],
         // @ts-expect-error TODO: Passing string rather than serializing nested object into string -- default serialization not accepted by API
         mediaType: "StillImage",
-        limit: 2,
+        limit: 5,
         taxonKey: taxonKeys,
         ...query,
       },
     },
   });
 
-  return data?.results && combineGbifPlantResults(data.results);
+  return data?.results && normalizeGbifPlants(data.results);
 };
 
-const extractScientificName = ({
-  scientificName,
-  scientificNameAuthorship,
-}: GbifOccurenceResult) =>
-  scientificNameAuthorship
-    ? scientificName?.split(scientificNameAuthorship)[0].trim()
-    : scientificName;
-
-const combineGbifPlantResults = (gbifResults: GbifOccurenceResult[]) =>
-  gbifResults.reduce<GbifResultDict>((prev, result) => {
-    const plantKey = extractScientificName(result);
-    if (!plantKey) {
-      return prev;
-    }
-    if (prev[plantKey] && result.media) {
-      prev[plantKey].media.push(...result.media);
-    } else {
-      prev[plantKey] = result;
-    }
-
-    return prev;
-  }, {});
-
-export const storeGbifSearchResults = async (gbifResults: GbifResultDict) => {
-  const fullData = await Promise.all(
-    Object.entries(gbifResults).map(async ([plantKey, plant]) =>
-      // TODO: save some GBIF data like coords, images
-      lookupPlantByName(plantKey)
-    )
+export const storeCompletedGbifPlants = async (gbifResults: GbifResultDict) => {
+  const completedData = await Promise.all(
+    Object.entries(gbifResults).map(async ([plantKey, plant]) => {
+      const plantData = await lookupPlantByName(plantKey);
+      return plantData && combineGbifData(plantData, plant);
+    })
   );
 
-  return fullData.filter((plant) => !!plant);
+  return completedData.filter((plant) => !!plant);
 };
