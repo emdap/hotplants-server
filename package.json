@@ -5,7 +5,8 @@
   "scripts": {
     "start": "ts-node src/index.ts",
     "dev": "ts-node-dev src/index.ts",
-    "generate-gbif-types": "npx openapi-typescript src/gbif/schema/gbif-schema.json -o src/gbif/schema/gbif.d.ts"
+    "generate-gbif-types": "npx openapi-typescript src/gbif/schema/gbif-schema.json -o src/gbif/schema/gbif.d.ts",
+    "swagger": "npx ./swagger.ts"
   },
   "keywords": [],
   "author": "",
@@ -13,7 +14,6 @@
   "description": "",
   "dependencies": {
     "@turf/turf": "^7.2.0",
-    "@types/express": "^5.0.3",
     "dotenv": "^17.2.0",
     "express": "^5.1.0",
     "jsdom": "^26.1.0",
@@ -21,6 +21,7 @@
     "openapi-fetch": "^0.14.0"
   },
   "devDependencies": {
+    "@types/express": "^5.0.3",
     "@types/jsdom": "^21.1.7",
     "@types/node": "^24.1.0",
     "openapi-typescript": "^7.8.0",
