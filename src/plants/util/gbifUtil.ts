@@ -7,7 +7,7 @@ type NormalizedGbifResult = Omit<
   GbifOccurenceResult,
   "media" | "decimalLatitude" | "decimalLongitude"
 > &
-  Required<CommonPlantData>;
+  Required<CommonPlantData> & { needsUpdate?: boolean };
 
 export type GbifResultDict = Record<string, NormalizedGbifResult>;
 
@@ -67,19 +67,31 @@ export const combineGbifData = <T extends CommonPlantData>(
   existingData: T,
   addData: NormalizedGbifResult
 ) => {
-  const combinedData: T & Required<CommonPlantData> = {
+  const combinedData = {
     ...existingData,
     mediaUrls: existingData.mediaUrls || [],
     occurrenceCoords: existingData.occurrenceCoords || [],
+    needsUpdate: false,
   };
 
-  if (addData.mediaUrls?.length) {
-    combinedData.mediaUrls.push(...addData.mediaUrls);
+  if (addData.mediaUrls.length) {
+    combinedData.mediaUrls = Array.from(
+      new Set(combinedData.mediaUrls.concat(addData.mediaUrls))
+    );
+    combinedData.needsUpdate =
+      combinedData.mediaUrls.length !== existingData.mediaUrls?.length;
   }
 
-  if (addData.occurrenceCoords) {
-    combinedData.occurrenceCoords.push(...addData.occurrenceCoords);
-  }
+  addData.occurrenceCoords.forEach((newCoord) => {
+    if (
+      !combinedData.occurrenceCoords.find(
+        (coord) => coord[0] === newCoord[0] && coord[1] === newCoord[1]
+      )
+    ) {
+      combinedData.occurrenceCoords.push(newCoord);
+      combinedData.needsUpdate = true;
+    }
+  });
 
   return combinedData;
 };

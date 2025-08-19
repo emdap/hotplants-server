@@ -1,6 +1,8 @@
 import { JSDOM } from "jsdom";
 import { plantCharacterstics, PlantData } from "../config/mongodbClient";
 
+const PFAF_URL = "https://pfaf.org/user/Plant.aspx?LatinName=";
+
 const PLANT_FIELD_MAPPING: Record<string, keyof PlantData> = {
   "common name": "commonName",
   "usda hardiness": "hardiness",
@@ -126,10 +128,8 @@ const scrapePlantPhysicalChars = (document: Document) => {
 export const scrapePFAF = async (
   scientificName: string
 ): Promise<PlantData | null> => {
-  const baseUrl = "https://pfaf.org/user/Plant.aspx?LatinName=";
-
   const response = await fetch(
-    `${baseUrl}${scientificName.replace(/ /g, "+")}`
+    `${PFAF_URL}${scientificName.replace(/ /g, "+")}`
   );
   const html = (await response.text()).toLowerCase();
 

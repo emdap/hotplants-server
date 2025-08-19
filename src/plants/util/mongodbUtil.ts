@@ -2,19 +2,27 @@ import { WithId } from "mongodb";
 import { plantCharacterstics, PlantData } from "../../config/mongodbClient";
 import { scrapePFAF } from "../pfafScraper";
 
-export const lookupPlantByName = async (lowercaseName: string) =>
-  (await plantCharacterstics.findOne({
+export const lookupPlantByName = async (scientificName: string) => {
+  const lowercaseName = scientificName.toLowerCase();
+  const existingPlant = await plantCharacterstics.findOne({
     scientificName: lowercaseName,
-  })) ?? scrapePFAF(lowercaseName);
+  });
 
-export const storePlantData = (plantData: PlantData | WithId<PlantData>) =>
-  plantCharacterstics.updateOne(
-    { _id: "_id" in plantData ? plantData._id : undefined },
-    { $set: plantData },
-    {
-      upsert: true,
-    }
-  );
+  return existingPlant ?? scrapePFAF(lowercaseName);
+};
+
+export const storePlantData = async (
+  plantData: PlantData | WithId<PlantData>
+) => {
+  if ("_id" in plantData) {
+    return plantCharacterstics.updateOne(
+      { _id: plantData._id },
+      { $set: plantData }
+    );
+  } else {
+    return plantCharacterstics.insertOne(plantData);
+  }
+};
 
 // const lookupPlantByCoordinates = () => {
 //TODO

@@ -1,11 +1,12 @@
 import { gbifClient, GbifOccurrenceSearchQuery } from "../config/gbifClient";
+import { PlantData } from "../config/mongodbClient";
 import {
   combineGbifData,
   GbifResultDict,
   normalizeGbifPlants,
   searchGbifSpecies,
 } from "./util/gbifUtil";
-import { lookupPlantByName } from "./util/mongodbUtil";
+import { lookupPlantByName, storePlantData } from "./util/mongodbUtil";
 
 export const searchGbifPlants = async ({
   q: searchText,
@@ -36,17 +37,34 @@ export const searchGbifPlants = async ({
   return data?.results && normalizeGbifPlants(data.results);
 };
 
-export const storeCompletedGbifPlants = async (gbifResults: GbifResultDict) => {
-  const completedData = await Promise.all(
+export const getCompletedGbifPlants = async (gbifResults: GbifResultDict) => {
+  const combinedData = await Promise.all(
     Object.entries(gbifResults).map(async ([plantKey, plant]) => {
       const plantData = await lookupPlantByName(plantKey);
       return plantData && combineGbifData(plantData, plant);
     })
   );
 
-  if (completedData.length) {
-    return completedData.filter((plant) => !!plant);
-  }
+  if (combinedData.length) {
+    const storagePromises: Promise<unknown>[] = [];
+    const filteredData: PlantData[] = [];
 
-  return;
+    combinedData.forEach((plant) => {
+      if (plant) {
+        const { needsUpdate, ...plantData } = plant;
+
+        if (!("_id" in plantData)) {
+          storagePromises.push(storePlantData(plantData));
+          filteredData.push(plantData);
+        } else {
+          needsUpdate && storagePromises.push(storePlantData(plantData));
+          const { _id, ...plantDataWithoutId } = plantData;
+          filteredData.push(plantDataWithoutId);
+        }
+      }
+    });
+
+    await Promise.all(storagePromises);
+    return filteredData;
+  }
 };
