@@ -1,24 +1,30 @@
 {
-  "name": "smarty-plants-server",
+  "name": "hot-plants-server",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "ts-node src/index.ts",
-    "dev": "ts-node-dev src/index.ts",
-    "generate-gbif-types": "npx openapi-typescript src/gbif/schema/gbif-schema.json -o src/gbif/schema/gbif.d.ts",
-    "swagger": "npx ./swagger.ts"
+    "start:prod": "node dist/app.js",
+    "build": "tsc && mkdir -p dist/public && cp public/swagger.json \"$_\"",
+    "start": "ts-node src/app.ts",
+    "dev": "ts-node-dev src/app.ts",
+    "generate-gbif-types": "npx openapi-typescript src/config/schemas/gbif-schema.json -o src/config/schemas/gbif.d.ts",
+    "swagger": "npx tsoa spec"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@tsoa/runtime": "^6.6.0",
     "@turf/turf": "^7.2.0",
+    "@types/swagger-ui-express": "^4.1.8",
     "dotenv": "^17.2.0",
     "express": "^5.1.0",
     "jsdom": "^26.1.0",
     "mongodb": "^6.18.0",
-    "openapi-fetch": "^0.14.0"
+    "openapi-fetch": "^0.14.0",
+    "swagger-ui-express": "^5.0.1",
+    "tsoa": "^6.6.0"
   },
   "devDependencies": {
     "@types/express": "^5.0.3",

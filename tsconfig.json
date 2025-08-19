@@ -6,14 +6,21 @@
   "compilerOptions": {
     "lib": ["es2023"],
     "module": "Node16",
-    "target": "es2022",
+    "target": "es6",
     "outDir": "./dist",
 
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "moduleResolution": "node16"
+    "moduleResolution": "node16",
+
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+
+    "experimentalDecorators": true
   },
   "include": ["src"]
 }

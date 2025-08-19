@@ -1,11 +1,11 @@
-import { lookupPlantByName } from "../internal-db/internal-plant-util";
-import { gbifClient, GbifOccurrenceSearchQuery } from "./gbif-config";
+import { gbifClient, GbifOccurrenceSearchQuery } from "../config/gbifClient";
 import {
   combineGbifData,
   GbifResultDict,
   normalizeGbifPlants,
   searchGbifSpecies,
-} from "./gbif-util";
+} from "./util/gbifUtil";
+import { lookupPlantByName } from "./util/mongodbUtil";
 
 export const searchGbifPlants = async ({
   q: searchText,
@@ -44,5 +44,9 @@ export const storeCompletedGbifPlants = async (gbifResults: GbifResultDict) => {
     })
   );
 
-  return completedData.filter((plant) => !!plant);
+  if (completedData.length) {
+    return completedData.filter((plant) => !!plant);
+  }
+
+  return;
 };

@@ -1,5 +1,5 @@
-import { PlantData } from "../internal-db/mongo-config";
-import { gbifClient, GbifOccurenceResult } from "./gbif-config";
+import { gbifClient, GbifOccurenceResult } from "../../config/gbifClient";
+import { PlantData } from "../../config/mongodbClient";
 
 type CommonPlantData = Pick<PlantData, "occurrenceCoords" | "mediaUrls">;
 
