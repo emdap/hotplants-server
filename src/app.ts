@@ -13,7 +13,7 @@ app.use(express.static("public"));
 RegisterRoutes(app);
 
 app.listen(port, hostname, async () => {
-  console.log("i'm listening here");
+  console.info("i'm listening here");
 });
 
 app.use(

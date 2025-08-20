@@ -1,5 +1,5 @@
 import { Body, Post, Route } from "tsoa";
-import { GbifOccurrenceSearchQuery } from "../config/gbifClient";
+import { GbifOccurrenceSearchParams } from "../config/gbifClient";
 import { PlantResponse } from "../config/types";
 import { getCompletedGbifPlants, searchGbifPlants } from "./gbifPlantSearch";
 
@@ -7,9 +7,9 @@ import { getCompletedGbifPlants, searchGbifPlants } from "./gbifPlantSearch";
 export class PlantController {
   @Post("search")
   public async searchPlants(
-    @Body() query?: GbifOccurrenceSearchQuery
+    @Body() searchParams: GbifOccurrenceSearchParams | undefined = {}
   ): Promise<PlantResponse[] | void> {
-    const gbifData = await searchGbifPlants(query);
+    const gbifData = await searchGbifPlants(searchParams);
     return gbifData && getCompletedGbifPlants(gbifData);
   }
 }

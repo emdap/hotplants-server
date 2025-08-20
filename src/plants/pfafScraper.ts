@@ -12,7 +12,11 @@ const PLANT_FIELD_MAPPING: Record<string, keyof PlantData> = {
   "main bloom time": "bloomTime",
 };
 
-const trimArrayItems = (array: string[]) => array.map((item) => item.trim());
+const cleanText = (text: string) =>
+  text
+    .replace(/\[[^\]]*\]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
 
 const plantPageFound = (document: Document) => {
   const plantTitle = document.getElementById(
@@ -60,14 +64,14 @@ const scrapeStructuredFields = (document: Document) => {
     const plantKey = rowLabel ? PLANT_FIELD_MAPPING[rowLabel] : null;
     if (plantKey && rowValue) {
       if (rowValue.includes(", ")) {
-        plantData.push([plantKey, trimArrayItems(rowValue.split(", "))]);
+        plantData.push([plantKey, rowValue.split(", ").map(cleanText)]);
       } else if (plantKey === "hardiness") {
         plantData.push([
           plantKey,
           rowValue.split("-").map((item) => parseInt(item)),
         ]);
       } else {
-        plantData.push([plantKey, rowValue]);
+        plantData.push([plantKey, cleanText(rowValue)]);
       }
     }
   });
@@ -85,7 +89,7 @@ const scrapePlantSummary = (document: Document) => {
     const data = item.split(":");
     const plantKey = PLANT_FIELD_MAPPING[data[0].trim()];
     if (plantKey && data[1]) {
-      plantData.push([plantKey, trimArrayItems(data[1].split(", "))]);
+      plantData.push([plantKey, data[1].split(", ").map(cleanText)]);
     }
   });
 

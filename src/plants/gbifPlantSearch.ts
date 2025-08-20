@@ -1,5 +1,5 @@
 import { InsertOneResult, UpdateResult } from "mongodb";
-import { gbifClient, GbifOccurrenceSearchQuery } from "../config/gbifClient";
+import { gbifClient, GbifOccurrenceSearchParams } from "../config/gbifClient";
 import { PlantData, PlantResponse } from "../config/types";
 import {
   combineGbifData,
@@ -12,7 +12,7 @@ import { lookupPlantByName, storePlantData } from "./util/mongodbUtil";
 export const searchGbifPlants = async ({
   q: searchText,
   ...query
-}: GbifOccurrenceSearchQuery = {}) => {
+}: GbifOccurrenceSearchParams) => {
   const taxonKeys = searchText
     ? await searchGbifSpecies(searchText)
     : undefined;

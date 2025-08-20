@@ -5,7 +5,8 @@ export const gbifClient = createClient<paths>({
   baseUrl: "https://api.gbif.org/v1/",
 });
 
-export type GbifOccurrenceSearchQuery =
-  operations["searchOccurrence"]["parameters"]["query"];
+export type GbifOccurrenceSearchParams = Required<
+  operations["searchOccurrence"]["parameters"]
+>["query"];
 
 export type GbifOccurenceResult = components["schemas"]["Occurrence"];
