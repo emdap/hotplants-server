@@ -1,5 +1,5 @@
 import { JSDOM } from "jsdom";
-import { plantCharacterstics, PlantData } from "../config/mongodbClient";
+import { PlantData } from "../config/types";
 
 const PFAF_URL = "https://pfaf.org/user/Plant.aspx?LatinName=";
 
@@ -127,7 +127,7 @@ const scrapePlantPhysicalChars = (document: Document) => {
 
 export const scrapePFAF = async (
   scientificName: string
-): Promise<PlantData | null> => {
+): Promise<PlantData> => {
   const response = await fetch(
     `${PFAF_URL}${scientificName.replace(/ /g, "+")}`
   );
@@ -136,47 +136,17 @@ export const scrapePFAF = async (
   const document = new JSDOM(html).window.document;
 
   if (!plantPageFound(document)) {
-    return null;
+    return { scientificName, scrapeSuccessful: false };
   }
 
   const scrapedData: PlantData = {
     scientificName: scientificName,
+    scrapeSuccessful: true,
     ...scrapeStructuredFields(document),
     ...scrapeCareIcons(document),
     ...scrapePlantSummary(document),
     ...scrapePlantPhysicalChars(document),
   };
-
-  return scrapedData;
-};
-
-export const getPlantData = async (
-  scientificName: string,
-  overwrite?: boolean
-): Promise<PlantData | null> => {
-  const lowercaseName = scientificName.toLowerCase();
-
-  const existingData = await plantCharacterstics.findOne({
-    scientificName: lowercaseName,
-  });
-
-  if (existingData && !overwrite) {
-    const { _id, ...plantData } = existingData;
-    return plantData;
-  }
-
-  const scrapedData = await scrapePFAF(lowercaseName);
-  if (!scrapedData) {
-    return null;
-  }
-
-  await plantCharacterstics.updateOne(
-    { _id: existingData?._id },
-    { $set: scrapedData },
-    {
-      upsert: true,
-    }
-  );
 
   return scrapedData;
 };

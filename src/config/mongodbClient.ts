@@ -1,29 +1,9 @@
 import { MongoClient } from "mongodb";
+import { PlantData } from "./types";
 
-type PlantSizeData = { amount: number; unit: "m" | "cm" | string };
-
-export type PlantData = {
-  scientificName: string;
-  commonName?: string | string[];
-  bloomColor?: string;
-  bloomTime?: string;
-  isPerennial?: boolean;
-  maturityTime?: string;
-  habitat?: string;
-  soilTypes?: string[];
-  lightLevels?: string[];
-  hardiness?: number;
-  height?: PlantSizeData;
-  spread?: PlantSizeData;
-  uses?: string[];
-  otherTraits?: Record<string, string>;
-
-  // Data from Gbif
-  occurrenceCoords?: number[][];
-  mediaUrls?: string[];
-};
+export type PlantSizeData = { amount: number; unit: "m" | "cm" | string };
 
 const client = new MongoClient(process.env.MONGODB_CONNECTION_STRING!);
-export const plantCharacterstics = client
+export const plantCollection = client
   .db("plants")
-  .collection<PlantData>("plant_characteristics");
+  .collection<PlantData>("plantData");

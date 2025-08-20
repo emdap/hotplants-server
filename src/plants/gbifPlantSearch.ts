@@ -1,5 +1,6 @@
+import { InsertOneResult, UpdateResult } from "mongodb";
 import { gbifClient, GbifOccurrenceSearchQuery } from "../config/gbifClient";
-import { PlantData } from "../config/mongodbClient";
+import { PlantData, PlantResponse } from "../config/types";
 import {
   combineGbifData,
   GbifResultDict,
@@ -46,25 +47,27 @@ export const getCompletedGbifPlants = async (gbifResults: GbifResultDict) => {
   );
 
   if (combinedData.length) {
-    const storagePromises: Promise<unknown>[] = [];
-    const filteredData: PlantData[] = [];
-
-    combinedData.forEach((plant) => {
-      if (plant) {
-        const { needsUpdate, ...plantData } = plant;
-
-        if (!("_id" in plantData)) {
-          storagePromises.push(storePlantData(plantData));
-          filteredData.push(plantData);
-        } else {
-          needsUpdate && storagePromises.push(storePlantData(plantData));
-          const { _id, ...plantDataWithoutId } = plantData;
-          filteredData.push(plantDataWithoutId);
+    const { storagePromises, plantResponse } = combinedData.reduce<{
+      storagePromises: Promise<
+        UpdateResult<PlantData> | InsertOneResult<PlantData>
+      >[];
+      plantResponse: PlantResponse[];
+    }>(
+      (prev, { _id, needsUpdate, ...plant }) => {
+        if (!_id || needsUpdate) {
+          prev.storagePromises.push(storePlantData(plant));
         }
-      }
-    });
+        if (plant.scrapeSuccessful) {
+          const { scrapeSuccessful, ...rest } = plant;
+          prev.plantResponse.push(rest);
+        }
+
+        return prev;
+      },
+      { storagePromises: [], plantResponse: [] }
+    );
 
     await Promise.all(storagePromises);
-    return filteredData;
+    return plantResponse;
   }
 };

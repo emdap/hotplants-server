@@ -1,5 +1,5 @@
 import { gbifClient, GbifOccurenceResult } from "../../config/gbifClient";
-import { PlantData } from "../../config/mongodbClient";
+import { PlantData } from "../../config/types";
 
 type CommonPlantData = Pick<PlantData, "occurrenceCoords" | "mediaUrls">;
 

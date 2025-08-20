@@ -1,26 +1,25 @@
-import { WithId } from "mongodb";
-import { plantCharacterstics, PlantData } from "../../config/mongodbClient";
+import { plantCollection } from "../../config/mongodbClient";
+import { PlantData } from "../../config/types";
 import { scrapePFAF } from "../pfafScraper";
 
-export const lookupPlantByName = async (scientificName: string) => {
+export const lookupPlantByName = async (
+  scientificName: string
+): Promise<PlantData> => {
   const lowercaseName = scientificName.toLowerCase();
-  const existingPlant = await plantCharacterstics.findOne({
+  const existingPlant = await plantCollection.findOne({
     scientificName: lowercaseName,
   });
 
   return existingPlant ?? scrapePFAF(lowercaseName);
 };
 
-export const storePlantData = async (
-  plantData: PlantData | WithId<PlantData>
-) => {
-  if ("_id" in plantData) {
-    return plantCharacterstics.updateOne(
-      { _id: plantData._id },
-      { $set: plantData }
-    );
+export const storePlantData = async (plantData: PlantData) => {
+  const { _id, ...rest } = plantData;
+
+  if (_id) {
+    return plantCollection.updateOne({ _id }, { $set: rest });
   } else {
-    return plantCharacterstics.insertOne(plantData);
+    return plantCollection.insertOne(rest);
   }
 };
 
