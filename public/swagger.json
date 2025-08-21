@@ -146,7 +146,7 @@
 				"$ref": "#/components/schemas/Pick_PlantDataRaw.Exclude_keyofPlantDataRaw._id__",
 				"description": "Construct a type with the properties of T except for those in type K."
 			},
-			"PlantSearchResponse": {
+			"OccurrenceScrapeResponse": {
 				"properties": {
 					"results": {
 						"items": {
@@ -154,11 +154,9 @@
 						},
 						"type": "array"
 					},
-					"plantNames": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
+					"occurrencesFound": {
+						"type": "number",
+						"format": "double"
 					},
 					"count": {
 						"type": "number",
@@ -167,7 +165,7 @@
 				},
 				"required": [
 					"results",
-					"plantNames",
+					"occurrencesFound",
 					"count"
 				],
 				"type": "object"
@@ -1446,9 +1444,9 @@
 		"contact": {}
 	},
 	"paths": {
-		"/plants/search": {
+		"/plants/scrapeOccurrences": {
 			"post": {
-				"operationId": "SearchPlants",
+				"operationId": "ScrapeOccurrences",
 				"responses": {
 					"200": {
 						"description": "Ok",
@@ -1457,7 +1455,7 @@
 								"schema": {
 									"anyOf": [
 										{
-											"$ref": "#/components/schemas/PlantSearchResponse"
+											"$ref": "#/components/schemas/OccurrenceScrapeResponse"
 										},
 										{}
 									]

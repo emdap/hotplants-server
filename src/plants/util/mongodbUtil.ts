@@ -18,10 +18,14 @@ export const storePlantData = async (plantData: PlantDataRaw) => {
   const { _id, ...rest } = plantData;
 
   if (_id) {
-    console.log("update", plantData.scientificName);
+    console.info("update", plantData.scientificName);
     return plantCollection.updateOne({ _id }, { $set: rest });
   } else {
-    console.log("insert", plantData.scientificName);
+    console.info(
+      "insert",
+      plantData.scientificName,
+      plantData.scrapeSources?.length && "scrape success"
+    );
     return plantCollection.insertOne(rest);
   }
 };

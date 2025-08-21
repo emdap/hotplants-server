@@ -20,15 +20,6 @@ export const searchGbifPlants = async ({
   const { data } = await gbifClient.GET("/occurrence/search", {
     params: {
       query: {
-        kingdomKey: [6],
-        basisOfRecord: [
-          "HUMAN_OBSERVATION",
-          "OBSERVATION",
-          "MACHINE_OBSERVATION",
-        ],
-        // @ts-expect-error TODO: Passing string rather than serializing nested object into string -- default serialization not accepted by API
-        mediaType: "StillImage",
-        limit: 5,
         taxonKey: taxonKeys,
         ...query,
       },

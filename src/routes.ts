@@ -32,9 +32,9 @@ const models: TsoaRoute.Models = {
         "type": {"ref":"Pick_PlantDataRaw.Exclude_keyofPlantDataRaw._id__","validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "PlantSearchResponse": {
+    "OccurrenceScrapeResponse": {
         "dataType": "refAlias",
-        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"results":{"dataType":"array","array":{"dataType":"refAlias","ref":"Omit_PlantDataRaw._id_"},"required":true},"plantNames":{"dataType":"array","array":{"dataType":"string"},"required":true},"count":{"dataType":"double","required":true}},"validators":{}},
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"results":{"dataType":"array","array":{"dataType":"refAlias","ref":"Omit_PlantDataRaw._id_"},"required":true},"occurrencesFound":{"dataType":"double","required":true},"count":{"dataType":"double","required":true}},"validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "Record_string.never_": {
@@ -74,25 +74,25 @@ export function RegisterRoutes(app: Router) {
 
 
     
-        const argsPlantController_searchPlants: Record<string, TsoaRoute.ParameterSchema> = {
+        const argsPlantController_scrapeOccurrences: Record<string, TsoaRoute.ParameterSchema> = {
                 body: {"in":"body","name":"body","dataType":"union","subSchemas":[{"ref":"PlantSearchParams"},{"dataType":"undefined"}]},
         };
-        app.post('/plants/search',
+        app.post('/plants/scrapeOccurrences',
             ...(fetchMiddlewares<RequestHandler>(PlantController)),
-            ...(fetchMiddlewares<RequestHandler>(PlantController.prototype.searchPlants)),
+            ...(fetchMiddlewares<RequestHandler>(PlantController.prototype.scrapeOccurrences)),
 
-            async function PlantController_searchPlants(request: ExRequest, response: ExResponse, next: any) {
+            async function PlantController_scrapeOccurrences(request: ExRequest, response: ExResponse, next: any) {
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 
             let validatedArgs: any[] = [];
             try {
-                validatedArgs = templateService.getValidatedArgs({ args: argsPlantController_searchPlants, request, response });
+                validatedArgs = templateService.getValidatedArgs({ args: argsPlantController_scrapeOccurrences, request, response });
 
                 const controller = new PlantController();
 
               await templateService.apiHandler({
-                methodName: 'searchPlants',
+                methodName: 'scrapeOccurrences',
                 controller,
                 response,
                 next,

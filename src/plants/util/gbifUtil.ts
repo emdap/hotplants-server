@@ -27,7 +27,6 @@ export const searchGbifSpecies = async (searchText: string) => {
     params: {
       query: {
         higherTaxonKey: "6",
-        limit: 100,
         q: searchText,
       },
     },

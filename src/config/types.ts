@@ -27,8 +27,8 @@ export type PlantDataRaw = {
   scrapeSources?: string[];
 };
 
-export type PlantSearchResponse = {
+export type OccurrenceScrapeResponse = {
   count: number;
-  plantNames: string[];
+  occurrencesFound: number;
   results: Omit<PlantDataRaw, "_id">[];
 };
