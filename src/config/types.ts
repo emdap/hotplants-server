@@ -22,12 +22,13 @@ export type PlantDataRaw = {
   // Data from Gbif
   occurrenceCoords?: number[][];
   mediaUrls?: string[];
+  occurrenceIds?: number[];
 
-  scrapeSuccessful: boolean;
+  scrapeSources?: string[];
 };
 
 export type PlantSearchResponse = {
   count: number;
   plantNames: string[];
-  results: Omit<PlantDataRaw, "scrapeSuccessful" | "_id">[];
+  results: Omit<PlantDataRaw, "_id">[];
 };

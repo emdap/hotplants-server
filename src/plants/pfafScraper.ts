@@ -132,20 +132,19 @@ const scrapePlantPhysicalChars = (document: Document) => {
 export const scrapePFAF = async (
   scientificName: string
 ): Promise<PlantDataRaw> => {
-  const response = await fetch(
-    `${PFAF_URL}${scientificName.replace(/ /g, "+")}`
-  );
+  const scrapeUrl = `${PFAF_URL}${scientificName.replace(/ /g, "+")}`;
+  const response = await fetch(scrapeUrl);
   const html = (await response.text()).toLowerCase();
 
   const document = new JSDOM(html).window.document;
 
   if (!plantPageFound(document)) {
-    return { scientificName, scrapeSuccessful: false };
+    return { scientificName };
   }
 
   const scrapedData: PlantDataRaw = {
     scientificName: scientificName,
-    scrapeSuccessful: true,
+    scrapeSources: [scrapeUrl],
     ...scrapeStructuredFields(document),
     ...scrapeCareIcons(document),
     ...scrapePlantSummary(document),

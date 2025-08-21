@@ -22,19 +22,19 @@ const models: TsoaRoute.Models = {
         "type": {"dataType":"nestedObjectLiteral","nestedProperties":{},"additionalProperties":{"dataType":"string"},"validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "Pick_PlantDataRaw.Exclude_keyofPlantDataRaw.scrapeSuccessful-or-_id__": {
+    "Pick_PlantDataRaw.Exclude_keyofPlantDataRaw._id__": {
         "dataType": "refAlias",
-        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"scientificName":{"dataType":"string","required":true},"commonName":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"array","array":{"dataType":"string"}}]},"bloomColor":{"dataType":"string"},"bloomTime":{"dataType":"string"},"isPerennial":{"dataType":"boolean"},"maturityTime":{"dataType":"string"},"habitat":{"dataType":"string"},"soilTypes":{"dataType":"array","array":{"dataType":"string"}},"lightLevels":{"dataType":"array","array":{"dataType":"string"}},"hardiness":{"dataType":"double"},"height":{"ref":"PlantSizeData"},"spread":{"ref":"PlantSizeData"},"uses":{"dataType":"array","array":{"dataType":"string"}},"otherTraits":{"ref":"Record_string.string_"},"occurrenceCoords":{"dataType":"array","array":{"dataType":"array","array":{"dataType":"double"}}},"mediaUrls":{"dataType":"array","array":{"dataType":"string"}}},"validators":{}},
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"scientificName":{"dataType":"string","required":true},"commonName":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"array","array":{"dataType":"string"}}]},"bloomColor":{"dataType":"string"},"bloomTime":{"dataType":"string"},"isPerennial":{"dataType":"boolean"},"maturityTime":{"dataType":"string"},"habitat":{"dataType":"string"},"soilTypes":{"dataType":"array","array":{"dataType":"string"}},"lightLevels":{"dataType":"array","array":{"dataType":"string"}},"hardiness":{"dataType":"double"},"height":{"ref":"PlantSizeData"},"spread":{"ref":"PlantSizeData"},"uses":{"dataType":"array","array":{"dataType":"string"}},"otherTraits":{"ref":"Record_string.string_"},"occurrenceCoords":{"dataType":"array","array":{"dataType":"array","array":{"dataType":"double"}}},"mediaUrls":{"dataType":"array","array":{"dataType":"string"}},"occurrenceIds":{"dataType":"array","array":{"dataType":"double"}},"scrapeSources":{"dataType":"array","array":{"dataType":"string"}}},"validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "Omit_PlantDataRaw.scrapeSuccessful-or-_id_": {
+    "Omit_PlantDataRaw._id_": {
         "dataType": "refAlias",
-        "type": {"ref":"Pick_PlantDataRaw.Exclude_keyofPlantDataRaw.scrapeSuccessful-or-_id__","validators":{}},
+        "type": {"ref":"Pick_PlantDataRaw.Exclude_keyofPlantDataRaw._id__","validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "PlantSearchResponse": {
         "dataType": "refAlias",
-        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"results":{"dataType":"array","array":{"dataType":"refAlias","ref":"Omit_PlantDataRaw.scrapeSuccessful-or-_id_"},"required":true},"plantNames":{"dataType":"array","array":{"dataType":"string"},"required":true},"count":{"dataType":"double","required":true}},"validators":{}},
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"results":{"dataType":"array","array":{"dataType":"refAlias","ref":"Omit_PlantDataRaw._id_"},"required":true},"plantNames":{"dataType":"array","array":{"dataType":"string"},"required":true},"count":{"dataType":"double","required":true}},"validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "Record_string.never_": {

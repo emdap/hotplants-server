@@ -47,7 +47,7 @@ export class PlantController {
       results && {
         count: results.length,
         plantNames: results.map(({ scientificName }) => scientificName),
-        results: results?.map(({ scrapeSuccessful, ...plant }) => plant),
+        results,
       }
     );
   }

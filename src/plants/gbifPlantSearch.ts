@@ -4,7 +4,7 @@ import { PlantDataRaw } from "../config/types";
 import {
   combineGbifData,
   GbifResultDict,
-  normalizeGbifPlants,
+  reduceGbifResults,
   searchGbifSpecies,
 } from "./util/gbifUtil";
 import { lookupPlantByName, storePlantData } from "./util/mongodbUtil";
@@ -35,14 +35,14 @@ export const searchGbifPlants = async ({
     },
   });
 
-  return data?.results && normalizeGbifPlants(data.results);
+  return data?.results && reduceGbifResults(data.results);
 };
 
 export const getCompletedGbifPlants = async (gbifResults: GbifResultDict) => {
   const combinedData = await Promise.all(
     Object.entries(gbifResults).map(async ([plantKey, plant]) => {
-      const plantData = await lookupPlantByName(plantKey);
-      return plantData && combineGbifData(plantData, plant);
+      const scrapedPlantData = await lookupPlantByName(plantKey);
+      return combineGbifData(scrapedPlantData, plant);
     })
   );
 
@@ -54,12 +54,8 @@ export const getCompletedGbifPlants = async (gbifResults: GbifResultDict) => {
       plantData: PlantDataRaw[];
     }>(
       (prev, { needsUpdate, ...plant }) => {
-        if (!plant._id || needsUpdate) {
-          prev.storagePromises.push(storePlantData(plant));
-        }
-        if (plant.scrapeSuccessful) {
-          prev.plantData.push(plant);
-        }
+        needsUpdate && prev.storagePromises.push(storePlantData(plant));
+        plant.scrapeSources?.length && prev.plantData.push(plant);
 
         return prev;
       },

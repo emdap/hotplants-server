@@ -1,13 +1,16 @@
 import { gbifClient, GbifOccurenceResult } from "../../config/gbifClient";
 import { PlantDataRaw } from "../../config/types";
 
-type CommonPlantData = Pick<PlantDataRaw, "occurrenceCoords" | "mediaUrls">;
+type CommonPlantData = Pick<
+  PlantDataRaw,
+  "occurrenceCoords" | "mediaUrls" | "occurrenceIds"
+>;
 
 type NormalizedGbifResult = Omit<
   GbifOccurenceResult,
   "media" | "decimalLatitude" | "decimalLongitude"
 > &
-  Required<CommonPlantData> & { needsUpdate?: boolean };
+  Required<CommonPlantData>;
 
 export type GbifResultDict = Record<string, NormalizedGbifResult>;
 
@@ -33,31 +36,36 @@ export const searchGbifSpecies = async (searchText: string) => {
   return data?.results?.flatMap(({ key }) => key ?? []);
 };
 
-export const normalizeGbifPlants = (gbifResults: GbifOccurenceResult[]) =>
+const normalizePlant = (gbifOccurrence: GbifOccurenceResult) => {
+  const { media, decimalLatitude, decimalLongitude, ...rest } = gbifOccurrence;
+  const normalizedPlant: NormalizedGbifResult = {
+    ...rest,
+    mediaUrls: media.map(({ identifier }) => identifier),
+    occurrenceCoords: [],
+    occurrenceIds: [gbifOccurrence.key],
+  };
+
+  if (decimalLatitude && decimalLongitude) {
+    normalizedPlant.occurrenceCoords.push([decimalLongitude, decimalLatitude]);
+  }
+
+  return normalizedPlant;
+};
+
+export const reduceGbifResults = (gbifResults: GbifOccurenceResult[]) =>
   gbifResults.reduce<GbifResultDict>((prev, result) => {
     const plantKey = extractScientificName(result);
     if (!plantKey) {
       return prev;
     }
 
-    const { media, decimalLatitude, decimalLongitude, ...rest } = result;
-    const normalizedPlant: NormalizedGbifResult = {
-      ...rest,
-      mediaUrls: media.map(({ identifier }) => identifier),
-      occurrenceCoords: [],
-    };
-
-    if (decimalLatitude && decimalLongitude) {
-      normalizedPlant.occurrenceCoords.push([
-        decimalLongitude,
-        decimalLatitude,
-      ]);
-    }
-
-    if (prev[plantKey]) {
-      prev[plantKey] = combineGbifData(prev[plantKey], normalizedPlant);
-    } else {
-      prev[plantKey] = normalizedPlant;
+    if (!prev[plantKey] || !prev[plantKey].occurrenceIds.includes(result.key)) {
+      const normalizedGbifPlant = normalizePlant(result);
+      if (prev[plantKey]) {
+        prev[plantKey] = combineGbifData(prev[plantKey], normalizedGbifPlant);
+      } else {
+        prev[plantKey] = normalizedGbifPlant;
+      }
     }
 
     return prev;
@@ -65,24 +73,35 @@ export const normalizeGbifPlants = (gbifResults: GbifOccurenceResult[]) =>
 
 export const combineGbifData = <T extends CommonPlantData>(
   existingData: T,
-  addData: NormalizedGbifResult
+  newGbifData: NormalizedGbifResult
 ) => {
   const combinedData = {
     ...existingData,
     mediaUrls: existingData.mediaUrls || [],
     occurrenceCoords: existingData.occurrenceCoords || [],
     needsUpdate: false,
+    occurrenceIds: existingData.occurrenceIds || [],
   };
 
-  if (addData.mediaUrls.length) {
-    combinedData.mediaUrls = Array.from(
-      new Set(combinedData.mediaUrls.concat(addData.mediaUrls))
-    );
-    combinedData.needsUpdate =
-      combinedData.mediaUrls.length !== existingData.mediaUrls?.length;
+  const newOccurrenceIds = newGbifData.occurrenceIds.filter(
+    (id) => !combinedData.occurrenceIds.includes(id)
+  );
+
+  if (!newOccurrenceIds.length) {
+    return combinedData;
+  } else {
+    combinedData.occurrenceIds.push(...newOccurrenceIds);
+    combinedData.needsUpdate = true;
   }
 
-  addData.occurrenceCoords.forEach((newCoord) => {
+  if (newGbifData.mediaUrls.length) {
+    combinedData.mediaUrls = Array.from(
+      new Set(combinedData.mediaUrls.concat(newGbifData.mediaUrls))
+    );
+    combinedData.needsUpdate = true;
+  }
+
+  newGbifData.occurrenceCoords.forEach((newCoord) => {
     if (
       !combinedData.occurrenceCoords.find(
         (coord) => coord[0] === newCoord[0] && coord[1] === newCoord[1]
