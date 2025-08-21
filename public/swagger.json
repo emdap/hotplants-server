@@ -42,68 +42,9 @@
 				"type": "object",
 				"description": "Construct a type with a set of properties K of type T"
 			},
-			"PlantData": {
+			"Pick_PlantDataRaw.Exclude_keyofPlantDataRaw.scrapeSuccessful-or-_id__": {
 				"properties": {
-					"mediaUrls": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
-					},
-					"occurrenceCoords": {
-						"items": {
-							"items": {
-								"type": "number",
-								"format": "double"
-							},
-							"type": "array"
-						},
-						"type": "array"
-					},
-					"otherTraits": {
-						"$ref": "#/components/schemas/Record_string.string_"
-					},
-					"uses": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
-					},
-					"spread": {
-						"$ref": "#/components/schemas/PlantSizeData"
-					},
-					"height": {
-						"$ref": "#/components/schemas/PlantSizeData"
-					},
-					"hardiness": {
-						"type": "number",
-						"format": "double"
-					},
-					"lightLevels": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
-					},
-					"soilTypes": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
-					},
-					"habitat": {
-						"type": "string"
-					},
-					"maturityTime": {
-						"type": "string"
-					},
-					"isPerennial": {
-						"type": "boolean"
-					},
-					"bloomTime": {
-						"type": "string"
-					},
-					"bloomColor": {
+					"scientificName": {
 						"type": "string"
 					},
 					"commonName": {
@@ -119,12 +60,102 @@
 							}
 						]
 					},
-					"scientificName": {
+					"bloomColor": {
 						"type": "string"
+					},
+					"bloomTime": {
+						"type": "string"
+					},
+					"isPerennial": {
+						"type": "boolean"
+					},
+					"maturityTime": {
+						"type": "string"
+					},
+					"habitat": {
+						"type": "string"
+					},
+					"soilTypes": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					"lightLevels": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					"hardiness": {
+						"type": "number",
+						"format": "double"
+					},
+					"height": {
+						"$ref": "#/components/schemas/PlantSizeData"
+					},
+					"spread": {
+						"$ref": "#/components/schemas/PlantSizeData"
+					},
+					"uses": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					"otherTraits": {
+						"$ref": "#/components/schemas/Record_string.string_"
+					},
+					"occurrenceCoords": {
+						"items": {
+							"items": {
+								"type": "number",
+								"format": "double"
+							},
+							"type": "array"
+						},
+						"type": "array"
+					},
+					"mediaUrls": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
 					}
 				},
 				"required": [
 					"scientificName"
+				],
+				"type": "object",
+				"description": "From T, pick a set of properties whose keys are in the union K"
+			},
+			"Omit_PlantDataRaw.scrapeSuccessful-or-_id_": {
+				"$ref": "#/components/schemas/Pick_PlantDataRaw.Exclude_keyofPlantDataRaw.scrapeSuccessful-or-_id__",
+				"description": "Construct a type with the properties of T except for those in type K."
+			},
+			"PlantSearchResponse": {
+				"properties": {
+					"results": {
+						"items": {
+							"$ref": "#/components/schemas/Omit_PlantDataRaw.scrapeSuccessful-or-_id_"
+						},
+						"type": "array"
+					},
+					"plantNames": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					"count": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"results",
+					"plantNames",
+					"count"
 				],
 				"type": "object"
 			},
@@ -133,907 +164,96 @@
 				"type": "object",
 				"description": "Construct a type with a set of properties K of type T"
 			},
-			"GbifOccurrenceSearchQuery": {
+			"Pick_GbifOccurrenceSearchParams.Exclude_keyofGbifOccurrenceSearchParams.geometry__": {
 				"properties": {
-					"facetOffset": {
-						"type": "number",
-						"format": "double"
-					},
-					"facetLimit": {
-						"type": "number",
-						"format": "double"
-					},
-					"facetMultiselect": {
-						"type": "boolean"
-					},
-					"facetMincount": {
-						"type": "number",
-						"format": "double"
-					},
-					"facet": {
-						"type": "string"
-					},
-					"offset": {
-						"type": "number",
-						"format": "double"
-					},
-					"limit": {
-						"type": "number",
-						"format": "double"
-					},
-					"q": {
-						"type": "string"
-					},
-					"hl": {
-						"type": "boolean",
-						"example": true
-					},
-					"shuffle": {
-						"type": "string"
-					},
-					"matchCase": {
-						"type": "boolean",
-						"example": true
-					},
-					"biostratigraphy": {
-						"type": "string"
-					},
-					"lithostratigraphy": {
-						"type": "string"
-					},
-					"geologicalTime": {
-						"type": "string"
-					},
-					"year": {
-						"items": {
-							"type": "number",
-							"format": "double"
-						},
-						"type": "array",
-						"example": 1998
-					},
-					"waterBody": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
-					},
-					"verbatimScientificName": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
-					},
-					"typeStatus": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
-					},
-					"taxonomicStatus": {
-						"items": {
-							"type": "string",
-							"enum": [
-								"ACCEPTED",
-								"DOUBTFUL",
-								"SYNONYM",
-								"HETEROTYPIC_SYNONYM",
-								"HOMOTYPIC_SYNONYM",
-								"PROPARTE_SYNONYM",
-								"MISAPPLIED"
-							]
-						},
-						"type": "array"
-					},
-					"taxonId": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
-					},
-					"taxonKey": {
-						"items": {
-							"type": "number",
-							"format": "double"
-						},
-						"type": "array",
-						"example": 2476674
-					},
-					"taxonConceptId": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
-					},
-					"stateProvince": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
-					},
-					"startDayOfYear": {
-						"items": {
-							"type": "number",
-							"format": "double"
-						},
-						"type": "array",
-						"example": 5
-					},
-					"speciesKey": {
-						"items": {
-							"type": "number",
-							"format": "double"
-						},
-						"type": "array",
-						"example": 2476674
-					},
 					"scientificName": {
 						"items": {
 							"type": "string"
 						},
 						"type": "array"
 					},
-					"sex": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
-					},
-					"samplingProtocol": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
-					},
-					"sampleSizeValue": {
+					"acceptedTaxonKey": {
 						"items": {
 							"type": "number",
 							"format": "double"
 						},
 						"type": "array",
-						"example": 50.5
+						"example": 2476674
 					},
-					"sampleSizeUnit": {
+					"associatedSequences": {
 						"items": {
 							"type": "string"
 						},
 						"type": "array"
 					},
-					"repatriated": {
-						"type": "boolean",
-						"example": true
+					"basisOfRecord": {
+						"items": {
+							"type": "string",
+							"enum": [
+								"PRESERVED_SPECIMEN",
+								"FOSSIL_SPECIMEN",
+								"LIVING_SPECIMEN",
+								"OBSERVATION",
+								"HUMAN_OBSERVATION",
+								"MACHINE_OBSERVATION",
+								"MATERIAL_SAMPLE",
+								"LITERATURE",
+								"MATERIAL_CITATION",
+								"OCCURRENCE",
+								"UNKNOWN"
+							]
+						},
+						"type": "array"
 					},
-					"relativeOrganismQuantity": {
+					"bed": {
 						"items": {
 							"type": "string"
 						},
 						"type": "array"
 					},
-					"recordNumber": {
+					"catalogNumber": {
 						"items": {
 							"type": "string"
+						},
+						"type": "array"
+					},
+					"classKey": {
+						"items": {
+							"type": "number",
+							"format": "double"
 						},
 						"type": "array",
-						"example": 1
+						"example": 212
 					},
-					"recordedByID": {
+					"collectionCode": {
 						"items": {
 							"type": "string"
 						},
 						"type": "array"
 					},
-					"recordedBy": {
+					"collectionKey": {
 						"items": {
 							"type": "string"
 						},
 						"type": "array"
 					},
-					"publishingOrg": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
-					},
-					"publishedByGbifRegion": {
+					"continent": {
 						"items": {
 							"type": "string",
 							"enum": [
 								"AFRICA",
+								"ANTARCTICA",
 								"ASIA",
+								"OCEANIA",
 								"EUROPE",
 								"NORTH_AMERICA",
-								"OCEANIA",
-								"LATIN_AMERICA",
-								"ANTARCTICA"
+								"SOUTH_AMERICA"
 							]
 						},
 						"type": "array"
 					},
-					"protocol": {
-						"items": {
-							"type": "string",
-							"enum": [
-								"EML",
-								"FEED",
-								"WFS",
-								"WMS",
-								"TCS_RDF",
-								"TCS_XML",
-								"DWC_ARCHIVE",
-								"DIGIR",
-								"DIGIR_MANIS",
-								"TAPIR",
-								"BIOCASE",
-								"BIOCASE_XML_ARCHIVE",
-								"OAI_PMH",
-								"COLDP",
-								"CAMTRAP_DP",
-								"BIOM_1_0",
-								"BIOM_2_1",
-								"ACEF",
-								"TEXT_TREE",
-								"OTHER"
-							]
-						},
-						"type": "array"
-					},
-					"projectId": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
-					},
-					"programme": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
-					},
-					"previousIdentifications": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
-					},
-					"preparations": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
-					},
-					"phylumKey": {
-						"items": {
-							"type": "number",
-							"format": "double"
-						},
-						"type": "array",
-						"example": 44
-					},
-					"pathway": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
-					},
-					"parentEventId": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
-					},
-					"otherCatalogNumbers": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
-					},
-					"organismQuantityType": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
-					},
-					"organismQuantity": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array",
-						"example": 1
-					},
-					"organismId": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
-					},
-					"orderKey": {
-						"items": {
-							"type": "number",
-							"format": "double"
-						},
-						"type": "array",
-						"example": 1448
-					},
-					"occurrenceStatus": {
-						"type": "string",
-						"enum": [
-							"PRESENT",
-							"ABSENT"
-						]
-					},
-					"occurrenceId": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
-					},
-					"networkKey": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
-					},
-					"month": {
-						"items": {
-							"type": "number",
-							"format": "double"
-						},
-						"type": "array",
-						"example": 5
-					},
-					"modified": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
-					},
-					"member": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
-					},
-					"mediaType": {
-						"items": {
-							"properties": {
-								"concrete": {
-									"type": "boolean",
-									"example": null
-								},
-								"charset": {
-									"properties": {
-										"registered": {
-											"type": "boolean",
-											"example": null
-										}
-									},
-									"type": "object",
-									"example": null
-								},
-								"wildcardSubtype": {
-									"type": "boolean",
-									"example": null
-								},
-								"wildcardType": {
-									"type": "boolean",
-									"example": null
-								},
-								"qualityValue": {
-									"type": "number",
-									"format": "double",
-									"description": "Format: double",
-									"example": null
-								},
-								"parameters": {
-									"properties": {},
-									"additionalProperties": {
-										"type": "string"
-									},
-									"type": "object",
-									"example": null
-								},
-								"subtype": {
-									"type": "string",
-									"example": null
-								},
-								"type": {
-									"type": "string",
-									"example": null
-								}
-							},
-							"type": "object"
-						},
-						"type": "array"
-					},
-					"lowestBiostratigraphicZone": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
-					},
-					"locality": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
-					},
-					"lifeStage": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
-					},
-					"license": {
-						"items": {
-							"type": "string",
-							"enum": [
-								"CC0_1_0",
-								"CC_BY_4_0",
-								"CC_BY_NC_4_0",
-								"UNSPECIFIED",
-								"UNSUPPORTED"
-							]
-						},
-						"type": "array"
-					},
-					"latestAgeOrHighestStage": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
-					},
-					"latestEpochOrHighestSeries": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
-					},
-					"latestPeriodOrHighestSystem": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
-					},
-					"latestEraOrHighestErathem": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
-					},
-					"latestEonOrHighestEonothem": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
-					},
-					"lastInterpreted": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
-					},
-					"kingdomKey": {
-						"items": {
-							"type": "number",
-							"format": "double"
-						},
-						"type": "array",
-						"example": 5
-					},
-					"iucnRedListCategory": {
-						"items": {
-							"type": "string",
-							"enum": [
-								"EXTINCT",
-								"EXTINCT_IN_THE_WILD",
-								"REGIONALLY_EXTINCT",
-								"CRITICALLY_ENDANGERED",
-								"ENDANGERED",
-								"VULNERABLE",
-								"NEAR_THREATENED",
-								"LEAST_CONCERN",
-								"DATA_DEFICIENT",
-								"NOT_APPLICABLE",
-								"NOT_EVALUATED"
-							]
-						},
-						"type": "array"
-					},
-					"isSequenced": {
-						"type": "boolean",
-						"example": true
-					},
-					"islandGroup": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
-					},
-					"island": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
-					},
-					"isInCluster": {
-						"type": "boolean",
-						"example": true
-					},
-					"issue": {
-						"items": {
-							"type": "string",
-							"enum": [
-								"ZERO_COORDINATE",
-								"COORDINATE_OUT_OF_RANGE",
-								"COORDINATE_INVALID",
-								"COORDINATE_ROUNDED",
-								"GEODETIC_DATUM_INVALID",
-								"GEODETIC_DATUM_ASSUMED_WGS84",
-								"COORDINATE_REPROJECTED",
-								"COORDINATE_REPROJECTION_FAILED",
-								"COORDINATE_REPROJECTION_SUSPICIOUS",
-								"COORDINATE_ACCURACY_INVALID",
-								"COORDINATE_PRECISION_INVALID",
-								"COORDINATE_UNCERTAINTY_METERS_INVALID",
-								"COORDINATE_PRECISION_UNCERTAINTY_MISMATCH",
-								"FOOTPRINT_SRS_INVALID",
-								"FOOTPRINT_WKT_MISMATCH",
-								"FOOTPRINT_WKT_INVALID",
-								"COUNTRY_COORDINATE_MISMATCH",
-								"COUNTRY_MISMATCH",
-								"COUNTRY_INVALID",
-								"COUNTRY_DERIVED_FROM_COORDINATES",
-								"CONTINENT_COORDINATE_MISMATCH",
-								"CONTINENT_COUNTRY_MISMATCH",
-								"CONTINENT_INVALID",
-								"CONTINENT_DERIVED_FROM_COUNTRY",
-								"CONTINENT_DERIVED_FROM_COORDINATES",
-								"PRESUMED_SWAPPED_COORDINATE",
-								"PRESUMED_NEGATED_LONGITUDE",
-								"PRESUMED_NEGATED_LATITUDE",
-								"RECORDED_DATE_MISMATCH",
-								"RECORDED_DATE_INVALID",
-								"RECORDED_DATE_UNLIKELY",
-								"TAXON_MATCH_FUZZY",
-								"TAXON_MATCH_HIGHERRANK",
-								"TAXON_MATCH_AGGREGATE",
-								"TAXON_MATCH_SCIENTIFIC_NAME_ID_IGNORED",
-								"TAXON_MATCH_TAXON_CONCEPT_ID_IGNORED",
-								"TAXON_MATCH_TAXON_ID_IGNORED",
-								"SCIENTIFIC_NAME_ID_NOT_FOUND",
-								"TAXON_CONCEPT_ID_NOT_FOUND",
-								"TAXON_ID_NOT_FOUND",
-								"SCIENTIFIC_NAME_AND_ID_INCONSISTENT",
-								"TAXON_MATCH_NONE",
-								"TAXON_MATCH_NAME_AND_ID_AMBIGUOUS",
-								"DEPTH_NOT_METRIC",
-								"DEPTH_UNLIKELY",
-								"DEPTH_MIN_MAX_SWAPPED",
-								"DEPTH_NON_NUMERIC",
-								"ELEVATION_UNLIKELY",
-								"ELEVATION_MIN_MAX_SWAPPED",
-								"ELEVATION_NOT_METRIC",
-								"ELEVATION_NON_NUMERIC",
-								"MODIFIED_DATE_INVALID",
-								"MODIFIED_DATE_UNLIKELY",
-								"IDENTIFIED_DATE_UNLIKELY",
-								"IDENTIFIED_DATE_INVALID",
-								"BASIS_OF_RECORD_INVALID",
-								"TYPE_STATUS_INVALID",
-								"SUSPECTED_TYPE",
-								"MULTIMEDIA_DATE_INVALID",
-								"MULTIMEDIA_URI_INVALID",
-								"REFERENCES_URI_INVALID",
-								"INTERPRETATION_ERROR",
-								"INDIVIDUAL_COUNT_INVALID",
-								"INDIVIDUAL_COUNT_CONFLICTS_WITH_OCCURRENCE_STATUS",
-								"OCCURRENCE_STATUS_UNPARSABLE",
-								"OCCURRENCE_STATUS_INFERRED_FROM_INDIVIDUAL_COUNT",
-								"OCCURRENCE_STATUS_INFERRED_FROM_BASIS_OF_RECORD",
-								"GEOREFERENCED_DATE_UNLIKELY",
-								"GEOREFERENCED_DATE_INVALID",
-								"AMBIGUOUS_INSTITUTION",
-								"AMBIGUOUS_COLLECTION",
-								"INSTITUTION_MATCH_NONE",
-								"COLLECTION_MATCH_NONE",
-								"INSTITUTION_MATCH_FUZZY",
-								"COLLECTION_MATCH_FUZZY",
-								"INSTITUTION_COLLECTION_MISMATCH",
-								"POSSIBLY_ON_LOAN",
-								"DIFFERENT_OWNER_INSTITUTION",
-								"ERA_OR_ERATHEM_INFERRED_FROM_PARENT_RANK",
-								"PERIOD_OR_SYSTEM_INFERRED_FROM_PARENT_RANK",
-								"EPOCH_OR_SERIES_INFERRED_FROM_PARENT_RANK",
-								"AGE_OR_STAGE_INFERRED_FROM_PARENT_RANK",
-								"EON_OR_EONOTHEM_RANK_MISMATCH",
-								"ERA_OR_ERATHEM_RANK_MISMATCH",
-								"PERIOD_OR_SYSTEM_RANK_MISMATCH",
-								"EPOCH_OR_SERIES_RANK_MISMATCH",
-								"AGE_OR_STAGE_RANK_MISMATCH",
-								"EON_OR_EONOTHEM_INVALID_RANGE",
-								"ERA_OR_ERATHEM_INVALID_RANGE",
-								"PERIOD_OR_SYSTEM_INVALID_RANGE",
-								"EPOCH_OR_SERIES_INVALID_RANGE",
-								"AGE_OR_STAGE_INVALID_RANGE",
-								"EON_OR_EONOTHEM_AND_ERA_OR_ERATHEM_MISMATCH",
-								"ERA_OR_ERATHEM_AND_PERIOD_OR_SYSTEM_MISMATCH",
-								"PERIOD_OR_SYSTEM_AND_EPOCH_OR_SERIES_MISMATCH",
-								"EPOCH_OR_SERIES_AND_AGE_OR_STAGE_MISMATCH"
-							]
-						},
-						"type": "array"
-					},
-					"institutionKey": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
-					},
-					"institutionCode": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
-					},
-					"installationKey": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
-					},
-					"identifiedByID": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
-					},
-					"identifiedBy": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
-					},
-					"hostingOrganizationKey": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
-					},
-					"hasGeospatialIssue": {
-						"type": "boolean",
-						"example": true
-					},
-					"highestBiostratigraphicZone": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
-					},
-					"higherGeography": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
-					},
-					"hasCoordinate": {
-						"type": "boolean",
-						"example": true
-					},
-					"group": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
-					},
-					"geometry": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
-					},
-					"georeferencedBy": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
-					},
-					"geoDistance": {
-						"type": "string"
-					},
-					"genusKey": {
-						"items": {
-							"type": "number",
-							"format": "double"
-						},
-						"type": "array",
-						"example": 2877951
-					},
-					"gbifRegion": {
-						"items": {
-							"type": "string",
-							"enum": [
-								"AFRICA",
-								"ASIA",
-								"EUROPE",
-								"NORTH_AMERICA",
-								"OCEANIA",
-								"LATIN_AMERICA",
-								"ANTARCTICA"
-							]
-						},
-						"type": "array"
-					},
-					"gbifId": {
-						"type": "number",
-						"format": "double",
-						"example": 2005380410
-					},
-					"gadmLevel3Gid": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
-					},
-					"gadmLevel2Gid": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
-					},
-					"gadmLevel1Gid": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
-					},
-					"gadmLevel0Gid": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
-					},
-					"gadmGid": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
-					},
-					"formation": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
-					},
-					"fieldNumber": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
-					},
-					"familyKey": {
-						"items": {
-							"type": "number",
-							"format": "double"
-						},
-						"type": "array",
-						"example": 2405
-					},
-					"eventId": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
-					},
-					"eventDate": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
-					},
-					"establishmentMeans": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
-					},
-					"endDayOfYear": {
-						"items": {
-							"type": "number",
-							"format": "double"
-						},
-						"type": "array",
-						"example": 6
-					},
-					"elevation": {
+					"coordinateUncertaintyInMeters": {
 						"$ref": "#/components/schemas/Record_string.never_"
-					},
-					"earliestAgeOrLowestStage": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
-					},
-					"earliestEpochOrLowestSeries": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
-					},
-					"earliestPeriodOrLowestSystem": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
-					},
-					"earliestEraOrLowestErathem": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
-					},
-					"earliestEonOrLowestEonothem": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
-					},
-					"dwcaExtension": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
-					},
-					"distanceFromCentroidInMeters": {
-						"$ref": "#/components/schemas/Record_string.never_"
-					},
-					"depth": {
-						"$ref": "#/components/schemas/Record_string.never_"
-					},
-					"decimalLongitude": {
-						"$ref": "#/components/schemas/Record_string.never_"
-					},
-					"degreeOfEstablishment": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
-					},
-					"decimalLatitude": {
-						"$ref": "#/components/schemas/Record_string.never_"
-					},
-					"day": {
-						"items": {
-							"type": "number",
-							"format": "double"
-						},
-						"type": "array",
-						"example": 15
-					},
-					"datasetName": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
-					},
-					"datasetKey": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
-					},
-					"datasetId": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
-					},
-					"crawlId": {
-						"items": {
-							"type": "number",
-							"format": "double"
-						},
-						"type": "array",
-						"example": 1
 					},
 					"country": {
 						"items": {
@@ -1296,10 +516,179 @@
 						},
 						"type": "array"
 					},
-					"coordinateUncertaintyInMeters": {
+					"crawlId": {
+						"items": {
+							"type": "number",
+							"format": "double"
+						},
+						"type": "array",
+						"example": 1
+					},
+					"datasetId": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					"datasetKey": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					"datasetName": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					"day": {
+						"items": {
+							"type": "number",
+							"format": "double"
+						},
+						"type": "array",
+						"example": 15
+					},
+					"decimalLatitude": {
 						"$ref": "#/components/schemas/Record_string.never_"
 					},
-					"continent": {
+					"degreeOfEstablishment": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					"decimalLongitude": {
+						"$ref": "#/components/schemas/Record_string.never_"
+					},
+					"depth": {
+						"$ref": "#/components/schemas/Record_string.never_"
+					},
+					"distanceFromCentroidInMeters": {
+						"$ref": "#/components/schemas/Record_string.never_"
+					},
+					"dwcaExtension": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					"earliestEonOrLowestEonothem": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					"earliestEraOrLowestErathem": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					"earliestPeriodOrLowestSystem": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					"earliestEpochOrLowestSeries": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					"earliestAgeOrLowestStage": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					"elevation": {
+						"$ref": "#/components/schemas/Record_string.never_"
+					},
+					"endDayOfYear": {
+						"items": {
+							"type": "number",
+							"format": "double"
+						},
+						"type": "array",
+						"example": 6
+					},
+					"establishmentMeans": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					"eventDate": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					"eventId": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					"familyKey": {
+						"items": {
+							"type": "number",
+							"format": "double"
+						},
+						"type": "array",
+						"example": 2405
+					},
+					"fieldNumber": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					"formation": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					"gadmGid": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					"gadmLevel0Gid": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					"gadmLevel1Gid": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					"gadmLevel2Gid": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					"gadmLevel3Gid": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					"gbifId": {
+						"type": "number",
+						"format": "double",
+						"example": 2005380410
+					},
+					"gbifRegion": {
 						"items": {
 							"type": "string",
 							"enum": [
@@ -1309,78 +698,728 @@
 								"OCEANIA",
 								"EUROPE",
 								"NORTH_AMERICA",
-								"SOUTH_AMERICA"
+								"LATIN_AMERICA"
 							]
 						},
 						"type": "array"
 					},
-					"collectionKey": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
-					},
-					"collectionCode": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
-					},
-					"classKey": {
+					"genusKey": {
 						"items": {
 							"type": "number",
 							"format": "double"
 						},
 						"type": "array",
-						"example": 212
+						"example": 2877951
 					},
-					"catalogNumber": {
+					"geoDistance": {
+						"type": "string"
+					},
+					"georeferencedBy": {
 						"items": {
 							"type": "string"
 						},
 						"type": "array"
 					},
-					"bed": {
+					"group": {
 						"items": {
 							"type": "string"
 						},
 						"type": "array"
 					},
-					"basisOfRecord": {
+					"hasCoordinate": {
+						"type": "boolean",
+						"example": true
+					},
+					"higherGeography": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					"highestBiostratigraphicZone": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					"hasGeospatialIssue": {
+						"type": "boolean",
+						"example": true
+					},
+					"hostingOrganizationKey": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					"identifiedBy": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					"identifiedByID": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					"installationKey": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					"institutionCode": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					"institutionKey": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					"issue": {
 						"items": {
 							"type": "string",
 							"enum": [
-								"PRESERVED_SPECIMEN",
-								"FOSSIL_SPECIMEN",
-								"LIVING_SPECIMEN",
-								"OBSERVATION",
-								"HUMAN_OBSERVATION",
-								"MACHINE_OBSERVATION",
-								"MATERIAL_SAMPLE",
-								"LITERATURE",
-								"MATERIAL_CITATION",
-								"OCCURRENCE",
-								"UNKNOWN"
+								"ZERO_COORDINATE",
+								"COORDINATE_OUT_OF_RANGE",
+								"COORDINATE_INVALID",
+								"COORDINATE_ROUNDED",
+								"GEODETIC_DATUM_INVALID",
+								"GEODETIC_DATUM_ASSUMED_WGS84",
+								"COORDINATE_REPROJECTED",
+								"COORDINATE_REPROJECTION_FAILED",
+								"COORDINATE_REPROJECTION_SUSPICIOUS",
+								"COORDINATE_ACCURACY_INVALID",
+								"COORDINATE_PRECISION_INVALID",
+								"COORDINATE_UNCERTAINTY_METERS_INVALID",
+								"COORDINATE_PRECISION_UNCERTAINTY_MISMATCH",
+								"FOOTPRINT_SRS_INVALID",
+								"FOOTPRINT_WKT_MISMATCH",
+								"FOOTPRINT_WKT_INVALID",
+								"COUNTRY_COORDINATE_MISMATCH",
+								"COUNTRY_MISMATCH",
+								"COUNTRY_INVALID",
+								"COUNTRY_DERIVED_FROM_COORDINATES",
+								"CONTINENT_COORDINATE_MISMATCH",
+								"CONTINENT_COUNTRY_MISMATCH",
+								"CONTINENT_INVALID",
+								"CONTINENT_DERIVED_FROM_COUNTRY",
+								"CONTINENT_DERIVED_FROM_COORDINATES",
+								"PRESUMED_SWAPPED_COORDINATE",
+								"PRESUMED_NEGATED_LONGITUDE",
+								"PRESUMED_NEGATED_LATITUDE",
+								"RECORDED_DATE_MISMATCH",
+								"RECORDED_DATE_INVALID",
+								"RECORDED_DATE_UNLIKELY",
+								"TAXON_MATCH_FUZZY",
+								"TAXON_MATCH_HIGHERRANK",
+								"TAXON_MATCH_AGGREGATE",
+								"TAXON_MATCH_SCIENTIFIC_NAME_ID_IGNORED",
+								"TAXON_MATCH_TAXON_CONCEPT_ID_IGNORED",
+								"TAXON_MATCH_TAXON_ID_IGNORED",
+								"SCIENTIFIC_NAME_ID_NOT_FOUND",
+								"TAXON_CONCEPT_ID_NOT_FOUND",
+								"TAXON_ID_NOT_FOUND",
+								"SCIENTIFIC_NAME_AND_ID_INCONSISTENT",
+								"TAXON_MATCH_NONE",
+								"TAXON_MATCH_NAME_AND_ID_AMBIGUOUS",
+								"DEPTH_NOT_METRIC",
+								"DEPTH_UNLIKELY",
+								"DEPTH_MIN_MAX_SWAPPED",
+								"DEPTH_NON_NUMERIC",
+								"ELEVATION_UNLIKELY",
+								"ELEVATION_MIN_MAX_SWAPPED",
+								"ELEVATION_NOT_METRIC",
+								"ELEVATION_NON_NUMERIC",
+								"MODIFIED_DATE_INVALID",
+								"MODIFIED_DATE_UNLIKELY",
+								"IDENTIFIED_DATE_UNLIKELY",
+								"IDENTIFIED_DATE_INVALID",
+								"BASIS_OF_RECORD_INVALID",
+								"TYPE_STATUS_INVALID",
+								"SUSPECTED_TYPE",
+								"MULTIMEDIA_DATE_INVALID",
+								"MULTIMEDIA_URI_INVALID",
+								"REFERENCES_URI_INVALID",
+								"INTERPRETATION_ERROR",
+								"INDIVIDUAL_COUNT_INVALID",
+								"INDIVIDUAL_COUNT_CONFLICTS_WITH_OCCURRENCE_STATUS",
+								"OCCURRENCE_STATUS_UNPARSABLE",
+								"OCCURRENCE_STATUS_INFERRED_FROM_INDIVIDUAL_COUNT",
+								"OCCURRENCE_STATUS_INFERRED_FROM_BASIS_OF_RECORD",
+								"GEOREFERENCED_DATE_UNLIKELY",
+								"GEOREFERENCED_DATE_INVALID",
+								"AMBIGUOUS_INSTITUTION",
+								"AMBIGUOUS_COLLECTION",
+								"INSTITUTION_MATCH_NONE",
+								"COLLECTION_MATCH_NONE",
+								"INSTITUTION_MATCH_FUZZY",
+								"COLLECTION_MATCH_FUZZY",
+								"INSTITUTION_COLLECTION_MISMATCH",
+								"POSSIBLY_ON_LOAN",
+								"DIFFERENT_OWNER_INSTITUTION",
+								"ERA_OR_ERATHEM_INFERRED_FROM_PARENT_RANK",
+								"PERIOD_OR_SYSTEM_INFERRED_FROM_PARENT_RANK",
+								"EPOCH_OR_SERIES_INFERRED_FROM_PARENT_RANK",
+								"AGE_OR_STAGE_INFERRED_FROM_PARENT_RANK",
+								"EON_OR_EONOTHEM_RANK_MISMATCH",
+								"ERA_OR_ERATHEM_RANK_MISMATCH",
+								"PERIOD_OR_SYSTEM_RANK_MISMATCH",
+								"EPOCH_OR_SERIES_RANK_MISMATCH",
+								"AGE_OR_STAGE_RANK_MISMATCH",
+								"EON_OR_EONOTHEM_INVALID_RANGE",
+								"ERA_OR_ERATHEM_INVALID_RANGE",
+								"PERIOD_OR_SYSTEM_INVALID_RANGE",
+								"EPOCH_OR_SERIES_INVALID_RANGE",
+								"AGE_OR_STAGE_INVALID_RANGE",
+								"EON_OR_EONOTHEM_AND_ERA_OR_ERATHEM_MISMATCH",
+								"ERA_OR_ERATHEM_AND_PERIOD_OR_SYSTEM_MISMATCH",
+								"PERIOD_OR_SYSTEM_AND_EPOCH_OR_SERIES_MISMATCH",
+								"EPOCH_OR_SERIES_AND_AGE_OR_STAGE_MISMATCH"
 							]
 						},
 						"type": "array"
 					},
-					"associatedSequences": {
+					"isInCluster": {
+						"type": "boolean",
+						"example": true
+					},
+					"island": {
 						"items": {
 							"type": "string"
 						},
 						"type": "array"
 					},
-					"acceptedTaxonKey": {
+					"islandGroup": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					"isSequenced": {
+						"type": "boolean",
+						"example": true
+					},
+					"iucnRedListCategory": {
+						"items": {
+							"type": "string",
+							"enum": [
+								"EXTINCT",
+								"EXTINCT_IN_THE_WILD",
+								"REGIONALLY_EXTINCT",
+								"CRITICALLY_ENDANGERED",
+								"ENDANGERED",
+								"VULNERABLE",
+								"NEAR_THREATENED",
+								"LEAST_CONCERN",
+								"DATA_DEFICIENT",
+								"NOT_APPLICABLE",
+								"NOT_EVALUATED"
+							]
+						},
+						"type": "array"
+					},
+					"kingdomKey": {
+						"items": {
+							"type": "number",
+							"format": "double"
+						},
+						"type": "array",
+						"example": 5
+					},
+					"lastInterpreted": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					"latestEonOrHighestEonothem": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					"latestEraOrHighestErathem": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					"latestPeriodOrHighestSystem": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					"latestEpochOrHighestSeries": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					"latestAgeOrHighestStage": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					"license": {
+						"items": {
+							"type": "string",
+							"enum": [
+								"CC0_1_0",
+								"CC_BY_4_0",
+								"CC_BY_NC_4_0",
+								"UNSPECIFIED",
+								"UNSUPPORTED"
+							]
+						},
+						"type": "array"
+					},
+					"lifeStage": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					"locality": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					"lowestBiostratigraphicZone": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					"mediaType": {
+						"items": {
+							"properties": {
+								"concrete": {
+									"type": "boolean"
+								},
+								"charset": {
+									"properties": {
+										"registered": {
+											"type": "boolean"
+										}
+									},
+									"type": "object"
+								},
+								"wildcardSubtype": {
+									"type": "boolean"
+								},
+								"wildcardType": {
+									"type": "boolean"
+								},
+								"qualityValue": {
+									"type": "number",
+									"format": "double"
+								},
+								"parameters": {
+									"properties": {},
+									"additionalProperties": {
+										"type": "string"
+									},
+									"type": "object"
+								},
+								"subtype": {
+									"type": "string"
+								},
+								"type": {
+									"type": "string"
+								}
+							},
+							"type": "object"
+						},
+						"type": "array"
+					},
+					"member": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					"modified": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					"month": {
+						"items": {
+							"type": "number",
+							"format": "double"
+						},
+						"type": "array",
+						"example": 5
+					},
+					"networkKey": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					"occurrenceId": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					"occurrenceStatus": {
+						"type": "string",
+						"enum": [
+							"PRESENT",
+							"ABSENT"
+						]
+					},
+					"orderKey": {
+						"items": {
+							"type": "number",
+							"format": "double"
+						},
+						"type": "array",
+						"example": 1448
+					},
+					"organismId": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					"organismQuantity": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array",
+						"example": 1
+					},
+					"organismQuantityType": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					"otherCatalogNumbers": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					"parentEventId": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					"pathway": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					"phylumKey": {
+						"items": {
+							"type": "number",
+							"format": "double"
+						},
+						"type": "array",
+						"example": 44
+					},
+					"preparations": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					"previousIdentifications": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					"programme": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					"projectId": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					"protocol": {
+						"items": {
+							"type": "string",
+							"enum": [
+								"EML",
+								"FEED",
+								"WFS",
+								"WMS",
+								"TCS_RDF",
+								"TCS_XML",
+								"DWC_ARCHIVE",
+								"DIGIR",
+								"DIGIR_MANIS",
+								"TAPIR",
+								"BIOCASE",
+								"BIOCASE_XML_ARCHIVE",
+								"OAI_PMH",
+								"COLDP",
+								"CAMTRAP_DP",
+								"BIOM_1_0",
+								"BIOM_2_1",
+								"ACEF",
+								"TEXT_TREE",
+								"OTHER"
+							]
+						},
+						"type": "array"
+					},
+					"publishedByGbifRegion": {
+						"items": {
+							"type": "string",
+							"enum": [
+								"AFRICA",
+								"ANTARCTICA",
+								"ASIA",
+								"OCEANIA",
+								"EUROPE",
+								"NORTH_AMERICA",
+								"LATIN_AMERICA"
+							]
+						},
+						"type": "array"
+					},
+					"publishingOrg": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					"recordedBy": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					"recordedByID": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					"recordNumber": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array",
+						"example": 1
+					},
+					"relativeOrganismQuantity": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					"repatriated": {
+						"type": "boolean",
+						"example": true
+					},
+					"sampleSizeUnit": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					"sampleSizeValue": {
+						"items": {
+							"type": "number",
+							"format": "double"
+						},
+						"type": "array",
+						"example": 50.5
+					},
+					"samplingProtocol": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					"sex": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					"speciesKey": {
 						"items": {
 							"type": "number",
 							"format": "double"
 						},
 						"type": "array",
 						"example": 2476674
+					},
+					"startDayOfYear": {
+						"items": {
+							"type": "number",
+							"format": "double"
+						},
+						"type": "array",
+						"example": 5
+					},
+					"stateProvince": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					"taxonConceptId": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					"taxonKey": {
+						"items": {
+							"type": "number",
+							"format": "double"
+						},
+						"type": "array",
+						"example": 2476674
+					},
+					"taxonId": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					"taxonomicStatus": {
+						"items": {
+							"type": "string",
+							"enum": [
+								"ACCEPTED",
+								"DOUBTFUL",
+								"SYNONYM",
+								"HETEROTYPIC_SYNONYM",
+								"HOMOTYPIC_SYNONYM",
+								"PROPARTE_SYNONYM",
+								"MISAPPLIED"
+							]
+						},
+						"type": "array"
+					},
+					"typeStatus": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					"verbatimScientificName": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					"waterBody": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					"year": {
+						"items": {
+							"type": "number",
+							"format": "double"
+						},
+						"type": "array",
+						"example": 1998
+					},
+					"geologicalTime": {
+						"type": "string"
+					},
+					"lithostratigraphy": {
+						"type": "string"
+					},
+					"biostratigraphy": {
+						"type": "string"
+					},
+					"matchCase": {
+						"type": "boolean",
+						"example": true
+					},
+					"shuffle": {
+						"type": "string"
+					},
+					"hl": {
+						"type": "boolean",
+						"example": true
+					},
+					"q": {
+						"type": "string"
+					},
+					"limit": {
+						"type": "number",
+						"format": "double"
+					},
+					"offset": {
+						"type": "number",
+						"format": "double"
+					},
+					"facet": {
+						"type": "string"
+					},
+					"facetMincount": {
+						"type": "number",
+						"format": "double"
+					},
+					"facetMultiselect": {
+						"type": "boolean"
+					},
+					"facetLimit": {
+						"type": "number",
+						"format": "double"
+					},
+					"facetOffset": {
+						"type": "number",
+						"format": "double"
 					}
 				},
-				"type": "object"
+				"type": "object",
+				"description": "From T, pick a set of properties whose keys are in the union K"
+			},
+			"Omit_GbifOccurrenceSearchParams.geometry_": {
+				"$ref": "#/components/schemas/Pick_GbifOccurrenceSearchParams.Exclude_keyofGbifOccurrenceSearchParams.geometry__",
+				"description": "Construct a type with the properties of T except for those in type K."
+			},
+			"PlantSearchParams": {
+				"allOf": [
+					{
+						"$ref": "#/components/schemas/Omit_GbifOccurrenceSearchParams.geometry_"
+					},
+					{
+						"properties": {
+							"boundingBox": {
+								"items": {
+									"type": "number",
+									"format": "double"
+								},
+								"type": "array"
+							}
+						},
+						"type": "object"
+					}
+				]
 			}
 		},
 		"securitySchemes": {}
@@ -1405,10 +1444,7 @@
 								"schema": {
 									"anyOf": [
 										{
-											"items": {
-												"$ref": "#/components/schemas/PlantData"
-											},
-											"type": "array"
+											"$ref": "#/components/schemas/PlantSearchResponse"
 										},
 										{}
 									]
@@ -1424,7 +1460,7 @@
 					"content": {
 						"application/json": {
 							"schema": {
-								"$ref": "#/components/schemas/GbifOccurrenceSearchQuery"
+								"$ref": "#/components/schemas/PlantSearchParams"
 							}
 						}
 					}

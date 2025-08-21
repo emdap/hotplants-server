@@ -1,7 +1,7 @@
 import { ObjectId } from "mongodb";
 import { PlantSizeData } from "./mongodbClient";
 
-export type PlantData = {
+export type PlantDataRaw = {
   _id?: ObjectId;
 
   scientificName: string;
@@ -26,4 +26,8 @@ export type PlantData = {
   scrapeSuccessful: boolean;
 };
 
-export type PlantResponse = Omit<PlantData, "scrapeSuccessful">;
+export type PlantSearchResponse = {
+  count: number;
+  plantNames: string[];
+  results: Omit<PlantDataRaw, "scrapeSuccessful" | "_id">[];
+};
