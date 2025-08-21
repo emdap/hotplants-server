@@ -7,24 +7,43 @@ import {
   reduceGbifResults,
   searchGbifSpecies,
 } from "./util/gbifUtil";
-import { lookupPlantByName, storePlantData } from "./util/mongodbUtil";
+import {
+  getGbifSearchRecord,
+  lookupPlantByName,
+  storePlantData,
+  updateGbifSearchRecord,
+} from "./util/mongodbUtil";
 
 export const searchGbifPlants = async ({
   q: searchText,
-  ...query
+  ...searchParams
 }: GbifOccurrenceSearchParams) => {
   const taxonKeys = searchText
     ? await searchGbifSpecies(searchText)
     : undefined;
 
+  const query = {
+    taxonKey: taxonKeys,
+    ...searchParams,
+  };
+
+  const searchRecord = await getGbifSearchRecord(query);
+  console.log(searchRecord);
+
+  if (searchRecord) {
+    // Always requesting a limit of 100, but doubly enforcing previous limit here so that
+    // the offset definitely matches up
+    query.limit = searchRecord.pageSize;
+    query.offset = searchRecord.pageSize * (searchRecord.lastPageSearched + 1);
+  }
+
   const { data } = await gbifClient.GET("/occurrence/search", {
     params: {
-      query: {
-        taxonKey: taxonKeys,
-        ...query,
-      },
+      query,
     },
   });
+
+  data && searchRecord && (await updateGbifSearchRecord(searchRecord, data));
 
   return data?.results && reduceGbifResults(data.results);
 };

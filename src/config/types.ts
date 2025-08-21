@@ -32,3 +32,10 @@ export type OccurrenceScrapeResponse = {
   occurrencesFound: number;
   results: Omit<PlantDataRaw, "_id">[];
 };
+
+export type GbifSearchRecord = {
+  jsonStringSearch: string;
+  pageSize: number;
+  lastPageSearched: number;
+  hasNextPage: boolean;
+};
