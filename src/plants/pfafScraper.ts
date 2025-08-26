@@ -1,15 +1,16 @@
 import { JSDOM } from "jsdom";
-import { PlantDataRaw } from "../config/types";
+import { PlantDataDocument } from "../config/types";
+import { PlantSizeUnit } from "../graphql/types";
 
 const PFAF_URL = "https://pfaf.org/user/Plant.aspx?LatinName=";
 
-const PLANT_FIELD_MAPPING: Record<string, keyof PlantDataRaw> = {
-  "common name": "commonName",
+const PLANT_FIELD_MAPPING: Record<string, keyof PlantDataDocument> = {
+  "common name": "commonNames",
   "usda hardiness": "hardiness",
   habitats: "habitat",
-  "bloom color": "bloomColor",
-  "bloom time": "bloomTime",
-  "main bloom time": "bloomTime",
+  "bloom color": "bloomColors",
+  "bloom time": "bloomTimes",
+  "main bloom time": "bloomTimes",
 };
 
 const cleanText = (text: string) =>
@@ -46,7 +47,7 @@ const scrapeCareIcons = (document: Document) => {
     }
   });
 
-  const plantData: Partial<PlantDataRaw> = {};
+  const plantData: Partial<PlantDataDocument> = {};
   if (soilType.length) plantData.soilTypes = soilType;
   if (lightLevel.length) plantData.lightLevels = lightLevel;
 
@@ -76,7 +77,7 @@ const scrapeStructuredFields = (document: Document) => {
     }
   });
 
-  return Object.fromEntries(plantData) as Partial<PlantDataRaw>;
+  return Object.fromEntries(plantData) as Partial<PlantDataDocument>;
 };
 
 const scrapePlantSummary = (document: Document) => {
@@ -93,13 +94,13 @@ const scrapePlantSummary = (document: Document) => {
     }
   });
 
-  return Object.fromEntries(plantData) as Partial<PlantDataRaw>;
+  return Object.fromEntries(plantData) as Partial<PlantDataDocument>;
 };
 
 const extractPlantSize = (plantCharData: string) => {
   const plantSizeRegExp = /(\d+\.*\d*)+?\s*(m|cm)/g;
   const sizeMatches = Array.from(plantCharData.matchAll(plantSizeRegExp));
-  const plantData: Pick<PlantDataRaw, "height" | "spread"> = {};
+  const plantData: Pick<PlantDataDocument, "height" | "spread"> = {};
 
   if (sizeMatches.length === 2) {
     // Size data typically listed as "<height> by <spread>", get the first 2 numbers listed
@@ -107,7 +108,8 @@ const extractPlantSize = (plantCharData: string) => {
       const [_, amount, unit] = sizeMatches[i];
       plantData[i === 0 ? "height" : "spread"] = {
         amount: Number(amount),
-        unit,
+        // TODO: Handle 'bad' unit
+        unit: unit as PlantSizeUnit,
       };
     }
   }
@@ -116,7 +118,7 @@ const extractPlantSize = (plantCharData: string) => {
 };
 
 const scrapePlantPhysicalChars = (document: Document) => {
-  let plantData: Partial<PlantDataRaw> = {};
+  let plantData: Partial<PlantDataDocument> = {};
   const plantCharData = document.getElementById(
     "contentplaceholder1_lblphystatment"
   )?.textContent;
@@ -131,7 +133,7 @@ const scrapePlantPhysicalChars = (document: Document) => {
 
 export const scrapePFAF = async (
   scientificName: string
-): Promise<PlantDataRaw> => {
+): Promise<PlantDataDocument> => {
   const scrapeUrl = `${PFAF_URL}${scientificName.replace(/ /g, "+")}`;
   const response = await fetch(scrapeUrl);
   const html = (await response.text()).toLowerCase();
@@ -142,7 +144,7 @@ export const scrapePFAF = async (
     return { scientificName };
   }
 
-  const scrapedData: PlantDataRaw = {
+  const scrapedData: PlantDataDocument = {
     scientificName: scientificName,
     scrapeSources: [scrapeUrl],
     ...scrapeStructuredFields(document),

@@ -1,8 +1,8 @@
 import { gbifClient, GbifOccurenceResult } from "../../config/gbifClient";
-import { PlantDataRaw } from "../../config/types";
+import { PlantDataDocument } from "../../config/types";
 
 type CommonPlantData = Pick<
-  PlantDataRaw,
+  PlantDataDocument,
   "occurrenceCoords" | "mediaUrls" | "occurrenceIds"
 >;
 

@@ -1,0 +1,16 @@
+
+enum PlantDataField {
+  scientificName
+  commonNames
+  bloomColors
+  bloomTimes
+  isPerennial
+  maturityTime
+  habitat
+  soilTypes
+  lightLevels
+  hardiness
+  height
+  spread
+  uses
+}

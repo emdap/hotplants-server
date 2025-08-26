@@ -1,0 +1,36 @@
+enum PlantSizeUnit {
+  m
+  cm
+  in
+  ft
+}
+
+type PlantSize {
+  amount: Int
+  unit: PlantSizeUnit
+}
+
+type PlantData {
+  scientificName: String!
+  commonNames: [String]
+  bloomColors: [String]
+  bloomTimes: [String]
+  isPerennial: Boolean
+  maturityTime: String
+
+  habitat: String
+  soilTypes: [String]
+  lightLevels: [String]
+  hardiness: [Int]
+  height: PlantSize
+  spread: PlantSize
+  uses: [String]
+
+  #   otherTraits: Object
+}
+
+scalar JSON
+
+type Query {
+  plants(limit: Int, skip: Int, where: JSON): [PlantData]
+}

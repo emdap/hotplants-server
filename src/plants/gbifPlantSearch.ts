@@ -1,6 +1,6 @@
 import { InsertOneResult, UpdateResult } from "mongodb";
 import { gbifClient, GbifOccurrenceSearchParams } from "../config/gbifClient";
-import { PlantDataRaw } from "../config/types";
+import { PlantDataDocument } from "../config/types";
 import {
   combineGbifData,
   GbifResultDict,
@@ -59,9 +59,9 @@ export const getCompletedGbifPlants = async (gbifResults: GbifResultDict) => {
   if (combinedData.length) {
     const { storagePromises, plantData } = combinedData.reduce<{
       storagePromises: Promise<
-        UpdateResult<PlantDataRaw> | InsertOneResult<PlantDataRaw>
+        UpdateResult<PlantDataDocument> | InsertOneResult<PlantDataDocument>
       >[];
-      plantData: PlantDataRaw[];
+      plantData: PlantDataDocument[];
     }>(
       (prev, { needsUpdate, ...plant }) => {
         needsUpdate && prev.storagePromises.push(storePlantData(plant));

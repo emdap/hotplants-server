@@ -8,12 +8,12 @@ import {
   gbifSearchesCollection,
   plantCollection,
 } from "../../config/mongodbClient";
-import { GbifSearchRecord, PlantDataRaw } from "../../config/types";
+import { GbifSearchRecord, PlantDataDocument } from "../../config/types";
 import { scrapePFAF } from "../pfafScraper";
 
 export const lookupPlantByName = async (
   scientificName: string
-): Promise<PlantDataRaw> => {
+): Promise<PlantDataDocument> => {
   const lowercaseName = scientificName.toLowerCase();
   const existingPlant = await plantCollection.findOne({
     scientificName: lowercaseName,
@@ -22,7 +22,7 @@ export const lookupPlantByName = async (
   return existingPlant ?? scrapePFAF(lowercaseName);
 };
 
-export const storePlantData = async (plantData: PlantDataRaw) => {
+export const storePlantData = async (plantData: PlantDataDocument) => {
   const { _id, ...rest } = plantData;
 
   return _id

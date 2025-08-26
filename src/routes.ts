@@ -12,9 +12,24 @@ import type { Request as ExRequest, Response as ExResponse, RequestHandler, Rout
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 
 const models: TsoaRoute.Models = {
-    "PlantSizeData": {
+    "Maybe_Scalars-at-Int_91_output_93__": {
         "dataType": "refAlias",
-        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"unit":{"dataType":"union","subSchemas":[{"dataType":"enum","enums":["m"]},{"dataType":"enum","enums":["cm"]},{"dataType":"string"}],"required":true},"amount":{"dataType":"double","required":true}},"validators":{}},
+        "type": {"dataType":"union","subSchemas":[{"dataType":"double"},{"dataType":"enum","enums":[null]}],"validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "PlantSizeUnit": {
+        "dataType": "refEnum",
+        "enums": ["cm","ft","in","m"],
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "Maybe_PlantSizeUnit_": {
+        "dataType": "refAlias",
+        "type": {"dataType":"union","subSchemas":[{"ref":"PlantSizeUnit"},{"dataType":"enum","enums":[null]}],"validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "PlantSize": {
+        "dataType": "refAlias",
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"unit":{"ref":"Maybe_PlantSizeUnit_"},"amount":{"ref":"Maybe_Scalars-at-Int_91_output_93__"},"__typename":{"dataType":"enum","enums":["PlantSize"]}},"validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "Record_string.string_": {
@@ -22,19 +37,19 @@ const models: TsoaRoute.Models = {
         "type": {"dataType":"nestedObjectLiteral","nestedProperties":{},"additionalProperties":{"dataType":"string"},"validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "Pick_PlantDataRaw.Exclude_keyofPlantDataRaw._id__": {
+    "Pick_PlantDataDocument.Exclude_keyofPlantDataDocument._id__": {
         "dataType": "refAlias",
-        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"scientificName":{"dataType":"string","required":true},"commonName":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"array","array":{"dataType":"string"}}]},"bloomColor":{"dataType":"string"},"bloomTime":{"dataType":"string"},"isPerennial":{"dataType":"boolean"},"maturityTime":{"dataType":"string"},"habitat":{"dataType":"string"},"soilTypes":{"dataType":"array","array":{"dataType":"string"}},"lightLevels":{"dataType":"array","array":{"dataType":"string"}},"hardiness":{"dataType":"double"},"height":{"ref":"PlantSizeData"},"spread":{"ref":"PlantSizeData"},"uses":{"dataType":"array","array":{"dataType":"string"}},"otherTraits":{"ref":"Record_string.string_"},"occurrenceCoords":{"dataType":"array","array":{"dataType":"array","array":{"dataType":"double"}}},"mediaUrls":{"dataType":"array","array":{"dataType":"string"}},"occurrenceIds":{"dataType":"array","array":{"dataType":"double"}},"scrapeSources":{"dataType":"array","array":{"dataType":"string"}}},"validators":{}},
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"__typename":{"dataType":"enum","enums":["PlantData"]},"bloomColors":{"dataType":"array","array":{"dataType":"string"}},"bloomTimes":{"dataType":"array","array":{"dataType":"string"}},"commonNames":{"dataType":"array","array":{"dataType":"string"}},"habitat":{"dataType":"string"},"hardiness":{"dataType":"array","array":{"dataType":"double"}},"height":{"ref":"PlantSize"},"isPerennial":{"dataType":"boolean"},"lightLevels":{"dataType":"array","array":{"dataType":"string"}},"maturityTime":{"dataType":"string"},"scientificName":{"dataType":"string","required":true},"soilTypes":{"dataType":"array","array":{"dataType":"string"}},"spread":{"ref":"PlantSize"},"uses":{"dataType":"array","array":{"dataType":"string"}},"otherTraits":{"ref":"Record_string.string_"},"occurrenceCoords":{"dataType":"array","array":{"dataType":"array","array":{"dataType":"double"}}},"mediaUrls":{"dataType":"array","array":{"dataType":"string"}},"occurrenceIds":{"dataType":"array","array":{"dataType":"double"}},"scrapeSources":{"dataType":"array","array":{"dataType":"string"}}},"validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "Omit_PlantDataRaw._id_": {
+    "Omit_PlantDataDocument._id_": {
         "dataType": "refAlias",
-        "type": {"ref":"Pick_PlantDataRaw.Exclude_keyofPlantDataRaw._id__","validators":{}},
+        "type": {"ref":"Pick_PlantDataDocument.Exclude_keyofPlantDataDocument._id__","validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "OccurrenceScrapeResponse": {
         "dataType": "refAlias",
-        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"results":{"dataType":"array","array":{"dataType":"refAlias","ref":"Omit_PlantDataRaw._id_"},"required":true},"occurrencesFound":{"dataType":"double","required":true},"count":{"dataType":"double","required":true}},"validators":{}},
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"results":{"dataType":"array","array":{"dataType":"refAlias","ref":"Omit_PlantDataDocument._id_"},"required":true},"occurrencesFound":{"dataType":"double","required":true},"count":{"dataType":"double","required":true}},"validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "Record_string.never_": {

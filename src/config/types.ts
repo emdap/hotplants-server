@@ -1,22 +1,9 @@
 import { ObjectId } from "mongodb";
-import { PlantSizeData } from "./mongodbClient";
+import { PlantData } from "../graphql/types";
 
-export type PlantDataRaw = {
+export type PlantDataDocument = PlantData & {
   _id?: ObjectId;
 
-  scientificName: string;
-  commonName?: string | string[];
-  bloomColor?: string;
-  bloomTime?: string;
-  isPerennial?: boolean;
-  maturityTime?: string;
-  habitat?: string;
-  soilTypes?: string[];
-  lightLevels?: string[];
-  hardiness?: number;
-  height?: PlantSizeData;
-  spread?: PlantSizeData;
-  uses?: string[];
   otherTraits?: Record<string, string>;
 
   // Data from Gbif
@@ -30,7 +17,7 @@ export type PlantDataRaw = {
 export type OccurrenceScrapeResponse = {
   count: number;
   occurrencesFound: number;
-  results: Omit<PlantDataRaw, "_id">[];
+  results: Omit<PlantDataDocument, "_id">[];
 };
 
 export type GbifSearchRecord = {
