@@ -1,10 +1,5 @@
 import { gbifClient, GbifOccurenceResult } from "../../config/gbifClient";
-import { PlantDataDocument } from "../../config/types";
-
-type CommonPlantData = Pick<
-  PlantDataDocument,
-  "occurrenceCoords" | "mediaUrls" | "occurrenceIds"
->;
+import { CommonPlantData } from "../../config/types";
 
 type NormalizedGbifResult = Omit<
   GbifOccurenceResult,

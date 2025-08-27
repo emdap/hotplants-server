@@ -57,6 +57,29 @@
 			},
 			"Pick_PlantDataDocument.Exclude_keyofPlantDataDocument._id__": {
 				"properties": {
+					"occurrenceCoords": {
+						"items": {
+							"items": {
+								"type": "number",
+								"format": "double"
+							},
+							"type": "array"
+						},
+						"type": "array"
+					},
+					"mediaUrls": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					"occurrenceIds": {
+						"items": {
+							"type": "number",
+							"format": "double"
+						},
+						"type": "array"
+					},
 					"__typename": {
 						"type": "string",
 						"enum": [
@@ -127,29 +150,6 @@
 					},
 					"otherTraits": {
 						"$ref": "#/components/schemas/Record_string.string_"
-					},
-					"occurrenceCoords": {
-						"items": {
-							"items": {
-								"type": "number",
-								"format": "double"
-							},
-							"type": "array"
-						},
-						"type": "array"
-					},
-					"mediaUrls": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
-					},
-					"occurrenceIds": {
-						"items": {
-							"type": "number",
-							"format": "double"
-						},
-						"type": "array"
 					},
 					"scrapeSources": {
 						"items": {

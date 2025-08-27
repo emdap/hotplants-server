@@ -26,7 +26,8 @@ type PlantData {
   spread: PlantSize
   uses: [String]
 
-  #   otherTraits: Object
+  occurrenceCoords: [[Int]]
+  mediaUrls: [String]
 }
 
 scalar JSON

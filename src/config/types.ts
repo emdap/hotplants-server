@@ -1,17 +1,17 @@
 import { ObjectId } from "mongodb";
 import { PlantData } from "../graphql/graphql";
 
-export type PlantDataDocument = PlantData & {
+type CommonPlantDataKeys = "occurrenceCoords" | "mediaUrls" | "occurrenceIds";
+
+export type PlantDataDocument = Omit<PlantData, CommonPlantDataKeys> & {
   _id?: ObjectId;
 
   otherTraits?: Record<string, string>;
-
-  // Data from Gbif
   occurrenceCoords?: number[][];
   mediaUrls?: string[];
-  occurrenceIds?: number[];
 
   scrapeSources?: string[];
+  occurrenceIds?: number[];
 };
 
 export type OccurrenceScrapeResponse = {
@@ -26,3 +26,5 @@ export type GbifSearchRecord = {
   lastPageSearched: number;
   hasNextPage: boolean;
 };
+
+export type CommonPlantData = Pick<PlantDataDocument, CommonPlantDataKeys>;

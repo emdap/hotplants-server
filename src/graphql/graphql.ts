@@ -27,6 +27,8 @@ export type PlantData = {
   isPerennial?: Maybe<Scalars['Boolean']['output']>;
   lightLevels?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
   maturityTime?: Maybe<Scalars['String']['output']>;
+  mediaUrls?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
+  occurrenceCoords?: Maybe<Array<Maybe<Array<Maybe<Scalars['Int']['output']>>>>>;
   scientificName: Scalars['String']['output'];
   soilTypes?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
   spread?: Maybe<PlantSize>;
@@ -165,6 +167,8 @@ export type PlantDataResolvers<ContextType = any, ParentType extends ResolversPa
   isPerennial?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   lightLevels?: Resolver<Maybe<Array<Maybe<ResolversTypes['String']>>>, ParentType, ContextType>;
   maturityTime?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  mediaUrls?: Resolver<Maybe<Array<Maybe<ResolversTypes['String']>>>, ParentType, ContextType>;
+  occurrenceCoords?: Resolver<Maybe<Array<Maybe<Array<Maybe<ResolversTypes['Int']>>>>>, ParentType, ContextType>;
   scientificName?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   soilTypes?: Resolver<Maybe<Array<Maybe<ResolversTypes['String']>>>, ParentType, ContextType>;
   spread?: Resolver<Maybe<ResolversTypes['PlantSize']>, ParentType, ContextType>;
