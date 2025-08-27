@@ -3,7 +3,7 @@ import { readFileSync } from "fs";
 import gql from "graphql-tag";
 import path from "path";
 import { plantCollection } from "../config/mongodbClient";
-import { Resolvers } from "./types";
+import { Resolvers } from "./graphql";
 
 const schemaPath = path.join(__dirname, "schema.graphql");
 const resolvers: Resolvers = {

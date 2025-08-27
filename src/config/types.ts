@@ -1,5 +1,5 @@
 import { ObjectId } from "mongodb";
-import { PlantData } from "../graphql/types";
+import { PlantData } from "../graphql/graphql";
 
 export type PlantDataDocument = PlantData & {
   _id?: ObjectId;

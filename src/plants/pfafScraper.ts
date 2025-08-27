@@ -1,6 +1,6 @@
 import { JSDOM } from "jsdom";
 import { PlantDataDocument } from "../config/types";
-import { PlantSizeUnit } from "../graphql/types";
+import { PlantSizeUnit } from "../graphql/graphql";
 
 const PFAF_URL = "https://pfaf.org/user/Plant.aspx?LatinName=";
 
