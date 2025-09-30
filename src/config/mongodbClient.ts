@@ -1,5 +1,5 @@
 import { MongoClient } from "mongodb";
-import { GbifSearchRecord, PlantDataDocument } from "./types";
+import { PlantDataDocument, SearchRecord } from "./types";
 
 export type PlantSizeData = { amount: number; unit: "m" | "cm" | string };
 
@@ -10,4 +10,4 @@ export const plantCollection =
   plantsDb.collection<PlantDataDocument>("plantData");
 
 export const gbifSearchesCollection =
-  plantsDb.collection<GbifSearchRecord>("gbifSearches");
+  plantsDb.collection<SearchRecord>("gbifSearches");

@@ -8,8 +8,17 @@ import {
   gbifSearchesCollection,
   plantCollection,
 } from "../../config/mongodbClient";
-import { GbifSearchRecord, PlantDataDocument } from "../../config/types";
+import {
+  OccurrenceScrapeResponse,
+  PlantDataDocument,
+  SearchRecord,
+} from "../../config/types";
 import { scrapePFAF } from "../pfafScraper";
+
+export type GbifPaginationInfo = Pick<
+  GbifOccurrenceSearchResponse,
+  "offset" | "limit" | "endOfRecords"
+>;
 
 /**
  *
@@ -53,55 +62,53 @@ export const lookupPlantByCoordinates = async ({
     })
     .toArray();
 
-export const getGbifSearchRecord = (
+export const openGbifSearchRecord = (
   gbifSearchParams: GbifOccurrenceSearchParams
 ) => {
   const jsonStringSearch = JSON.stringify(gbifSearchParams);
 
-  return gbifSearchesCollection.findOne({
-    jsonStringSearch,
-  });
+  return gbifSearchesCollection.findOneAndUpdate(
+    {
+      jsonStringSearch,
+    },
+    { status: "SCRAPING" }
+  );
 };
 
-export const updateGbifSearchRecord = async (
-  existingRecord: WithId<GbifSearchRecord> | null,
-  gbifSearchParams: GbifOccurrenceSearchParams,
-  { offset, limit, endOfRecords }: GbifOccurrenceSearchResponse,
-  newUniqueOccurrences: number = 0
+export const createGbifSearchRecord = async (
+  gbifSearchParams: GbifOccurrenceSearchParams
 ) => {
-  const createGbifSearchRecord = (
-    gbifSearchParams: GbifOccurrenceSearchParams
-  ) => {
-    const jsonStringSearch = JSON.stringify(gbifSearchParams);
+  const jsonStringSearch = JSON.stringify(gbifSearchParams);
 
-    return gbifSearchesCollection.findOneAndUpdate(
-      {
-        jsonStringSearch,
-      },
-      {
-        $setOnInsert: {
-          jsonStringSearch,
-          pageSize: gbifSearchParams.limit,
-          lastPageSearched: 0,
-          hasNextPage: false,
-        },
-      },
-      { upsert: true, returnDocument: "after" }
-    );
-  };
+  const insertedRecord = await gbifSearchesCollection.insertOne({
+    jsonStringSearch,
+    status: "SCRAPING",
+    pageSize: gbifSearchParams.limit,
+    lastPageSearched: 0,
+    uniqueOccurrences: 0,
+    hasNextPage: false,
+  });
 
-  const searchRecord =
-    existingRecord ?? (await createGbifSearchRecord(gbifSearchParams));
-  searchRecord &&
-    gbifSearchesCollection.updateOne(
-      { _id: searchRecord._id },
-      {
-        $set: {
-          hasNextPage: !endOfRecords && newUniqueOccurrences !== 0,
-          lastPageSearched: limit && Math.round((offset ?? 0) / limit),
-          uniqueOccurrences:
-            (searchRecord.uniqueOccurrences || 0) + newUniqueOccurrences,
-        },
-      }
-    );
+  return (
+    insertedRecord.insertedId &&
+    gbifSearchesCollection.findOne(insertedRecord.insertedId)
+  );
 };
+
+export const closeGbifSearchRecord = (
+  searchRecord: WithId<SearchRecord>,
+  { paginationInfo, count }: OccurrenceScrapeResponse
+) =>
+  gbifSearchesCollection.updateOne(
+    { _id: searchRecord._id },
+    {
+      $set: {
+        status: "DONE",
+        hasNextPage: !paginationInfo.endOfRecords && count !== 0,
+        lastPageSearched:
+          paginationInfo.limit &&
+          Math.round((paginationInfo.offset ?? 0) / paginationInfo.limit),
+        uniqueOccurrences: (searchRecord.uniqueOccurrences || 0) + count,
+      },
+    }
+  );
