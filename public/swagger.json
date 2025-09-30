@@ -1317,7 +1317,7 @@
 				"type": "object",
 				"description": "Construct a type with a set of properties K of type T"
 			},
-			"Pick_PlantDataDocument.Exclude_keyofPlantDataDocument._id__": {
+			"Pick_PlantDataDocument.Exclude_keyofPlantDataDocument.addedTimestamp-or-updatedTimestamp__": {
 				"properties": {
 					"scientificName": {
 						"type": "string"
@@ -1342,6 +1342,12 @@
 						"items": {
 							"type": "number",
 							"format": "double"
+						},
+						"type": "array"
+					},
+					"scrapeSources": {
+						"items": {
+							"type": "string"
 						},
 						"type": "array"
 					},
@@ -1410,14 +1416,11 @@
 						},
 						"type": "array"
 					},
+					"_id": {
+						"$ref": "#/components/schemas/ObjectId"
+					},
 					"otherTraits": {
 						"$ref": "#/components/schemas/Record_string.string_"
-					},
-					"scrapeSources": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
 					}
 				},
 				"required": [
@@ -1426,43 +1429,25 @@
 				"type": "object",
 				"description": "From T, pick a set of properties whose keys are in the union K"
 			},
-			"Omit_PlantDataDocument._id_": {
-				"$ref": "#/components/schemas/Pick_PlantDataDocument.Exclude_keyofPlantDataDocument._id__",
+			"Omit_PlantDataDocument.addedTimestamp-or-updatedTimestamp_": {
+				"$ref": "#/components/schemas/Pick_PlantDataDocument.Exclude_keyofPlantDataDocument.addedTimestamp-or-updatedTimestamp__",
 				"description": "Construct a type with the properties of T except for those in type K."
 			},
-			"Pick_GbifOccurrenceSearchResponse.offset-or-limit-or-endOfRecords_": {
-				"properties": {
-					"limit": {
-						"type": "number",
-						"format": "double",
-						"description": "Format: int32",
-						"example": null
-					},
-					"offset": {
-						"type": "number",
-						"format": "double",
-						"description": "Format: int64",
-						"example": null
-					},
-					"endOfRecords": {
-						"type": "boolean",
-						"example": null
-					}
-				},
-				"type": "object",
-				"description": "From T, pick a set of properties whose keys are in the union K"
-			},
-			"GbifPaginationInfo": {
-				"$ref": "#/components/schemas/Pick_GbifOccurrenceSearchResponse.offset-or-limit-or-endOfRecords_"
+			"PartialPlantData": {
+				"$ref": "#/components/schemas/Omit_PlantDataDocument.addedTimestamp-or-updatedTimestamp_"
 			},
 			"OccurrenceScrapeResponse": {
 				"properties": {
-					"paginationInfo": {
-						"$ref": "#/components/schemas/GbifPaginationInfo"
+					"endOfRecords": {
+						"type": "boolean"
+					},
+					"totalOccurrencesScraped": {
+						"type": "number",
+						"format": "double"
 					},
 					"results": {
 						"items": {
-							"$ref": "#/components/schemas/Omit_PlantDataDocument._id_"
+							"$ref": "#/components/schemas/PartialPlantData"
 						},
 						"type": "array"
 					},
@@ -1472,7 +1457,8 @@
 					}
 				},
 				"required": [
-					"paginationInfo",
+					"endOfRecords",
+					"totalOccurrencesScraped",
 					"results",
 					"count"
 				],

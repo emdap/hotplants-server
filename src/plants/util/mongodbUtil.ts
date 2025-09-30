@@ -1,24 +1,17 @@
 import { Feature, Polygon } from "geojson";
-import { WithId } from "mongodb";
-import {
-  GbifOccurrenceSearchParams,
-  GbifOccurrenceSearchResponse,
-} from "../../config/gbifClient";
+import { ObjectId, WithId } from "mongodb";
+import { GbifOccurrenceSearchParams } from "../../config/gbifClient";
 import {
   gbifSearchesCollection,
   plantCollection,
 } from "../../config/mongodbClient";
 import {
   OccurrenceScrapeResponse,
+  PartialPlantData,
   PlantDataDocument,
 } from "../../config/types";
 import { SearchRecord, SearchRecordStatus } from "../../graphql/graphql";
 import { scrapePFAF } from "../pfafScraper";
-
-export type GbifPaginationInfo = Pick<
-  GbifOccurrenceSearchResponse,
-  "offset" | "limit" | "endOfRecords"
->;
 
 /**
  *
@@ -32,7 +25,7 @@ export const lookupPlantByName = async (
   scientificName: string
 ): Promise<{
   existing: boolean;
-  data: PlantDataDocument;
+  data: PartialPlantData;
 }> => {
   const lowercaseName = scientificName.toLowerCase();
   const existingPlant = await plantCollection.findOne({
@@ -45,12 +38,21 @@ export const lookupPlantByName = async (
   };
 };
 
-export const storePlantData = async (plantData: PlantDataDocument) => {
-  const { _id, ...rest } = plantData;
+export const storePlantData = async ({
+  _id,
+  ...plantData
+}: PartialPlantData & { _id?: ObjectId; addedTimestamp?: number }) => {
+  // Enforce strict typechecking
+  const unixTimestamp = Date.now();
+  const fullData: PlantDataDocument = {
+    ...plantData,
+    addedTimestamp: plantData.addedTimestamp ?? unixTimestamp,
+    updatedTimestamp: unixTimestamp,
+  };
 
   return _id
-    ? plantCollection.updateOne({ _id }, { $set: rest })
-    : plantCollection.insertOne(rest);
+    ? plantCollection.updateOne({ _id }, { $set: fullData })
+    : plantCollection.insertOne(fullData);
 };
 
 export const lookupPlantByCoordinates = async ({
@@ -71,7 +73,7 @@ export const openGbifSearchRecord = (
     {
       jsonStringSearch,
     },
-    { $set: { status: SearchRecordStatus.Scraping } }
+    { $set: { status: SearchRecordStatus.Scraping, lastAddedCount: undefined } }
   );
 };
 
@@ -83,32 +85,34 @@ export const createGbifSearchRecord = async (
   const insertedRecord = await gbifSearchesCollection.insertOne({
     jsonStringSearch,
     status: SearchRecordStatus.Scraping,
-    pageSize: gbifSearchParams.limit,
-    lastPageSearched: 0,
+
+    totalOccurrences: 0,
     uniqueOccurrences: 0,
-    hasNextPage: false,
   });
 
   return (
     insertedRecord.insertedId &&
-    gbifSearchesCollection.findOne(insertedRecord.insertedId)
+    gbifSearchesCollection.findOne(new ObjectId(insertedRecord.insertedId))
   );
 };
 
 export const closeGbifSearchRecord = (
   searchRecord: WithId<SearchRecord>,
-  { paginationInfo, count }: OccurrenceScrapeResponse
-) =>
-  gbifSearchesCollection.updateOne(
+  { count, totalOccurrencesScraped, endOfRecords }: OccurrenceScrapeResponse
+) => {
+  // Enforce strict typechecking on the updated record
+  const updatedSearchRecord: Omit<SearchRecord, "jsonStringSearch"> = {
+    status: SearchRecordStatus.Done,
+    lastAddedCount: count,
+    uniqueOccurrences: searchRecord.uniqueOccurrences + count,
+    totalOccurrences: searchRecord.totalOccurrences + totalOccurrencesScraped,
+    endOfRecords,
+  };
+
+  return gbifSearchesCollection.updateOne(
     { _id: searchRecord._id },
     {
-      $set: {
-        status: SearchRecordStatus.Done,
-        hasNextPage: !paginationInfo.endOfRecords && count !== 0,
-        lastPageSearched:
-          paginationInfo.limit &&
-          Math.round((paginationInfo.offset ?? 0) / paginationInfo.limit),
-        uniqueOccurrences: (searchRecord.uniqueOccurrences || 0) + count,
-      },
+      $set: updatedSearchRecord,
     }
   );
+};

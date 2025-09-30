@@ -1,10 +1,10 @@
 import { JSDOM } from "jsdom";
-import { PlantDataDocument } from "../config/types";
+import { PartialPlantData } from "../config/types";
 import { PlantSizeUnit } from "../graphql/graphql";
 
 const PFAF_URL = "https://pfaf.org/user/Plant.aspx?LatinName=";
 
-const PLANT_FIELD_MAPPING: Record<string, keyof PlantDataDocument> = {
+const PLANT_FIELD_MAPPING: Record<string, keyof PartialPlantData> = {
   "common name": "commonNames",
   "usda hardiness": "hardiness",
   habitats: "habitat",
@@ -47,7 +47,7 @@ const scrapeCareIcons = (document: Document) => {
     }
   });
 
-  const plantData: Partial<PlantDataDocument> = {};
+  const plantData: Partial<PartialPlantData> = {};
   if (soilType.length) plantData.soilTypes = soilType;
   if (lightLevel.length) plantData.lightLevels = lightLevel;
 
@@ -77,7 +77,7 @@ const scrapeStructuredFields = (document: Document) => {
     }
   });
 
-  return Object.fromEntries(plantData) as Partial<PlantDataDocument>;
+  return Object.fromEntries(plantData) as Partial<PartialPlantData>;
 };
 
 const scrapePlantSummary = (document: Document) => {
@@ -94,13 +94,13 @@ const scrapePlantSummary = (document: Document) => {
     }
   });
 
-  return Object.fromEntries(plantData) as Partial<PlantDataDocument>;
+  return Object.fromEntries(plantData) as Partial<PartialPlantData>;
 };
 
 const extractPlantSize = (plantCharData: string) => {
   const plantSizeRegExp = /(\d+\.*\d*)+?\s*(m|cm)/g;
   const sizeMatches = Array.from(plantCharData.matchAll(plantSizeRegExp));
-  const plantData: Pick<PlantDataDocument, "height" | "spread"> = {};
+  const plantData: Pick<PartialPlantData, "height" | "spread"> = {};
 
   if (sizeMatches.length === 2) {
     // Size data typically listed as "<height> by <spread>", get the first 2 numbers listed
@@ -118,7 +118,7 @@ const extractPlantSize = (plantCharData: string) => {
 };
 
 const scrapePlantPhysicalChars = (document: Document) => {
-  let plantData: Partial<PlantDataDocument> = {};
+  let plantData: Partial<PartialPlantData> = {};
   const plantCharData = document.getElementById(
     "contentplaceholder1_lblphystatment"
   )?.textContent;
@@ -133,7 +133,7 @@ const scrapePlantPhysicalChars = (document: Document) => {
 
 export const scrapePFAF = async (
   scientificName: string
-): Promise<PlantDataDocument> => {
+): Promise<PartialPlantData> => {
   const scrapeUrl = `${PFAF_URL}${scientificName.replace(/ /g, "+")}`;
   const response = await fetch(scrapeUrl);
   const html = (await response.text()).toLowerCase();
@@ -144,7 +144,7 @@ export const scrapePFAF = async (
     return { scientificName };
   }
 
-  const scrapedData: PlantDataDocument = {
+  const scrapedData: PartialPlantData = {
     scientificName: scientificName,
     scrapeSources: [scrapeUrl],
     ...scrapeStructuredFields(document),

@@ -1,13 +1,17 @@
 import { InsertOneResult, UpdateResult } from "mongodb";
 import { gbifClient, GbifOccurenceResult } from "../../config/gbifClient";
-import { CommonPlantData, PlantDataDocument } from "../../config/types";
+import {
+  PartialPlantData,
+  PlantDataArrays,
+  PlantDataDocument,
+} from "../../config/types";
 import { lookupPlantByName, storePlantData } from "./mongodbUtil";
 
 type NormalizedGbifResult = Omit<
   GbifOccurenceResult,
   "media" | "decimalLatitude" | "decimalLongitude"
 > &
-  Required<CommonPlantData>;
+  Required<PlantDataArrays>;
 
 export type GbifResultDict = Record<string, NormalizedGbifResult>;
 
@@ -39,6 +43,7 @@ const normalizePlant = (gbifOccurrence: GbifOccurenceResult) => {
     mediaUrls: media.map(({ identifier }) => identifier),
     occurrenceCoords: [],
     occurrenceIds: [gbifOccurrence.key],
+    scrapeSources: [],
   };
 
   if (decimalLatitude && decimalLongitude) {
@@ -67,7 +72,7 @@ export const reduceGbifResults = (gbifResults: GbifOccurenceResult[]) =>
     return prev;
   }, {});
 
-export const combineGbifData = <T extends CommonPlantData>(
+export const combineGbifData = <T extends PlantDataArrays>(
   existingData: T,
   newGbifData: NormalizedGbifResult
 ) => {
@@ -77,6 +82,7 @@ export const combineGbifData = <T extends CommonPlantData>(
     occurrenceCoords: existingData.occurrenceCoords || [],
     needsUpdate: false,
     occurrenceIds: existingData.occurrenceIds || [],
+    scrapeSources: existingData.scrapeSources || [],
   };
 
   const newOccurrenceIds = newGbifData.occurrenceIds.filter(
@@ -97,10 +103,10 @@ export const combineGbifData = <T extends CommonPlantData>(
     combinedData.needsUpdate = true;
   }
 
-  newGbifData.occurrenceCoords.forEach((newCoord) => {
+  newGbifData.occurrenceCoords.forEach((newCoord: number[]) => {
     if (
       !combinedData.occurrenceCoords.find(
-        (coord) => coord[0] === newCoord[0] && coord[1] === newCoord[1]
+        (coord) => coord && coord[0] === newCoord[0] && coord[1] === newCoord[1]
       )
     ) {
       combinedData.occurrenceCoords.push(newCoord);
@@ -138,12 +144,13 @@ export const getCompletedGbifPlants = async (
       storagePromises: Promise<
         UpdateResult<PlantDataDocument> | InsertOneResult<PlantDataDocument>
       >[];
-      plantData: PlantDataDocument[];
+      plantData: PartialPlantData[];
     }>(
       (prev, data) => {
         if (data) {
           const { needsUpdate, ...plant } = data;
-          needsUpdate && prev.storagePromises.push(storePlantData(plant));
+          const storagePromise = storePlantData(plant);
+          needsUpdate && prev.storagePromises.push(storagePromise);
           plant.scrapeSources?.length && prev.plantData.push(plant);
         }
 

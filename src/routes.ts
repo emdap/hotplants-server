@@ -62,29 +62,24 @@ const models: TsoaRoute.Models = {
         "type": {"dataType":"nestedObjectLiteral","nestedProperties":{},"additionalProperties":{"dataType":"string"},"validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "Pick_PlantDataDocument.Exclude_keyofPlantDataDocument._id__": {
+    "Pick_PlantDataDocument.Exclude_keyofPlantDataDocument.addedTimestamp-or-updatedTimestamp__": {
         "dataType": "refAlias",
-        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"scientificName":{"dataType":"string","required":true},"occurrenceCoords":{"dataType":"array","array":{"dataType":"array","array":{"dataType":"double"}}},"mediaUrls":{"dataType":"array","array":{"dataType":"string"}},"occurrenceIds":{"dataType":"array","array":{"dataType":"double"}},"__typename":{"dataType":"enum","enums":["PlantData"]},"bloomColors":{"dataType":"array","array":{"dataType":"string"}},"bloomTimes":{"dataType":"array","array":{"dataType":"string"}},"commonNames":{"dataType":"array","array":{"dataType":"string"}},"habitat":{"dataType":"string"},"hardiness":{"dataType":"array","array":{"dataType":"double"}},"height":{"ref":"PlantSize"},"isPerennial":{"dataType":"boolean"},"lightLevels":{"dataType":"array","array":{"dataType":"string"}},"maturityTime":{"dataType":"string"},"soilTypes":{"dataType":"array","array":{"dataType":"string"}},"spread":{"ref":"PlantSize"},"uses":{"dataType":"array","array":{"dataType":"string"}},"otherTraits":{"ref":"Record_string.string_"},"scrapeSources":{"dataType":"array","array":{"dataType":"string"}}},"validators":{}},
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"scientificName":{"dataType":"string","required":true},"occurrenceCoords":{"dataType":"array","array":{"dataType":"array","array":{"dataType":"double"}}},"mediaUrls":{"dataType":"array","array":{"dataType":"string"}},"occurrenceIds":{"dataType":"array","array":{"dataType":"double"}},"scrapeSources":{"dataType":"array","array":{"dataType":"string"}},"__typename":{"dataType":"enum","enums":["PlantData"]},"bloomColors":{"dataType":"array","array":{"dataType":"string"}},"bloomTimes":{"dataType":"array","array":{"dataType":"string"}},"commonNames":{"dataType":"array","array":{"dataType":"string"}},"habitat":{"dataType":"string"},"hardiness":{"dataType":"array","array":{"dataType":"double"}},"height":{"ref":"PlantSize"},"isPerennial":{"dataType":"boolean"},"lightLevels":{"dataType":"array","array":{"dataType":"string"}},"maturityTime":{"dataType":"string"},"soilTypes":{"dataType":"array","array":{"dataType":"string"}},"spread":{"ref":"PlantSize"},"uses":{"dataType":"array","array":{"dataType":"string"}},"_id":{"ref":"ObjectId"},"otherTraits":{"ref":"Record_string.string_"}},"validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "Omit_PlantDataDocument._id_": {
+    "Omit_PlantDataDocument.addedTimestamp-or-updatedTimestamp_": {
         "dataType": "refAlias",
-        "type": {"ref":"Pick_PlantDataDocument.Exclude_keyofPlantDataDocument._id__","validators":{}},
+        "type": {"ref":"Pick_PlantDataDocument.Exclude_keyofPlantDataDocument.addedTimestamp-or-updatedTimestamp__","validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "Pick_GbifOccurrenceSearchResponse.offset-or-limit-or-endOfRecords_": {
+    "PartialPlantData": {
         "dataType": "refAlias",
-        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"limit":{"dataType":"double"},"offset":{"dataType":"double"},"endOfRecords":{"dataType":"boolean"}},"validators":{}},
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "GbifPaginationInfo": {
-        "dataType": "refAlias",
-        "type": {"ref":"Pick_GbifOccurrenceSearchResponse.offset-or-limit-or-endOfRecords_","validators":{}},
+        "type": {"ref":"Omit_PlantDataDocument.addedTimestamp-or-updatedTimestamp_","validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "OccurrenceScrapeResponse": {
         "dataType": "refAlias",
-        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"paginationInfo":{"ref":"GbifPaginationInfo","required":true},"results":{"dataType":"array","array":{"dataType":"refAlias","ref":"Omit_PlantDataDocument._id_"},"required":true},"count":{"dataType":"double","required":true}},"validators":{}},
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"endOfRecords":{"dataType":"boolean","required":true},"totalOccurrencesScraped":{"dataType":"double","required":true},"results":{"dataType":"array","array":{"dataType":"refAlias","ref":"PartialPlantData"},"required":true},"count":{"dataType":"double","required":true}},"validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 };

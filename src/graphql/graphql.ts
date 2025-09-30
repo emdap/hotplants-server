@@ -19,6 +19,7 @@ export type Scalars = {
 
 export type PlantData = {
   __typename?: 'PlantData';
+  addedTimestamp: Scalars['Int']['output'];
   bloomColors?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
   bloomTimes?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
   commonNames?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
@@ -30,9 +31,12 @@ export type PlantData = {
   maturityTime?: Maybe<Scalars['String']['output']>;
   mediaUrls?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
   occurrenceCoords?: Maybe<Array<Maybe<Array<Maybe<Scalars['Int']['output']>>>>>;
+  occurrenceIds?: Maybe<Array<Maybe<Scalars['Int']['output']>>>;
   scientificName: Scalars['String']['output'];
+  scrapeSources?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
   soilTypes?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
   spread?: Maybe<PlantSize>;
+  updatedTimestamp: Scalars['Int']['output'];
   uses?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
 };
 
@@ -69,11 +73,11 @@ export type QuerySearchRecordsArgs = {
 
 export type SearchRecord = {
   __typename?: 'SearchRecord';
-  hasNextPage: Scalars['Boolean']['output'];
+  endOfRecords?: Maybe<Scalars['Boolean']['output']>;
   jsonStringSearch: Scalars['String']['output'];
-  lastPageSearched: Scalars['Int']['output'];
-  pageSize: Scalars['Int']['output'];
+  lastAddedCount?: Maybe<Scalars['Int']['output']>;
   status: SearchRecordStatus;
+  totalOccurrences: Scalars['Int']['output'];
   uniqueOccurrences: Scalars['Int']['output'];
 };
 
@@ -183,6 +187,7 @@ export interface JsonScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes
 }
 
 export type PlantDataResolvers<ContextType = any, ParentType extends ResolversParentTypes['PlantData'] = ResolversParentTypes['PlantData']> = ResolversObject<{
+  addedTimestamp?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   bloomColors?: Resolver<Maybe<Array<Maybe<ResolversTypes['String']>>>, ParentType, ContextType>;
   bloomTimes?: Resolver<Maybe<Array<Maybe<ResolversTypes['String']>>>, ParentType, ContextType>;
   commonNames?: Resolver<Maybe<Array<Maybe<ResolversTypes['String']>>>, ParentType, ContextType>;
@@ -194,9 +199,12 @@ export type PlantDataResolvers<ContextType = any, ParentType extends ResolversPa
   maturityTime?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   mediaUrls?: Resolver<Maybe<Array<Maybe<ResolversTypes['String']>>>, ParentType, ContextType>;
   occurrenceCoords?: Resolver<Maybe<Array<Maybe<Array<Maybe<ResolversTypes['Int']>>>>>, ParentType, ContextType>;
+  occurrenceIds?: Resolver<Maybe<Array<Maybe<ResolversTypes['Int']>>>, ParentType, ContextType>;
   scientificName?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  scrapeSources?: Resolver<Maybe<Array<Maybe<ResolversTypes['String']>>>, ParentType, ContextType>;
   soilTypes?: Resolver<Maybe<Array<Maybe<ResolversTypes['String']>>>, ParentType, ContextType>;
   spread?: Resolver<Maybe<ResolversTypes['PlantSize']>, ParentType, ContextType>;
+  updatedTimestamp?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   uses?: Resolver<Maybe<Array<Maybe<ResolversTypes['String']>>>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
@@ -213,11 +221,11 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
 }>;
 
 export type SearchRecordResolvers<ContextType = any, ParentType extends ResolversParentTypes['SearchRecord'] = ResolversParentTypes['SearchRecord']> = ResolversObject<{
-  hasNextPage?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  endOfRecords?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   jsonStringSearch?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  lastPageSearched?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  pageSize?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  lastAddedCount?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   status?: Resolver<ResolversTypes['SearchRecordStatus'], ParentType, ContextType>;
+  totalOccurrences?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   uniqueOccurrences?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;

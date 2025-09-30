@@ -5,7 +5,6 @@ import { Body, Post, Res, Route, TsoaResponse } from "tsoa";
 import { stringify } from "wkt";
 import { gbifClient, GbifOccurrenceSearchParams } from "../config/gbifClient";
 import { OccurrenceScrapeResponse } from "../config/types";
-import { SearchRecord } from "../graphql/graphql";
 import {
   getCompletedGbifPlants,
   reduceGbifResults,
@@ -30,7 +29,8 @@ const DEFAULT_LIMIT = 100;
 const EMPTY_OCCURRENCE_SCRAPE_RESPONSE: OccurrenceScrapeResponse = {
   count: 0,
   results: [],
-  paginationInfo: { offset: 0, limit: DEFAULT_LIMIT, endOfRecords: true },
+  totalOccurrencesScraped: 0,
+  endOfRecords: true,
 };
 
 const DEFAULT_GBIF_SEARCH_PARAMS: GbifOccurrenceSearchParams = {
@@ -68,7 +68,10 @@ export class PlantController {
 
     const scrapeAdditionalData = async () => {
       try {
-        const results = await normalizeQueryResults(baseQuery, searchRecord);
+        const results = await normalizeQueryResults(
+          baseQuery,
+          searchRecord.totalOccurrences
+        );
         searchRecord && (await closeGbifSearchRecord(searchRecord, results));
         console.info(results);
       } catch (error) {
@@ -81,8 +84,8 @@ export class PlantController {
       }
     };
 
-    searchRecord?._id && scrapeAdditionalData();
-    return searchRecord?._id;
+    searchRecord._id && scrapeAdditionalData();
+    return searchRecord._id;
   }
 
   @Post("scrapeOccurrencesLegacy")
@@ -100,7 +103,10 @@ export class PlantController {
       return errorResponse(500, "Unable to create search record");
     }
 
-    const results = await normalizeQueryResults(baseQuery, searchRecord);
+    const results = await normalizeQueryResults(
+      baseQuery,
+      searchRecord.totalOccurrences
+    );
 
     await closeGbifSearchRecord(searchRecord, results);
 
@@ -133,38 +139,34 @@ const createBaseQuery = async (body: PlantSearchParams | undefined = {}) => {
 
 const normalizeQueryResults = async (
   baseQuery: GbifOccurrenceSearchParams,
-  searchRecord: SearchRecord
-) => {
+  previousSearchOffset: number
+): Promise<OccurrenceScrapeResponse> => {
   const { data } = await gbifClient.GET("/occurrence/search", {
     params: {
       query: {
         ...baseQuery,
-
-        // Always requesting a limit of 100, but doubly enforcing previous limit here so that
-        // the offset definitely matches up
-
-        limit: searchRecord.pageSize,
-        offset: searchRecord.pageSize * (searchRecord.lastPageSearched + 1),
+        offset: previousSearchOffset,
       },
     },
   });
 
-  if (!data?.results) {
+  if (!data?.results?.length) {
     return EMPTY_OCCURRENCE_SCRAPE_RESPONSE;
   }
 
-  const reducedResults = reduceGbifResults(data.results);
+  const { results, endOfRecords } = data;
+  const reducedResults = reduceGbifResults(results);
 
   const uniqueResults = await getCompletedGbifPlants(
     reducedResults,
-    searchRecord.lastPageSearched == 0
+    previousSearchOffset === 0
   );
-
-  const { offset, limit, endOfRecords } = data;
 
   return {
     count: uniqueResults.length,
     results: uniqueResults,
-    paginationInfo: { offset, limit, endOfRecords },
+
+    totalOccurrencesScraped: results.length,
+    endOfRecords: Boolean(endOfRecords),
   };
 };
