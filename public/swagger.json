@@ -1322,35 +1322,6 @@
 					"scientificName": {
 						"type": "string"
 					},
-					"occurrenceCoords": {
-						"items": {
-							"items": {
-								"type": "number",
-								"format": "double"
-							},
-							"type": "array"
-						},
-						"type": "array"
-					},
-					"mediaUrls": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
-					},
-					"occurrenceIds": {
-						"items": {
-							"type": "number",
-							"format": "double"
-						},
-						"type": "array"
-					},
-					"scrapeSources": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
-					},
 					"__typename": {
 						"type": "string",
 						"enum": [
@@ -1401,6 +1372,35 @@
 					"maturityTime": {
 						"type": "string"
 					},
+					"mediaUrls": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					"occurrenceCoords": {
+						"items": {
+							"items": {
+								"type": "number",
+								"format": "double"
+							},
+							"type": "array"
+						},
+						"type": "array"
+					},
+					"occurrenceIds": {
+						"items": {
+							"type": "number",
+							"format": "double"
+						},
+						"type": "array"
+					},
+					"scrapeSources": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
 					"soilTypes": {
 						"items": {
 							"type": "string"
@@ -1424,7 +1424,11 @@
 					}
 				},
 				"required": [
-					"scientificName"
+					"scientificName",
+					"mediaUrls",
+					"occurrenceCoords",
+					"occurrenceIds",
+					"scrapeSources"
 				],
 				"type": "object",
 				"description": "From T, pick a set of properties whose keys are in the union K"

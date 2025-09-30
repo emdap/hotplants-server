@@ -17,6 +17,11 @@ type PlantData {
   addedTimestamp: Int!
   updatedTimestamp: Int!
 
+  occurrenceCoords: [[Int]!]!
+  occurrenceIds: [Int!]!
+  mediaUrls: [String!]!
+  scrapeSources: [String!]!
+
   commonNames: [String]
   bloomColors: [String]
   bloomTimes: [String]
@@ -30,12 +35,6 @@ type PlantData {
   height: PlantSize
   spread: PlantSize
   uses: [String]
-
-  occurrenceCoords: [[Int]]
-  mediaUrls: [String]
-
-  occurrenceIds: [Int]
-  scrapeSources: [String]
 }
 
 enum SearchRecordStatus {

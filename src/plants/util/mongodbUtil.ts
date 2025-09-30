@@ -32,9 +32,18 @@ export const lookupPlantByName = async (
     scientificName: lowercaseName,
   });
 
+  if (existingPlant) {
+    return { existing: true, data: existingPlant };
+  }
+  const scrapedPlant = await scrapePFAF(lowercaseName);
   return {
-    existing: !!existingPlant,
-    data: existingPlant ?? (await scrapePFAF(lowercaseName)),
+    existing: false,
+    data: {
+      ...scrapedPlant,
+      occurrenceCoords: [],
+      occurrenceIds: [],
+      mediaUrls: [],
+    },
   };
 };
 

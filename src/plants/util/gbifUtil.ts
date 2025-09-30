@@ -1,17 +1,19 @@
 import { InsertOneResult, UpdateResult } from "mongodb";
 import { gbifClient, GbifOccurenceResult } from "../../config/gbifClient";
 import {
+  GbifDataArrays,
   PartialPlantData,
-  PlantDataArrays,
   PlantDataDocument,
 } from "../../config/types";
+import { PlantData } from "../../graphql/graphql";
 import { lookupPlantByName, storePlantData } from "./mongodbUtil";
 
 type NormalizedGbifResult = Omit<
   GbifOccurenceResult,
   "media" | "decimalLatitude" | "decimalLongitude"
 > &
-  Required<PlantDataArrays>;
+  Required<GbifDataArrays> &
+  Pick<PlantData, "scrapeSources">;
 
 export type GbifResultDict = Record<string, NormalizedGbifResult>;
 
@@ -72,17 +74,13 @@ export const reduceGbifResults = (gbifResults: GbifOccurenceResult[]) =>
     return prev;
   }, {});
 
-export const combineGbifData = <T extends PlantDataArrays>(
+export const combineGbifData = <T extends GbifDataArrays>(
   existingData: T,
   newGbifData: NormalizedGbifResult
 ) => {
   const combinedData = {
     ...existingData,
-    mediaUrls: existingData.mediaUrls || [],
-    occurrenceCoords: existingData.occurrenceCoords || [],
     needsUpdate: false,
-    occurrenceIds: existingData.occurrenceIds || [],
-    scrapeSources: existingData.scrapeSources || [],
   };
 
   const newOccurrenceIds = newGbifData.occurrenceIds.filter(
@@ -103,7 +101,7 @@ export const combineGbifData = <T extends PlantDataArrays>(
     combinedData.needsUpdate = true;
   }
 
-  newGbifData.occurrenceCoords.forEach((newCoord: number[]) => {
+  newGbifData.occurrenceCoords.forEach((newCoord) => {
     if (
       !combinedData.occurrenceCoords.find(
         (coord) => coord && coord[0] === newCoord[0] && coord[1] === newCoord[1]

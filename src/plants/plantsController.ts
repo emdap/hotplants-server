@@ -68,7 +68,7 @@ export class PlantController {
 
     const scrapeAdditionalData = async () => {
       try {
-        const results = await normalizeQueryResults(
+        const results = await searchGbifOccurrences(
           baseQuery,
           searchRecord.totalOccurrences
         );
@@ -103,7 +103,7 @@ export class PlantController {
       return errorResponse(500, "Unable to create search record");
     }
 
-    const results = await normalizeQueryResults(
+    const results = await searchGbifOccurrences(
       baseQuery,
       searchRecord.totalOccurrences
     );
@@ -137,7 +137,7 @@ const createBaseQuery = async (body: PlantSearchParams | undefined = {}) => {
   };
 };
 
-const normalizeQueryResults = async (
+const searchGbifOccurrences = async (
   baseQuery: GbifOccurrenceSearchParams,
   previousSearchOffset: number
 ): Promise<OccurrenceScrapeResponse> => {
