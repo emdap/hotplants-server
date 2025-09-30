@@ -25,6 +25,7 @@ export type GbifSearchRecord = {
   pageSize: number;
   lastPageSearched: number;
   hasNextPage: boolean;
+  uniqueOccurrences: number;
 };
 
 export type CommonPlantData = Pick<PlantDataDocument, CommonPlantDataKeys>;

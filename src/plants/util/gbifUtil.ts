@@ -1,5 +1,7 @@
+import { InsertOneResult, UpdateResult } from "mongodb";
 import { gbifClient, GbifOccurenceResult } from "../../config/gbifClient";
-import { CommonPlantData } from "../../config/types";
+import { CommonPlantData, PlantDataDocument } from "../../config/types";
+import { lookupPlantByName, storePlantData } from "./mongodbUtil";
 
 type NormalizedGbifResult = Omit<
   GbifOccurenceResult,
@@ -107,4 +109,53 @@ export const combineGbifData = <T extends CommonPlantData>(
   });
 
   return combinedData;
+};
+
+/**
+ *
+ * Get completed plant result by combining GBIF occurrence data with existing data that's already
+ * stored in mongodb, or scraping data from PFAF through a helper function. Toggle whether only
+ * newly scraped results should be returned.
+ *
+ * @param gbifResults The occurrence results from GBIF that will be combined with additional data,
+ * in order to return a complete plant
+ * @param includeExisting Whether to return plants that already existed in mongodb
+ * @returns A list of plants with complete data
+ */
+export const getCompletedGbifPlants = async (
+  gbifResults: GbifResultDict,
+  includeExisting: boolean
+) => {
+  const combinedData = await Promise.all(
+    Object.entries(gbifResults).map(async ([plantKey, plant]) => {
+      const { existing, data } = await lookupPlantByName(plantKey);
+      return !existing || includeExisting ? combineGbifData(data, plant) : null;
+    })
+  );
+
+  if (combinedData.length) {
+    const { storagePromises, plantData } = combinedData.reduce<{
+      storagePromises: Promise<
+        UpdateResult<PlantDataDocument> | InsertOneResult<PlantDataDocument>
+      >[];
+      plantData: PlantDataDocument[];
+    }>(
+      (prev, data) => {
+        if (data) {
+          const { needsUpdate, ...plant } = data;
+          needsUpdate && prev.storagePromises.push(storePlantData(plant));
+          plant.scrapeSources?.length && prev.plantData.push(plant);
+        }
+
+        return prev;
+      },
+      { storagePromises: [], plantData: [] }
+    );
+
+    await Promise.all(storagePromises);
+
+    return plantData;
+  }
+
+  return [];
 };

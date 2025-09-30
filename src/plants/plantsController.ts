@@ -2,9 +2,17 @@ import { bboxPolygon } from "@turf/turf";
 import { BBox } from "geojson";
 import { Body, Post, Route } from "tsoa";
 import { stringify } from "wkt";
-import { GbifOccurrenceSearchParams } from "../config/gbifClient";
+import { gbifClient, GbifOccurrenceSearchParams } from "../config/gbifClient";
 import { OccurrenceScrapeResponse } from "../config/types";
-import { getCompletedGbifPlants, searchGbifPlants } from "./gbifPlantSearch";
+import {
+  getCompletedGbifPlants,
+  reduceGbifResults,
+  searchGbifSpecies,
+} from "./util/gbifUtil";
+import {
+  getGbifSearchRecord,
+  updateGbifSearchRecord,
+} from "./util/mongodbUtil";
 
 export type PlantSearchParams = Omit<
   GbifOccurrenceSearchParams,
@@ -36,34 +44,76 @@ export class PlantController {
   public async scrapeOccurrences(
     @Body() body: PlantSearchParams | undefined = {}
   ): Promise<OccurrenceScrapeResponse | void> {
-    const { boundingBox, ...searchParams } = {
-      ...DEFAULT_GBIF_SEARCH_PARAMS,
+    const {
+      boundingBox,
+      q: searchText,
+      ...searchParams
+    } = {
       ...body,
+      ...DEFAULT_GBIF_SEARCH_PARAMS,
     };
 
     const bboxPoly = boundingBox && bboxPolygon(boundingBox as BBox);
 
     // bboxPoly && results.push(...(await lookupPlantByCoordinates(bboxPoly)));
 
-    const gbifData = await searchGbifPlants({
-      ...(bboxPoly && { geometry: [stringify(bboxPoly)] }),
+    const taxonKey = searchText
+      ? await searchGbifSpecies(searchText)
+      : undefined;
+
+    const geometry = bboxPoly && [stringify(bboxPoly)];
+
+    const baseQuery = {
+      geometry,
+      taxonKey,
       ...searchParams,
+    };
+
+    let searchRecord = await getGbifSearchRecord(baseQuery);
+
+    console.log(searchRecord);
+
+    const { data } = await gbifClient.GET("/occurrence/search", {
+      params: {
+        query: {
+          ...baseQuery,
+
+          // Always requesting a limit of 100, but doubly enforcing previous limit here so that
+          // the offset definitely matches up
+          ...(searchRecord && {
+            limit: searchRecord.pageSize,
+            offset: searchRecord.pageSize * (searchRecord.lastPageSearched + 1),
+          }),
+        },
+      },
     });
 
-    if (!gbifData) {
+    if (!data?.results) {
       return EMPTY_OCCURRENCE_SCRAPE_RESPONSE;
     }
 
-    const occurrencesFound = Object.values(gbifData).reduce<number>(
+    const reducedResults = reduceGbifResults(data.results);
+
+    const occurrencesFound = Object.values(reducedResults).reduce<number>(
       (prev, plant) => (prev += plant.occurrenceIds?.length ?? 0),
       0
     );
-    const results = await getCompletedGbifPlants(gbifData);
+    const uniqueResults = await getCompletedGbifPlants(
+      reducedResults,
+      !searchRecord || searchRecord?.lastPageSearched == 0
+    );
+
+    await updateGbifSearchRecord(
+      searchRecord,
+      baseQuery,
+      data,
+      uniqueResults.length
+    );
 
     return {
-      count: results.length,
       occurrencesFound,
-      results,
+      count: uniqueResults.length,
+      results: uniqueResults,
     };
   }
 }
