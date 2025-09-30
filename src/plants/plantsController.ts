@@ -60,7 +60,7 @@ export class PlantController {
       (await openGbifSearchRecord(baseQuery)) ??
       (await createGbifSearchRecord(baseQuery));
 
-    console.log(searchRecord);
+    console.info(searchRecord);
 
     if (!searchRecord) {
       return errorResponse(500, "Unable to create search record");
@@ -70,7 +70,7 @@ export class PlantController {
       try {
         const results = await normalizeQueryResults(baseQuery, searchRecord);
         searchRecord && (await closeGbifSearchRecord(searchRecord, results));
-        console.log(results);
+        console.info(results);
       } catch (error) {
         console.error(error);
         searchRecord &&
@@ -95,8 +95,6 @@ export class PlantController {
     const searchRecord =
       (await openGbifSearchRecord(baseQuery)) ??
       (await createGbifSearchRecord(baseQuery));
-
-    console.log(searchRecord);
 
     if (!searchRecord) {
       return errorResponse(500, "Unable to create search record");
