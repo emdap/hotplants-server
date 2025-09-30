@@ -1503,6 +1503,16 @@
 								}
 							}
 						}
+					},
+					"500": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "string"
+								}
+							}
+						}
 					}
 				},
 				"description": "Initiate a new scrape of occurrences from GBIF and combine with PFAF data.\nReturn the searchRecord, which can be queried against in graphQL to check\nthe status of the scrape.",
@@ -1535,6 +1545,16 @@
 										},
 										{}
 									]
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "string"
 								}
 							}
 						}

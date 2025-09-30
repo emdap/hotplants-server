@@ -30,8 +30,23 @@ type PlantData {
   mediaUrls: [String]
 }
 
+enum SearchRecordStatus {
+  SCRAPING
+  DONE
+}
+
+type SearchRecord {
+  jsonStringSearch: String!
+  pageSize: Int!
+  lastPageSearched: Int!
+  hasNextPage: Boolean!
+  uniqueOccurrences: Int!
+  status: SearchRecordStatus!
+}
+
 scalar JSON
 
 type Query {
   plants(limit: Int, skip: Int, where: JSON): [PlantData]
+  searchRecords(id: String!): SearchRecord
 }

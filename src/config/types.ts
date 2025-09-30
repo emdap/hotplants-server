@@ -21,16 +21,4 @@ export type OccurrenceScrapeResponse = {
   paginationInfo: GbifPaginationInfo;
 };
 
-export type SearchRecordStatus = "SCRAPING" | "DONE";
-
-export type SearchRecord = {
-  jsonStringSearch: string;
-  pageSize: number;
-  lastPageSearched: number;
-  hasNextPage: boolean;
-  uniqueOccurrences: number;
-
-  status: SearchRecordStatus;
-};
-
 export type CommonPlantData = Pick<PlantDataDocument, CommonPlantDataKeys>;

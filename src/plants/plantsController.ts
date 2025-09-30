@@ -4,7 +4,8 @@ import { ObjectId } from "mongodb";
 import { Body, Post, Res, Route, TsoaResponse } from "tsoa";
 import { stringify } from "wkt";
 import { gbifClient, GbifOccurrenceSearchParams } from "../config/gbifClient";
-import { OccurrenceScrapeResponse, SearchRecord } from "../config/types";
+import { OccurrenceScrapeResponse } from "../config/types";
+import { SearchRecord } from "../graphql/graphql";
 import {
   getCompletedGbifPlants,
   reduceGbifResults,

@@ -11,8 +11,8 @@ import {
 import {
   OccurrenceScrapeResponse,
   PlantDataDocument,
-  SearchRecord,
 } from "../../config/types";
+import { SearchRecord, SearchRecordStatus } from "../../graphql/graphql";
 import { scrapePFAF } from "../pfafScraper";
 
 export type GbifPaginationInfo = Pick<
@@ -71,7 +71,7 @@ export const openGbifSearchRecord = (
     {
       jsonStringSearch,
     },
-    { status: "SCRAPING" }
+    { $set: { status: SearchRecordStatus.Scraping } }
   );
 };
 
@@ -82,7 +82,7 @@ export const createGbifSearchRecord = async (
 
   const insertedRecord = await gbifSearchesCollection.insertOne({
     jsonStringSearch,
-    status: "SCRAPING",
+    status: SearchRecordStatus.Scraping,
     pageSize: gbifSearchParams.limit,
     lastPageSearched: 0,
     uniqueOccurrences: 0,
@@ -103,7 +103,7 @@ export const closeGbifSearchRecord = (
     { _id: searchRecord._id },
     {
       $set: {
-        status: "DONE",
+        status: SearchRecordStatus.Done,
         hasNextPage: !paginationInfo.endOfRecords && count !== 0,
         lastPageSearched:
           paginationInfo.limit &&

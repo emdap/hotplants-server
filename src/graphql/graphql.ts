@@ -6,6 +6,7 @@ export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: 
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
 export type MakeEmpty<T extends { [key: string]: unknown }, K extends keyof T> = { [_ in K]?: never };
 export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
+export type RequireFields<T, K extends keyof T> = Omit<T, K> & { [P in K]-?: NonNullable<T[P]> };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: { input: string; output: string; }
@@ -51,6 +52,7 @@ export enum PlantSizeUnit {
 export type Query = {
   __typename?: 'Query';
   plants?: Maybe<Array<Maybe<PlantData>>>;
+  searchRecords?: Maybe<SearchRecord>;
 };
 
 
@@ -59,6 +61,26 @@ export type QueryPlantsArgs = {
   skip?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<Scalars['JSON']['input']>;
 };
+
+
+export type QuerySearchRecordsArgs = {
+  id: Scalars['String']['input'];
+};
+
+export type SearchRecord = {
+  __typename?: 'SearchRecord';
+  hasNextPage: Scalars['Boolean']['output'];
+  jsonStringSearch: Scalars['String']['output'];
+  lastPageSearched: Scalars['Int']['output'];
+  pageSize: Scalars['Int']['output'];
+  status: SearchRecordStatus;
+  uniqueOccurrences: Scalars['Int']['output'];
+};
+
+export enum SearchRecordStatus {
+  Done = 'DONE',
+  Scraping = 'SCRAPING'
+}
 
 export type WithIndex<TObject> = TObject & Record<string, any>;
 export type ResolversObject<TObject> = WithIndex<TObject>;
@@ -139,6 +161,8 @@ export type ResolversTypes = ResolversObject<{
   PlantSize: ResolverTypeWrapper<PlantSize>;
   PlantSizeUnit: PlantSizeUnit;
   Query: ResolverTypeWrapper<{}>;
+  SearchRecord: ResolverTypeWrapper<SearchRecord>;
+  SearchRecordStatus: SearchRecordStatus;
   String: ResolverTypeWrapper<Scalars['String']['output']>;
 }>;
 
@@ -150,6 +174,7 @@ export type ResolversParentTypes = ResolversObject<{
   PlantData: PlantData;
   PlantSize: PlantSize;
   Query: {};
+  SearchRecord: SearchRecord;
   String: Scalars['String']['output'];
 }>;
 
@@ -184,6 +209,17 @@ export type PlantSizeResolvers<ContextType = any, ParentType extends ResolversPa
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
   plants?: Resolver<Maybe<Array<Maybe<ResolversTypes['PlantData']>>>, ParentType, ContextType, Partial<QueryPlantsArgs>>;
+  searchRecords?: Resolver<Maybe<ResolversTypes['SearchRecord']>, ParentType, ContextType, RequireFields<QuerySearchRecordsArgs, 'id'>>;
+}>;
+
+export type SearchRecordResolvers<ContextType = any, ParentType extends ResolversParentTypes['SearchRecord'] = ResolversParentTypes['SearchRecord']> = ResolversObject<{
+  hasNextPage?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  jsonStringSearch?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  lastPageSearched?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  pageSize?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  status?: Resolver<ResolversTypes['SearchRecordStatus'], ParentType, ContextType>;
+  uniqueOccurrences?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
 export type Resolvers<ContextType = any> = ResolversObject<{
@@ -191,5 +227,6 @@ export type Resolvers<ContextType = any> = ResolversObject<{
   PlantData?: PlantDataResolvers<ContextType>;
   PlantSize?: PlantSizeResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
+  SearchRecord?: SearchRecordResolvers<ContextType>;
 }>;
 

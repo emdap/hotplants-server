@@ -1,5 +1,6 @@
 import { MongoClient } from "mongodb";
-import { PlantDataDocument, SearchRecord } from "./types";
+import { SearchRecord } from "../graphql/graphql";
+import { PlantDataDocument } from "./types";
 
 export type PlantSizeData = { amount: number; unit: "m" | "cm" | string };
 

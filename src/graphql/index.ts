@@ -1,8 +1,12 @@
 import { ApolloServer } from "@apollo/server";
 import { readFileSync } from "fs";
 import gql from "graphql-tag";
+import { ObjectId } from "mongodb";
 import path from "path";
-import { plantCollection } from "../config/mongodbClient";
+import {
+  gbifSearchesCollection,
+  plantCollection,
+} from "../config/mongodbClient";
 import { Resolvers } from "./graphql";
 
 const schemaPath = path.join(__dirname, "schema.graphql");
@@ -15,6 +19,8 @@ const resolvers: Resolvers = {
 
       return cursor.toArray();
     },
+    searchRecords: (_, { id }) =>
+      gbifSearchesCollection.findOne(new ObjectId(id)),
   },
 };
 
@@ -24,15 +30,3 @@ export const apolloServer = new ApolloServer({
   typeDefs: gql(readFileSync(schemaPath, "utf-8")),
   resolvers,
 });
-
-// export const startGraphqlServer = async () => {
-//   // Passing an ApolloServer instance to the `startStandaloneServer` function:
-//   //  1. creates an Express app
-//   //  2. installs your ApolloServer instance as middleware
-//   //  3. prepares your app to handle incoming requests
-//   const { url } = await startStandaloneServer(server, {
-//     listen: { port: 3000, path: "graphql" },
-//   });
-
-//   console.debug(`graphql server ready at: ${url}`);
-// };
