@@ -1,0 +1,18 @@
+import type { CodegenConfig } from "@graphql-codegen/cli";
+import { printSchema } from "graphql";
+import { plantDataSchema } from "./schemas/plantData.schema";
+
+const config: CodegenConfig = {
+  schema: ["src/graphql/schemas/**", printSchema(plantDataSchema)],
+
+  generates: {
+    "src/graphql/graphql.ts": {
+      plugins: ["typescript", "typescript-resolvers"],
+      config: {
+        useIndexSignature: true,
+      },
+    },
+  },
+};
+
+export default config;

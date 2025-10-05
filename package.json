@@ -8,7 +8,7 @@
     "start": "ts-node --files src/app.ts",
     "dev": "pnpm generate-graphql && pnpm generate-tsoa && ts-node-dev --files src/app.ts",
     "generate-gbif-types": "npx openapi-typescript src/config/schemas/gbif-schema.json -o src/config/schemas/gbif.d.ts",
-    "generate-graphql": "graphql-codegen --config src/graphql/codegen.yml",
+    "generate-graphql": "graphql-codegen --config src/graphql/codegen.ts",
     "generate-tsoa": "tsoa routes && tsoa spec"
   },
   "keywords": [],
@@ -37,6 +37,9 @@
   "devDependencies": {
     "@graphql-codegen/cli": "^5.0.7",
     "@graphql-codegen/typescript-resolvers": "^4.5.1",
+    "@graphql-tools/graphql-file-loader": "^8.1.2",
+    "@graphql-tools/load": "^8.1.2",
+    "@graphql-tools/schema": "^10.0.25",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.3",
     "@types/geojson": "^7946.0.16",

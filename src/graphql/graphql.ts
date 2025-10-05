@@ -1,4 +1,4 @@
-import { GraphQLResolveInfo, GraphQLScalarType, GraphQLScalarTypeConfig } from 'graphql';
+import { GraphQLResolveInfo } from 'graphql';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
@@ -14,7 +14,6 @@ export type Scalars = {
   Boolean: { input: boolean; output: boolean; }
   Int: { input: number; output: number; }
   Float: { input: number; output: number; }
-  JSON: { input: any; output: any; }
 };
 
 export type PlantData = {
@@ -30,7 +29,7 @@ export type PlantData = {
   lightLevels?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
   maturityTime?: Maybe<Scalars['String']['output']>;
   mediaUrls: Array<Scalars['String']['output']>;
-  occurrenceCoords: Array<Array<Maybe<Scalars['Int']['output']>>>;
+  occurrenceCoords: Array<Array<Maybe<Scalars['Float']['output']>>>;
   occurrenceIds: Array<Scalars['Int']['output']>;
   scientificName: Scalars['String']['output'];
   scrapeSources: Array<Scalars['String']['output']>;
@@ -40,10 +39,37 @@ export type PlantData = {
   uses?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
 };
 
+export type PlantDataInput = {
+  addedTimestamp?: InputMaybe<Scalars['Int']['input']>;
+  bloomColors?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  bloomTimes?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  boundingBox?: InputMaybe<Array<InputMaybe<Scalars['Float']['input']>>>;
+  commonNames?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  habitat?: InputMaybe<Scalars['String']['input']>;
+  hardiness?: InputMaybe<Array<InputMaybe<Scalars['Int']['input']>>>;
+  height?: InputMaybe<PlantSizeInput>;
+  isPerennial?: InputMaybe<Scalars['Boolean']['input']>;
+  lightLevels?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  maturityTime?: InputMaybe<Scalars['String']['input']>;
+  mediaUrls?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  occurrenceIds?: InputMaybe<Array<InputMaybe<Scalars['Int']['input']>>>;
+  scientificName?: InputMaybe<Scalars['String']['input']>;
+  scrapeSources?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  soilTypes?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  spread?: InputMaybe<PlantSizeInput>;
+  updatedTimestamp?: InputMaybe<Scalars['Int']['input']>;
+  uses?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
 export type PlantSize = {
   __typename?: 'PlantSize';
   amount?: Maybe<Scalars['Int']['output']>;
   unit?: Maybe<PlantSizeUnit>;
+};
+
+export type PlantSizeInput = {
+  amount?: InputMaybe<Scalars['Int']['input']>;
+  unit?: InputMaybe<PlantSizeUnit>;
 };
 
 export enum PlantSizeUnit {
@@ -63,7 +89,8 @@ export type Query = {
 export type QueryPlantsArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   skip?: InputMaybe<Scalars['Int']['input']>;
-  where?: InputMaybe<Scalars['JSON']['input']>;
+  sort?: InputMaybe<SortInput>;
+  where?: InputMaybe<PlantDataInput>;
 };
 
 
@@ -85,6 +112,17 @@ export enum SearchRecordStatus {
   Done = 'DONE',
   Scraping = 'SCRAPING'
 }
+
+export enum SortDirection {
+  Asc = 'asc',
+  Desc = 'desc'
+}
+
+export type SortInput = {
+  addedTimestamp?: InputMaybe<SortDirection>;
+  scientificName?: InputMaybe<SortDirection>;
+  updatedTimestamp?: InputMaybe<SortDirection>;
+};
 
 export type WithIndex<TObject> = TObject & Record<string, any>;
 export type ResolversObject<TObject> = WithIndex<TObject>;
@@ -159,32 +197,35 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = ResolversObject<{
   Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
+  Float: ResolverTypeWrapper<Scalars['Float']['output']>;
   Int: ResolverTypeWrapper<Scalars['Int']['output']>;
-  JSON: ResolverTypeWrapper<Scalars['JSON']['output']>;
   PlantData: ResolverTypeWrapper<PlantData>;
+  PlantDataInput: PlantDataInput;
   PlantSize: ResolverTypeWrapper<PlantSize>;
+  PlantSizeInput: PlantSizeInput;
   PlantSizeUnit: PlantSizeUnit;
   Query: ResolverTypeWrapper<{}>;
   SearchRecord: ResolverTypeWrapper<SearchRecord>;
   SearchRecordStatus: SearchRecordStatus;
+  SortDirection: SortDirection;
+  SortInput: SortInput;
   String: ResolverTypeWrapper<Scalars['String']['output']>;
 }>;
 
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = ResolversObject<{
   Boolean: Scalars['Boolean']['output'];
+  Float: Scalars['Float']['output'];
   Int: Scalars['Int']['output'];
-  JSON: Scalars['JSON']['output'];
   PlantData: PlantData;
+  PlantDataInput: PlantDataInput;
   PlantSize: PlantSize;
+  PlantSizeInput: PlantSizeInput;
   Query: {};
   SearchRecord: SearchRecord;
+  SortInput: SortInput;
   String: Scalars['String']['output'];
 }>;
-
-export interface JsonScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['JSON'], any> {
-  name: 'JSON';
-}
 
 export type PlantDataResolvers<ContextType = any, ParentType extends ResolversParentTypes['PlantData'] = ResolversParentTypes['PlantData']> = ResolversObject<{
   addedTimestamp?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
@@ -198,7 +239,7 @@ export type PlantDataResolvers<ContextType = any, ParentType extends ResolversPa
   lightLevels?: Resolver<Maybe<Array<Maybe<ResolversTypes['String']>>>, ParentType, ContextType>;
   maturityTime?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   mediaUrls?: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType>;
-  occurrenceCoords?: Resolver<Array<Array<Maybe<ResolversTypes['Int']>>>, ParentType, ContextType>;
+  occurrenceCoords?: Resolver<Array<Array<Maybe<ResolversTypes['Float']>>>, ParentType, ContextType>;
   occurrenceIds?: Resolver<Array<ResolversTypes['Int']>, ParentType, ContextType>;
   scientificName?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   scrapeSources?: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType>;
@@ -231,7 +272,6 @@ export type SearchRecordResolvers<ContextType = any, ParentType extends Resolver
 }>;
 
 export type Resolvers<ContextType = any> = ResolversObject<{
-  JSON?: GraphQLScalarType;
   PlantData?: PlantDataResolvers<ContextType>;
   PlantSize?: PlantSizeResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
