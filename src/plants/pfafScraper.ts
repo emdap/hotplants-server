@@ -66,15 +66,13 @@ const scrapeStructuredFields = (document: Document) => {
     const rowValue = cells[1]?.textContent?.trim();
     const plantKey = rowLabel ? PLANT_FIELD_MAPPING[rowLabel] : null;
     if (plantKey && rowValue) {
-      if (rowValue.includes(", ")) {
-        plantData.push([plantKey, rowValue.split(", ").map(cleanText)]);
-      } else if (plantKey === "hardiness") {
+      if (plantKey === "hardiness") {
         plantData.push([
           plantKey,
           rowValue.split("-").map((item) => parseInt(item)),
         ]);
       } else {
-        plantData.push([plantKey, cleanText(rowValue)]);
+        plantData.push([plantKey, rowValue.split(", ").map(cleanText)]);
       }
     }
   });

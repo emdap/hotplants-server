@@ -14,13 +14,13 @@ const PlantDataCommonFields = `
   maturityTime: String
   habitat: String
 
-  commonNames: [String]
-  bloomColors: [String]
-  bloomTimes: [String]
-  soilTypes: [String]
-  lightLevels: [String]
-  hardiness: [Int]
-  uses: [String]
+  commonNames: [String!]
+  bloomColors: [String!]
+  bloomTimes: [String!]
+  soilTypes: [String!]
+  lightLevels: [String!]
+  hardiness: [Int!]
+  uses: [String!]
 
   occurrenceIds: [Int!]!
   mediaUrls: [String!]!
@@ -36,7 +36,7 @@ export const plantDataSchema = buildSchema(`
     height: PlantSize
     spread: PlantSize
 
-    occurrenceCoords: [[Float]!]!
+    occurrenceCoords: [[Float!]!]!
   }
 
   input PlantDataInput {
@@ -45,7 +45,7 @@ export const plantDataSchema = buildSchema(`
     height: PlantSizeInput
     spread: PlantSizeInput
 
-    boundingBox: [Float]
+    boundingBox: [Float!]
   }
 
     enum PlantSizeUnit {
