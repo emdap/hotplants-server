@@ -14,7 +14,6 @@ const PlantDataCommonFields = `
   maturityTime: String
   habitat: String
 
-  commonNames: [String!]
   bloomColors: [String!]
   bloomTimes: [String!]
   soilTypes: [String!]
@@ -36,6 +35,7 @@ export const plantDataSchema = buildSchema(`
     height: PlantSize
     spread: PlantSize
 
+    commonNames: [String!]
     occurrenceCoords: [[Float!]!]!
   }
 
@@ -45,6 +45,7 @@ export const plantDataSchema = buildSchema(`
     height: PlantSizeInput
     spread: PlantSizeInput
 
+    commonName: String
     boundingBox: [Float!]
   }
 

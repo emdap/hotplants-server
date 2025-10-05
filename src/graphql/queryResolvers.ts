@@ -33,12 +33,16 @@ export const plantsResolver: QueryResolvers["plants"] = (
 const extractPlantFilter = (filter: PlantDataInput) =>
   Object.entries(filter).reduce<Filter<PlantDataDocument>>(
     (prev, [property, value]) => {
-      if (property === "boundingBox" && Array.isArray(value)) {
+      const valueIsArray = Array.isArray(value);
+      if (property === "commonName" && typeof value === "string") {
+        const regex = new RegExp(value, "i");
+        prev.commonNames = { $regex: regex };
+      } else if (property === "boundingBox" && valueIsArray) {
         const inputPolygon = parseBboxInput(value as number[]);
         prev.occurrenceCoords = inputPolygon && {
           $geoIntersects: { $geometry: inputPolygon.geometry },
         };
-      } else if (Array.isArray(value)) {
+      } else if (valueIsArray) {
         prev[property] = { $all: value };
       } else {
         prev[property] = value;

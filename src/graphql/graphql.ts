@@ -44,7 +44,7 @@ export type PlantDataInput = {
   bloomColors?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   bloomTimes?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   boundingBox?: InputMaybe<Array<Scalars['Float']['input']>>;
-  commonNames?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  commonName?: InputMaybe<Scalars['String']['input']>;
   habitat?: InputMaybe<Scalars['String']['input']>;
   hardiness?: InputMaybe<Array<InputMaybe<Scalars['Int']['input']>>>;
   height?: InputMaybe<PlantSizeInput>;
