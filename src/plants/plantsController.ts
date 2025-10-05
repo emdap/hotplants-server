@@ -1,10 +1,9 @@
-import { bboxPolygon } from "@turf/turf";
-import { BBox } from "geojson";
 import { ObjectId } from "mongodb";
 import { Body, Post, Res, Route, TsoaResponse } from "tsoa";
 import { stringify } from "wkt";
 import { gbifClient, GbifOccurrenceSearchParams } from "../config/gbifClient";
 import { OccurrenceScrapeResponse } from "../config/types";
+import { parseBboxInput } from "../graphql/queryResolvers";
 import {
   getCompletedGbifPlants,
   reduceGbifResults,
@@ -124,11 +123,10 @@ const createBaseQuery = async (body: PlantSearchParams | undefined = {}) => {
     ...DEFAULT_GBIF_SEARCH_PARAMS,
   };
 
-  const bboxPoly = boundingBox && bboxPolygon(boundingBox as BBox);
+  const bboxPoly = boundingBox && parseBboxInput(boundingBox);
+  const geometry = bboxPoly && [stringify(bboxPoly)];
 
   const taxonKey = searchText ? await searchGbifSpecies(searchText) : undefined;
-
-  const geometry = bboxPoly && [stringify(bboxPoly)];
 
   return {
     geometry,

@@ -3,7 +3,7 @@ import cors from "cors";
 import "dotenv/config";
 import express from "express";
 import swaggerUi from "swagger-ui-express";
-import { apolloServer } from "./graphql";
+import { apolloServer } from "./graphql/serverConfig";
 import { RegisterRoutes } from "./routes";
 
 const hostname = "127.0.0.1";
