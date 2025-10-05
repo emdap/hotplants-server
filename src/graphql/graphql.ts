@@ -19,31 +19,31 @@ export type Scalars = {
 export type PlantData = {
   __typename?: 'PlantData';
   addedTimestamp: Scalars['Int']['output'];
-  bloomColors?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
-  bloomTimes?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
-  commonNames?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
+  bloomColors?: Maybe<Array<Scalars['String']['output']>>;
+  bloomTimes?: Maybe<Array<Scalars['String']['output']>>;
+  commonNames?: Maybe<Array<Scalars['String']['output']>>;
   habitat?: Maybe<Scalars['String']['output']>;
-  hardiness?: Maybe<Array<Maybe<Scalars['Int']['output']>>>;
+  hardiness?: Maybe<Array<Scalars['Int']['output']>>;
   height?: Maybe<PlantSize>;
   isPerennial?: Maybe<Scalars['Boolean']['output']>;
-  lightLevels?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
+  lightLevels?: Maybe<Array<Scalars['String']['output']>>;
   maturityTime?: Maybe<Scalars['String']['output']>;
   mediaUrls: Array<Scalars['String']['output']>;
-  occurrenceCoords: Array<Array<Maybe<Scalars['Float']['output']>>>;
+  occurrenceCoords: Array<Array<Scalars['Float']['output']>>;
   occurrenceIds: Array<Scalars['Int']['output']>;
   scientificName: Scalars['String']['output'];
   scrapeSources: Array<Scalars['String']['output']>;
-  soilTypes?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
+  soilTypes?: Maybe<Array<Scalars['String']['output']>>;
   spread?: Maybe<PlantSize>;
   updatedTimestamp: Scalars['Int']['output'];
-  uses?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
+  uses?: Maybe<Array<Scalars['String']['output']>>;
 };
 
 export type PlantDataInput = {
   addedTimestamp?: InputMaybe<Scalars['Int']['input']>;
   bloomColors?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   bloomTimes?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
-  boundingBox?: InputMaybe<Array<InputMaybe<Scalars['Float']['input']>>>;
+  boundingBox?: InputMaybe<Array<Scalars['Float']['input']>>;
   commonNames?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   habitat?: InputMaybe<Scalars['String']['input']>;
   hardiness?: InputMaybe<Array<InputMaybe<Scalars['Int']['input']>>>;
@@ -229,24 +229,24 @@ export type ResolversParentTypes = ResolversObject<{
 
 export type PlantDataResolvers<ContextType = any, ParentType extends ResolversParentTypes['PlantData'] = ResolversParentTypes['PlantData']> = ResolversObject<{
   addedTimestamp?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  bloomColors?: Resolver<Maybe<Array<Maybe<ResolversTypes['String']>>>, ParentType, ContextType>;
-  bloomTimes?: Resolver<Maybe<Array<Maybe<ResolversTypes['String']>>>, ParentType, ContextType>;
-  commonNames?: Resolver<Maybe<Array<Maybe<ResolversTypes['String']>>>, ParentType, ContextType>;
+  bloomColors?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, ContextType>;
+  bloomTimes?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, ContextType>;
+  commonNames?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, ContextType>;
   habitat?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  hardiness?: Resolver<Maybe<Array<Maybe<ResolversTypes['Int']>>>, ParentType, ContextType>;
+  hardiness?: Resolver<Maybe<Array<ResolversTypes['Int']>>, ParentType, ContextType>;
   height?: Resolver<Maybe<ResolversTypes['PlantSize']>, ParentType, ContextType>;
   isPerennial?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
-  lightLevels?: Resolver<Maybe<Array<Maybe<ResolversTypes['String']>>>, ParentType, ContextType>;
+  lightLevels?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, ContextType>;
   maturityTime?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   mediaUrls?: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType>;
-  occurrenceCoords?: Resolver<Array<Array<Maybe<ResolversTypes['Float']>>>, ParentType, ContextType>;
+  occurrenceCoords?: Resolver<Array<Array<ResolversTypes['Float']>>, ParentType, ContextType>;
   occurrenceIds?: Resolver<Array<ResolversTypes['Int']>, ParentType, ContextType>;
   scientificName?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   scrapeSources?: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType>;
-  soilTypes?: Resolver<Maybe<Array<Maybe<ResolversTypes['String']>>>, ParentType, ContextType>;
+  soilTypes?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, ContextType>;
   spread?: Resolver<Maybe<ResolversTypes['PlantSize']>, ParentType, ContextType>;
   updatedTimestamp?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  uses?: Resolver<Maybe<Array<Maybe<ResolversTypes['String']>>>, ParentType, ContextType>;
+  uses?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
