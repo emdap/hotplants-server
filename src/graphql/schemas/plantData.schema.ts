@@ -76,6 +76,6 @@ export const plantDataSchema = buildSchema(`
   }
 
   type Query {
-    plants(sort: SortInput, limit: Int, skip: Int, where: PlantDataInput): [PlantData]
+    plants(sort: SortInput, limit: Int, skip: Int, where: PlantDataInput): [PlantData!]!
   }
 `);

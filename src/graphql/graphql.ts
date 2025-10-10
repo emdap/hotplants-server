@@ -81,7 +81,7 @@ export enum PlantSizeUnit {
 
 export type Query = {
   __typename?: 'Query';
-  plants?: Maybe<Array<Maybe<PlantData>>>;
+  plants: Array<PlantData>;
   searchRecords?: Maybe<SearchRecord>;
 };
 
@@ -257,7 +257,7 @@ export type PlantSizeResolvers<ContextType = any, ParentType extends ResolversPa
 }>;
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
-  plants?: Resolver<Maybe<Array<Maybe<ResolversTypes['PlantData']>>>, ParentType, ContextType, Partial<QueryPlantsArgs>>;
+  plants?: Resolver<Array<ResolversTypes['PlantData']>, ParentType, ContextType, Partial<QueryPlantsArgs>>;
   searchRecords?: Resolver<Maybe<ResolversTypes['SearchRecord']>, ParentType, ContextType, RequireFields<QuerySearchRecordsArgs, 'id'>>;
 }>;
 
