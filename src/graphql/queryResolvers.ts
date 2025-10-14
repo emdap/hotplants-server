@@ -18,14 +18,14 @@ export const parseBboxInput = (bbox: number[]) => {
 
 export const plantsResolver: QueryResolvers["plants"] = (
   _,
-  { sort, limit, skip, where }
+  { sort, limit, offset, where }
 ) => {
   const plantFilter = where ? extractPlantFilter(where) : {};
 
   const cursor = plantCollection.find(plantFilter);
   sort && cursor.sort(sort as Sort);
   limit && cursor.limit(limit);
-  skip && cursor.skip(skip);
+  offset && cursor.skip(offset);
 
   return cursor.toArray();
 };

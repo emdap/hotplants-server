@@ -88,7 +88,7 @@ export type Query = {
 
 export type QueryPlantsArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
-  skip?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<SortInput>;
   where?: InputMaybe<PlantDataInput>;
 };
