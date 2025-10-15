@@ -3,7 +3,7 @@ import { Body, Post, Res, Route, TsoaResponse } from "tsoa";
 import { stringify } from "wkt";
 import { gbifClient, GbifOccurrenceSearchParams } from "../config/gbifClient";
 import { OccurrenceScrapeResponse } from "../config/types";
-import { SearchRecord } from "../graphql/graphql";
+import { SearchRecord, SearchRecordStatus } from "../graphql/graphql";
 import { parseBboxInput } from "../graphql/queryResolvers";
 import {
   getCompletedGbifPlants,
@@ -51,9 +51,9 @@ export class PlantController {
 
     if (!searchRecord) {
       return errorResponse(500, "Unable to create search record");
+    } else if (searchRecord.status !== SearchRecordStatus.Scraping) {
+      runPlantSearch(gbifQuery, searchRecord);
     }
-
-    scrapePlantData(gbifQuery, searchRecord);
 
     return searchRecord._id;
   }
@@ -89,7 +89,7 @@ const findOrCreateSearchRecord = async (searchParams: PlantSearchParams) => {
   return existingRecord ?? createGbifSearchRecord(searchParams);
 };
 
-const scrapePlantData = async (
+const runPlantSearch = async (
   gbifQuery: GbifOccurrenceSearchParams,
   searchRecord: WithId<SearchRecord>
 ) => {
