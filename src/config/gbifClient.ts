@@ -7,7 +7,7 @@ export const gbifClient = createClient<paths>({
 
 export type GbifOccurrenceSearchParams = Required<
   operations["searchOccurrence"]["parameters"]
->["query"] & { limit: number };
+>["query"];
 
 export type GbifOccurenceResult = components["schemas"]["Occurrence"];
 

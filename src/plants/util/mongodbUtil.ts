@@ -10,8 +10,17 @@ import {
   PartialPlantData,
   PlantDataDocument,
 } from "../../config/types";
-import { SearchRecord, SearchRecordStatus } from "../../graphql/graphql";
+import {
+  PlantDataInput,
+  SearchRecord,
+  SearchRecordStatus,
+} from "../../graphql/graphql";
 import { scrapePFAF } from "../pfafScraper";
+
+export type PlantSearchParams = Omit<GbifOccurrenceSearchParams, "geometry"> &
+  // TODO: Strange error, if given PlantDataInput as-is, TSOA has error
+  // "GenerateMetadataError: Cannot read properties of undefined (reading 'kind')""
+  Omit<PlantDataInput, "">;
 
 /**
  *
@@ -73,10 +82,8 @@ export const lookupPlantByCoordinates = async ({
     })
     .toArray();
 
-export const openGbifSearchRecord = (
-  gbifSearchParams: GbifOccurrenceSearchParams
-) => {
-  const jsonStringSearch = JSON.stringify(gbifSearchParams);
+export const openGbifSearchRecord = (searchParams: PlantSearchParams) => {
+  const jsonStringSearch = JSON.stringify(searchParams);
 
   return gbifSearchesCollection.findOneAndUpdate(
     {
@@ -87,9 +94,9 @@ export const openGbifSearchRecord = (
 };
 
 export const createGbifSearchRecord = async (
-  gbifSearchParams: GbifOccurrenceSearchParams
+  searchParams: PlantSearchParams
 ) => {
-  const jsonStringSearch = JSON.stringify(gbifSearchParams);
+  const jsonStringSearch = JSON.stringify(searchParams);
 
   const insertedRecord = await gbifSearchesCollection.insertOne({
     jsonStringSearch,
