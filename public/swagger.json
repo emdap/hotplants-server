@@ -1217,9 +1217,6 @@
 						"type": "boolean",
 						"example": true
 					},
-					"q": {
-						"type": "string"
-					},
 					"limit": {
 						"type": "number",
 						"format": "double"
