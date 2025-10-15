@@ -30,7 +30,7 @@ export type PlantData = {
   maturityTime?: Maybe<Scalars['String']['output']>;
   mediaUrls: Array<Scalars['String']['output']>;
   occurrenceCoords: Array<Array<Scalars['Float']['output']>>;
-  occurrenceIds: Array<Scalars['Int']['output']>;
+  occurrenceIds: Array<Scalars['Float']['output']>;
   scientificName: Scalars['String']['output'];
   scrapeSources: Array<Scalars['String']['output']>;
   soilTypes?: Maybe<Array<Scalars['String']['output']>>;
@@ -52,7 +52,7 @@ export type PlantDataInput = {
   lightLevels?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   maturityTime?: InputMaybe<Scalars['String']['input']>;
   mediaUrls?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
-  occurrenceIds?: InputMaybe<Array<InputMaybe<Scalars['Int']['input']>>>;
+  occurrenceIds?: InputMaybe<Array<InputMaybe<Scalars['Float']['input']>>>;
   scientificName?: InputMaybe<Scalars['String']['input']>;
   scrapeSources?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   soilTypes?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
@@ -240,7 +240,7 @@ export type PlantDataResolvers<ContextType = any, ParentType extends ResolversPa
   maturityTime?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   mediaUrls?: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType>;
   occurrenceCoords?: Resolver<Array<Array<ResolversTypes['Float']>>, ParentType, ContextType>;
-  occurrenceIds?: Resolver<Array<ResolversTypes['Int']>, ParentType, ContextType>;
+  occurrenceIds?: Resolver<Array<ResolversTypes['Float']>, ParentType, ContextType>;
   scientificName?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   scrapeSources?: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType>;
   soilTypes?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, ContextType>;
