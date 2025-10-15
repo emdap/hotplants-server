@@ -26,7 +26,7 @@ const PlantDataCommonFields = `
   scrapeSources: [String!]!
 `;
 
-const makeFieldsOptional = (str: String) => str.replaceAll("!", "");
+const makeFieldsOptional = (str: String) => str.replaceAll(/!$/gm, "");
 
 export const plantDataSchema = buildSchema(`
   type PlantData {

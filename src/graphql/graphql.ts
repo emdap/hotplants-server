@@ -41,24 +41,24 @@ export type PlantData = {
 
 export type PlantDataInput = {
   addedTimestamp?: InputMaybe<Scalars['Int']['input']>;
-  bloomColors?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
-  bloomTimes?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  bloomColors?: InputMaybe<Array<Scalars['String']['input']>>;
+  bloomTimes?: InputMaybe<Array<Scalars['String']['input']>>;
   boundingBox?: InputMaybe<Array<Scalars['Float']['input']>>;
   commonName?: InputMaybe<Scalars['String']['input']>;
   habitat?: InputMaybe<Scalars['String']['input']>;
-  hardiness?: InputMaybe<Array<InputMaybe<Scalars['Int']['input']>>>;
+  hardiness?: InputMaybe<Array<Scalars['Int']['input']>>;
   height?: InputMaybe<PlantSizeInput>;
   isPerennial?: InputMaybe<Scalars['Boolean']['input']>;
-  lightLevels?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  lightLevels?: InputMaybe<Array<Scalars['String']['input']>>;
   maturityTime?: InputMaybe<Scalars['String']['input']>;
-  mediaUrls?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
-  occurrenceIds?: InputMaybe<Array<InputMaybe<Scalars['Float']['input']>>>;
+  mediaUrls?: InputMaybe<Array<Scalars['String']['input']>>;
+  occurrenceIds?: InputMaybe<Array<Scalars['Float']['input']>>;
   scientificName?: InputMaybe<Scalars['String']['input']>;
-  scrapeSources?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
-  soilTypes?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  scrapeSources?: InputMaybe<Array<Scalars['String']['input']>>;
+  soilTypes?: InputMaybe<Array<Scalars['String']['input']>>;
   spread?: InputMaybe<PlantSizeInput>;
   updatedTimestamp?: InputMaybe<Scalars['Int']['input']>;
-  uses?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  uses?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
 export type PlantSize = {
