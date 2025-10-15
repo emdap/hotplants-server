@@ -21,7 +21,7 @@ const PlantDataCommonFields = `
   hardiness: [Int!]
   uses: [String!]
 
-  occurrenceIds: [Int!]!
+  occurrenceIds: [Float!]!
   mediaUrls: [String!]!
   scrapeSources: [String!]!
 `;
