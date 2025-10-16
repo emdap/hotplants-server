@@ -3,14 +3,14 @@ import { readFileSync } from "fs";
 import gql from "graphql-tag";
 import path from "path";
 import { Resolvers } from "./graphql";
-import { plantsResolver, searchRecordsResolver } from "./queryResolvers";
+import { plantsResolver, searchRecordResolver } from "./queryResolvers";
 import { plantDataSchema } from "./schemas/plantData.schema";
 
 const schemaPath = path.join(__dirname, "schemas/mainSchema.graphql");
 const resolvers: Resolvers = {
   Query: {
     plants: plantsResolver,
-    searchRecords: searchRecordsResolver,
+    searchRecord: searchRecordResolver,
   },
 };
 
