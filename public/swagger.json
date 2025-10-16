@@ -16,7 +16,7 @@
 				"type": "object",
 				"description": "Construct a type with a set of properties K of type T"
 			},
-			"Pick_GbifOccurrenceSearchParams.Exclude_keyofGbifOccurrenceSearchParams.geometry__": {
+			"Pick_GbifOccurrenceSearchParams.Exclude_keyofGbifOccurrenceSearchParams.geometry-or-scientificName__": {
 				"properties": {
 					"acceptedTaxonKey": {
 						"items": {
@@ -1108,12 +1108,6 @@
 						},
 						"type": "array"
 					},
-					"scientificName": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
-					},
 					"speciesKey": {
 						"items": {
 							"type": "number",
@@ -1247,9 +1241,45 @@
 				"type": "object",
 				"description": "From T, pick a set of properties whose keys are in the union K"
 			},
-			"Omit_GbifOccurrenceSearchParams.geometry_": {
-				"$ref": "#/components/schemas/Pick_GbifOccurrenceSearchParams.Exclude_keyofGbifOccurrenceSearchParams.geometry__",
+			"Omit_GbifOccurrenceSearchParams.geometry-or-scientificName_": {
+				"$ref": "#/components/schemas/Pick_GbifOccurrenceSearchParams.Exclude_keyofGbifOccurrenceSearchParams.geometry-or-scientificName__",
 				"description": "Construct a type with the properties of T except for those in type K."
+			},
+			"Maybe_string_": {
+				"type": "string",
+				"nullable": true
+			},
+			"InputMaybe_string_": {
+				"$ref": "#/components/schemas/Maybe_string_"
+			},
+			"Maybe_number_": {
+				"type": "number",
+				"format": "double",
+				"nullable": true
+			},
+			"InputMaybe_number_": {
+				"$ref": "#/components/schemas/Maybe_number_"
+			},
+			"Maybe_string-Array_": {
+				"items": {
+					"type": "string"
+				},
+				"type": "array",
+				"nullable": true
+			},
+			"InputMaybe_string-Array_": {
+				"$ref": "#/components/schemas/Maybe_string-Array_"
+			},
+			"Maybe_number-Array_": {
+				"items": {
+					"type": "number",
+					"format": "double"
+				},
+				"type": "array",
+				"nullable": true
+			},
+			"InputMaybe_number-Array_": {
+				"$ref": "#/components/schemas/Maybe_number-Array_"
 			},
 			"Maybe_Scalars-at-Int_91_input_93__": {
 				"type": "number",
@@ -1290,99 +1320,82 @@
 				},
 				"type": "object"
 			},
+			"Maybe_PlantSizeInput_": {
+				"allOf": [
+					{
+						"$ref": "#/components/schemas/PlantSizeInput"
+					}
+				],
+				"nullable": true
+			},
+			"InputMaybe_PlantSizeInput_": {
+				"$ref": "#/components/schemas/Maybe_PlantSizeInput_"
+			},
+			"Maybe_boolean_": {
+				"type": "boolean",
+				"nullable": true
+			},
+			"InputMaybe_boolean_": {
+				"$ref": "#/components/schemas/Maybe_boolean_"
+			},
 			"Pick_PlantDataInput.Exclude_keyofPlantDataInput.__": {
 				"properties": {
 					"scientificName": {
-						"type": "string"
+						"$ref": "#/components/schemas/InputMaybe_string_"
 					},
 					"addedTimestamp": {
-						"type": "number",
-						"format": "double"
+						"$ref": "#/components/schemas/InputMaybe_number_"
 					},
 					"bloomColors": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
+						"$ref": "#/components/schemas/InputMaybe_string-Array_"
 					},
 					"bloomTimes": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
+						"$ref": "#/components/schemas/InputMaybe_string-Array_"
 					},
 					"boundingBox": {
-						"items": {
-							"type": "number",
-							"format": "double"
-						},
-						"type": "array"
+						"$ref": "#/components/schemas/InputMaybe_number-Array_"
 					},
 					"commonName": {
-						"type": "string"
+						"$ref": "#/components/schemas/InputMaybe_string_"
 					},
 					"habitat": {
-						"type": "string"
+						"$ref": "#/components/schemas/InputMaybe_string_"
 					},
 					"hardiness": {
-						"items": {
-							"type": "number",
-							"format": "double"
-						},
-						"type": "array"
+						"$ref": "#/components/schemas/InputMaybe_number-Array_"
 					},
 					"height": {
-						"$ref": "#/components/schemas/PlantSizeInput"
+						"$ref": "#/components/schemas/InputMaybe_PlantSizeInput_"
 					},
 					"isPerennial": {
-						"type": "boolean"
+						"$ref": "#/components/schemas/InputMaybe_boolean_"
 					},
 					"lightLevels": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
+						"$ref": "#/components/schemas/InputMaybe_string-Array_"
 					},
 					"maturityTime": {
-						"type": "string"
+						"$ref": "#/components/schemas/InputMaybe_string_"
 					},
 					"mediaUrls": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
+						"$ref": "#/components/schemas/InputMaybe_string-Array_"
 					},
 					"occurrenceIds": {
-						"items": {
-							"type": "number",
-							"format": "double"
-						},
-						"type": "array"
+						"$ref": "#/components/schemas/InputMaybe_number-Array_"
 					},
 					"scrapeSources": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
+						"$ref": "#/components/schemas/InputMaybe_string-Array_"
 					},
 					"soilTypes": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
+						"$ref": "#/components/schemas/InputMaybe_string-Array_"
 					},
 					"spread": {
-						"$ref": "#/components/schemas/PlantSizeInput"
+						"$ref": "#/components/schemas/InputMaybe_PlantSizeInput_"
 					},
 					"updatedTimestamp": {
-						"type": "number",
-						"format": "double"
+						"$ref": "#/components/schemas/InputMaybe_number_"
 					},
 					"uses": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
+						"$ref": "#/components/schemas/InputMaybe_string-Array_"
 					}
 				},
 				"type": "object",
@@ -1395,7 +1408,7 @@
 			"PlantSearchParams": {
 				"allOf": [
 					{
-						"$ref": "#/components/schemas/Omit_GbifOccurrenceSearchParams.geometry_"
+						"$ref": "#/components/schemas/Omit_GbifOccurrenceSearchParams.geometry-or-scientificName_"
 					},
 					{
 						"$ref": "#/components/schemas/Omit_PlantDataInput._"
@@ -1425,11 +1438,16 @@
 				},
 				"type": "object"
 			},
+			"Maybe_PlantSize_": {
+				"allOf": [
+					{
+						"$ref": "#/components/schemas/PlantSize"
+					}
+				],
+				"nullable": true
+			},
 			"Record_string.string_": {
 				"properties": {},
-				"additionalProperties": {
-					"type": "string"
-				},
 				"type": "object",
 				"description": "Construct a type with a set of properties K of type T"
 			},
@@ -1439,41 +1457,28 @@
 						"type": "string"
 					},
 					"bloomColors": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
+						"$ref": "#/components/schemas/Maybe_string-Array_"
 					},
 					"bloomTimes": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
+						"$ref": "#/components/schemas/Maybe_string-Array_"
 					},
 					"habitat": {
-						"type": "string"
+						"$ref": "#/components/schemas/Maybe_string_"
 					},
 					"hardiness": {
-						"items": {
-							"type": "number",
-							"format": "double"
-						},
-						"type": "array"
+						"$ref": "#/components/schemas/Maybe_number-Array_"
 					},
 					"height": {
-						"$ref": "#/components/schemas/PlantSize"
+						"$ref": "#/components/schemas/Maybe_PlantSize_"
 					},
 					"isPerennial": {
-						"type": "boolean"
+						"$ref": "#/components/schemas/Maybe_boolean_"
 					},
 					"lightLevels": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
+						"$ref": "#/components/schemas/Maybe_string-Array_"
 					},
 					"maturityTime": {
-						"type": "string"
+						"$ref": "#/components/schemas/Maybe_string_"
 					},
 					"mediaUrls": {
 						"items": {
@@ -1495,32 +1500,22 @@
 						"type": "array"
 					},
 					"soilTypes": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
+						"$ref": "#/components/schemas/Maybe_string-Array_"
 					},
 					"spread": {
-						"$ref": "#/components/schemas/PlantSize"
+						"$ref": "#/components/schemas/Maybe_PlantSize_"
 					},
 					"uses": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
+						"$ref": "#/components/schemas/Maybe_string-Array_"
 					},
 					"__typename": {
 						"type": "string",
 						"enum": [
 							"PlantData"
-						],
-						"nullable": false
+						]
 					},
 					"commonNames": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
+						"$ref": "#/components/schemas/Maybe_string-Array_"
 					},
 					"occurrenceCoords": {
 						"items": {

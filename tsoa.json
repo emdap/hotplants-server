@@ -8,5 +8,8 @@
   },
   "routes": {
     "routesDir": "src"
+  },
+  "compilerOptions": {
+    "strictNullChecks": true
   }
 }
