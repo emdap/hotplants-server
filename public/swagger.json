@@ -1624,12 +1624,7 @@
 					"content": {
 						"application/json": {
 							"schema": {
-								"allOf": [
-									{
-										"$ref": "#/components/schemas/PlantSearchParams"
-									}
-								],
-								"nullable": true
+								"$ref": "#/components/schemas/PlantSearchParams"
 							}
 						}
 					}

@@ -41,7 +41,7 @@ export class PlantController {
    */
   @Post("scrapeOccurrences")
   public async scrapeOccurrences(
-    @Body() plantSearch: PlantSearchParams | null = {},
+    @Body() plantSearch: PlantSearchParams = {},
     @Res() errorResponse: TsoaResponse<500, string>
   ): Promise<ObjectId | undefined> {
     const [gbifQuery, existingSearchRecord] = await Promise.all([
