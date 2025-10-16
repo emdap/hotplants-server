@@ -97,13 +97,14 @@ export const openGbifSearchRecord = (searchParams: PlantSearchParams) => {
 };
 
 export const createGbifSearchRecord = async (
-  searchParams: PlantSearchParams
+  searchParams: PlantSearchParams,
+  initialStatus: SearchRecordStatus = SearchRecordStatus.Scraping
 ) => {
   const jsonStringSearch = JSON.stringify(searchParams);
 
   const insertedRecord = await gbifSearchesCollection.insertOne({
     jsonStringSearch,
-    status: SearchRecordStatus.Scraping,
+    status: initialStatus,
 
     totalOccurrences: 0,
     uniqueOccurrences: 0,

@@ -44,16 +44,23 @@ export class PlantController {
     @Body() plantSearch: PlantSearchParams | undefined = {},
     @Res() errorResponse: TsoaResponse<500, string>
   ): Promise<ObjectId | undefined> {
-    const [gbifQuery, searchRecord] = await Promise.all([
+    const [gbifQuery, existingSearchRecord] = await Promise.all([
       createGbifQuery(plantSearch),
-      findOrCreateSearchRecord(plantSearch),
+      openGbifSearchRecord(plantSearch),
     ]);
+
+    if (existingSearchRecord?.status === SearchRecordStatus.Scraping) {
+      return existingSearchRecord._id;
+    }
+
+    const searchRecord =
+      existingSearchRecord ?? (await createGbifSearchRecord(plantSearch));
 
     if (!searchRecord) {
       return errorResponse(500, "Unable to create search record");
-    } else if (searchRecord.status !== SearchRecordStatus.Scraping) {
-      runPlantSearch(gbifQuery, searchRecord);
     }
+
+    startPlantSearch(gbifQuery, searchRecord);
 
     return searchRecord._id;
   }
@@ -84,12 +91,7 @@ export class PlantController {
   }
 }
 
-const findOrCreateSearchRecord = async (searchParams: PlantSearchParams) => {
-  const existingRecord = await openGbifSearchRecord(searchParams);
-  return existingRecord ?? createGbifSearchRecord(searchParams);
-};
-
-const runPlantSearch = async (
+const startPlantSearch = async (
   gbifQuery: GbifOccurrenceSearchParams,
   searchRecord: WithId<SearchRecord>
 ) => {
