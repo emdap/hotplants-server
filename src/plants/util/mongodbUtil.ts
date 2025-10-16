@@ -17,7 +17,10 @@ import {
 } from "../../graphql/graphql";
 import { scrapePFAF } from "../pfafScraper";
 
-export type PlantSearchParams = Omit<GbifOccurrenceSearchParams, "geometry"> &
+export type PlantSearchParams = Omit<
+  GbifOccurrenceSearchParams,
+  "geometry" | "scientificName"
+> &
   // TODO: Strange error, if given PlantDataInput as-is, TSOA has error
   // "GenerateMetadataError: Cannot read properties of undefined (reading 'kind')""
   Omit<PlantDataInput, "">;
