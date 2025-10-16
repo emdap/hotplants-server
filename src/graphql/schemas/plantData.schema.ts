@@ -75,7 +75,12 @@ export const plantDataSchema = buildSchema(`
     updatedTimestamp: SortDirection
   }
 
+  type PlantSearchResults {
+   count: Float!
+   results: [PlantData!]!
+  }
+
   type Query {
-    plants(sort: SortInput, limit: Int, offset: Int, where: PlantDataInput): [PlantData!]!
+    plantSearch(sort: SortInput, limit: Int, offset: Int, where: PlantDataInput): PlantSearchResults!
   }
 `);

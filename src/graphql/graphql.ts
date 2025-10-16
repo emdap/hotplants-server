@@ -61,6 +61,12 @@ export type PlantDataInput = {
   uses?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
+export type PlantSearchResults = {
+  __typename?: 'PlantSearchResults';
+  count: Scalars['Float']['output'];
+  results: Array<PlantData>;
+};
+
 export type PlantSize = {
   __typename?: 'PlantSize';
   amount?: Maybe<Scalars['Int']['output']>;
@@ -81,12 +87,12 @@ export enum PlantSizeUnit {
 
 export type Query = {
   __typename?: 'Query';
-  plants: Array<PlantData>;
+  plantSearch: PlantSearchResults;
   searchRecord?: Maybe<SearchRecord>;
 };
 
 
-export type QueryPlantsArgs = {
+export type QueryPlantSearchArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<SortInput>;
@@ -201,6 +207,7 @@ export type ResolversTypes = ResolversObject<{
   Int: ResolverTypeWrapper<Scalars['Int']['output']>;
   PlantData: ResolverTypeWrapper<PlantData>;
   PlantDataInput: PlantDataInput;
+  PlantSearchResults: ResolverTypeWrapper<PlantSearchResults>;
   PlantSize: ResolverTypeWrapper<PlantSize>;
   PlantSizeInput: PlantSizeInput;
   PlantSizeUnit: PlantSizeUnit;
@@ -219,6 +226,7 @@ export type ResolversParentTypes = ResolversObject<{
   Int: Scalars['Int']['output'];
   PlantData: PlantData;
   PlantDataInput: PlantDataInput;
+  PlantSearchResults: PlantSearchResults;
   PlantSize: PlantSize;
   PlantSizeInput: PlantSizeInput;
   Query: {};
@@ -250,6 +258,12 @@ export type PlantDataResolvers<ContextType = any, ParentType extends ResolversPa
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
+export type PlantSearchResultsResolvers<ContextType = any, ParentType extends ResolversParentTypes['PlantSearchResults'] = ResolversParentTypes['PlantSearchResults']> = ResolversObject<{
+  count?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  results?: Resolver<Array<ResolversTypes['PlantData']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
 export type PlantSizeResolvers<ContextType = any, ParentType extends ResolversParentTypes['PlantSize'] = ResolversParentTypes['PlantSize']> = ResolversObject<{
   amount?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   unit?: Resolver<Maybe<ResolversTypes['PlantSizeUnit']>, ParentType, ContextType>;
@@ -257,7 +271,7 @@ export type PlantSizeResolvers<ContextType = any, ParentType extends ResolversPa
 }>;
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
-  plants?: Resolver<Array<ResolversTypes['PlantData']>, ParentType, ContextType, Partial<QueryPlantsArgs>>;
+  plantSearch?: Resolver<ResolversTypes['PlantSearchResults'], ParentType, ContextType, Partial<QueryPlantSearchArgs>>;
   searchRecord?: Resolver<Maybe<ResolversTypes['SearchRecord']>, ParentType, ContextType, RequireFields<QuerySearchRecordArgs, 'id'>>;
 }>;
 
@@ -273,6 +287,7 @@ export type SearchRecordResolvers<ContextType = any, ParentType extends Resolver
 
 export type Resolvers<ContextType = any> = ResolversObject<{
   PlantData?: PlantDataResolvers<ContextType>;
+  PlantSearchResults?: PlantSearchResultsResolvers<ContextType>;
   PlantSize?: PlantSizeResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
   SearchRecord?: SearchRecordResolvers<ContextType>;

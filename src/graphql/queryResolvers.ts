@@ -16,7 +16,7 @@ export const parseBboxInput = (bbox: number[]) => {
   }
 };
 
-export const plantsResolver: QueryResolvers["plants"] = (
+export const plantsResolver: QueryResolvers["plantSearch"] = async (
   _,
   { sort, limit, offset, where }
 ) => {
@@ -27,7 +27,12 @@ export const plantsResolver: QueryResolvers["plants"] = (
   limit && cursor.limit(limit);
   offset && cursor.skip(offset);
 
-  return cursor.toArray();
+  const [count, results] = await Promise.all([
+    plantCollection.countDocuments(plantFilter),
+    cursor.toArray(),
+  ]);
+
+  return { count, results };
 };
 
 const extractPlantFilter = (filter: PlantDataInput) =>

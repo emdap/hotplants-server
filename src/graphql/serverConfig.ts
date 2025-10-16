@@ -2,14 +2,14 @@ import { ApolloServer } from "@apollo/server";
 import { readFileSync } from "fs";
 import gql from "graphql-tag";
 import path from "path";
-import { Resolvers } from "./graphql";
+import { QueryResolvers } from "./graphql";
 import { plantsResolver, searchRecordResolver } from "./queryResolvers";
 import { plantDataSchema } from "./schemas/plantData.schema";
 
 const schemaPath = path.join(__dirname, "schemas/mainSchema.graphql");
-const resolvers: Resolvers = {
+const resolvers: QueryResolvers = {
   Query: {
-    plants: plantsResolver,
+    plantSearch: plantsResolver,
     searchRecord: searchRecordResolver,
   },
 };
