@@ -85,8 +85,13 @@ export const lookupPlantByCoordinates = async ({
     })
     .toArray();
 
-export const openGbifSearchRecord = (searchParams: PlantSearchParams) => {
-  const jsonStringSearch = JSON.stringify(searchParams);
+const stringifySearch = (searchParams: PlantSearchParams | null) =>
+  JSON.stringify(searchParams ?? undefined);
+
+export const openGbifSearchRecord = (
+  searchParams: PlantSearchParams | null
+) => {
+  const jsonStringSearch = stringifySearch(searchParams);
 
   return gbifSearchesCollection.findOneAndUpdate(
     {
@@ -97,10 +102,10 @@ export const openGbifSearchRecord = (searchParams: PlantSearchParams) => {
 };
 
 export const createGbifSearchRecord = async (
-  searchParams: PlantSearchParams,
+  searchParams: PlantSearchParams | null,
   initialStatus: SearchRecordStatus = SearchRecordStatus.Scraping
 ) => {
-  const jsonStringSearch = JSON.stringify(searchParams);
+  const jsonStringSearch = stringifySearch(searchParams);
 
   const insertedRecord = await gbifSearchesCollection.insertOne({
     jsonStringSearch,

@@ -195,7 +195,7 @@ export function RegisterRoutes(app: Router) {
 
     
         const argsPlantController_scrapeOccurrences: Record<string, TsoaRoute.ParameterSchema> = {
-                plantSearch: {"in":"body","name":"plantSearch","dataType":"union","subSchemas":[{"ref":"PlantSearchParams"},{"dataType":"undefined"}]},
+                plantSearch: {"in":"body","name":"plantSearch","dataType":"union","subSchemas":[{"ref":"PlantSearchParams"},{"dataType":"enum","enums":[null]}]},
                 errorResponse: {"in":"res","name":"500","required":true,"dataType":"string"},
         };
         app.post('/plants/scrapeOccurrences',

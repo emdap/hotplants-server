@@ -41,7 +41,7 @@ export class PlantController {
    */
   @Post("scrapeOccurrences")
   public async scrapeOccurrences(
-    @Body() plantSearch: PlantSearchParams | undefined = {},
+    @Body() plantSearch: PlantSearchParams | null = {},
     @Res() errorResponse: TsoaResponse<500, string>
   ): Promise<ObjectId | undefined> {
     const [gbifQuery, existingSearchRecord] = await Promise.all([
@@ -111,7 +111,7 @@ const startPlantSearch = async (
 };
 
 const createGbifQuery = async (
-  body: PlantSearchParams | undefined = {}
+  body: PlantSearchParams | null = {}
 ): Promise<GbifOccurrenceSearchParams> => {
   const { boundingBox, commonName, scientificName, ...searchParams } = {
     ...body,
