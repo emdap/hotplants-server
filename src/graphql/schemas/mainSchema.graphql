@@ -15,5 +15,5 @@ type SearchRecord {
 }
 
 type Query {
-  searchRecords(id: String!): SearchRecord
+  searchRecord(id: String!): SearchRecord
 }

@@ -53,7 +53,7 @@ const extractPlantFilter = (filter: PlantDataInput) =>
     {}
   );
 
-export const searchRecordsResolver: QueryResolvers["searchRecords"] = (
+export const searchRecordsResolver: QueryResolvers["searchRecord"] = (
   _,
   { id }
 ) => gbifSearchesCollection.findOne(new ObjectId(id));

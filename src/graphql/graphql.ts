@@ -82,7 +82,7 @@ export enum PlantSizeUnit {
 export type Query = {
   __typename?: 'Query';
   plants: Array<PlantData>;
-  searchRecords?: Maybe<SearchRecord>;
+  searchRecord?: Maybe<SearchRecord>;
 };
 
 
@@ -94,7 +94,7 @@ export type QueryPlantsArgs = {
 };
 
 
-export type QuerySearchRecordsArgs = {
+export type QuerySearchRecordArgs = {
   id: Scalars['String']['input'];
 };
 
@@ -258,7 +258,7 @@ export type PlantSizeResolvers<ContextType = any, ParentType extends ResolversPa
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
   plants?: Resolver<Array<ResolversTypes['PlantData']>, ParentType, ContextType, Partial<QueryPlantsArgs>>;
-  searchRecords?: Resolver<Maybe<ResolversTypes['SearchRecord']>, ParentType, ContextType, RequireFields<QuerySearchRecordsArgs, 'id'>>;
+  searchRecord?: Resolver<Maybe<ResolversTypes['SearchRecord']>, ParentType, ContextType, RequireFields<QuerySearchRecordArgs, 'id'>>;
 }>;
 
 export type SearchRecordResolvers<ContextType = any, ParentType extends ResolversParentTypes['SearchRecord'] = ResolversParentTypes['SearchRecord']> = ResolversObject<{
