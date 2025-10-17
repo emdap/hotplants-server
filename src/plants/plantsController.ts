@@ -64,31 +64,6 @@ export class PlantController {
 
     return searchRecord._id;
   }
-
-  @Post("scrapeOccurrencesLegacy")
-  public async scrapeOccurrencesLegacy(
-    @Body() body: PlantSearchParams | undefined = {},
-    @Res() errorResponse: TsoaResponse<500, string>
-  ): Promise<OccurrenceScrapeResponse | void> {
-    const baseQuery = await createGbifQuery(body);
-
-    const searchRecord =
-      (await openGbifSearchRecord(body)) ??
-      (await createGbifSearchRecord(body));
-
-    if (!searchRecord) {
-      return errorResponse(500, "Unable to create search record");
-    }
-
-    const results = await searchGbifOccurrences(
-      baseQuery,
-      searchRecord.totalOccurrences
-    );
-
-    await closeGbifSearchRecord(searchRecord, results);
-
-    return results;
-  }
 }
 
 const startPlantSearch = async (

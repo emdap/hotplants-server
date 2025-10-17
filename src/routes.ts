@@ -137,46 +137,6 @@ const models: TsoaRoute.Models = {
         "type": {"dataType":"intersection","subSchemas":[{"ref":"Omit_GbifOccurrenceSearchParams.geometry-or-scientificName_"},{"ref":"Omit_PlantDataInput._"}],"validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "Maybe_Scalars-at-Int_91_output_93__": {
-        "dataType": "refAlias",
-        "type": {"dataType":"union","subSchemas":[{"dataType":"double"},{"dataType":"enum","enums":[null]}],"validators":{}},
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "PlantSize": {
-        "dataType": "refAlias",
-        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"unit":{"ref":"Maybe_PlantSizeUnit_"},"amount":{"ref":"Maybe_Scalars-at-Int_91_output_93__"},"__typename":{"dataType":"enum","enums":["PlantSize"]}},"validators":{}},
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "Maybe_PlantSize_": {
-        "dataType": "refAlias",
-        "type": {"dataType":"union","subSchemas":[{"ref":"PlantSize"},{"dataType":"enum","enums":[null]}],"validators":{}},
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "Record_string.string_": {
-        "dataType": "refAlias",
-        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{},"validators":{}},
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "Pick_PlantDataDocument.Exclude_keyofPlantDataDocument.addedTimestamp-or-updatedTimestamp__": {
-        "dataType": "refAlias",
-        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"scientificName":{"dataType":"string","required":true},"bloomColors":{"dataType":"union","subSchemas":[{"ref":"Maybe_string-Array_"},{"dataType":"undefined"}]},"bloomTimes":{"dataType":"union","subSchemas":[{"ref":"Maybe_string-Array_"},{"dataType":"undefined"}]},"habitat":{"dataType":"union","subSchemas":[{"ref":"Maybe_string_"},{"dataType":"undefined"}]},"hardiness":{"dataType":"union","subSchemas":[{"ref":"Maybe_number-Array_"},{"dataType":"undefined"}]},"height":{"dataType":"union","subSchemas":[{"ref":"Maybe_PlantSize_"},{"dataType":"undefined"}]},"isPerennial":{"dataType":"union","subSchemas":[{"ref":"Maybe_boolean_"},{"dataType":"undefined"}]},"lightLevels":{"dataType":"union","subSchemas":[{"ref":"Maybe_string-Array_"},{"dataType":"undefined"}]},"maturityTime":{"dataType":"union","subSchemas":[{"ref":"Maybe_string_"},{"dataType":"undefined"}]},"mediaUrls":{"dataType":"array","array":{"dataType":"string"},"required":true},"occurrenceIds":{"dataType":"array","array":{"dataType":"double"},"required":true},"physicalCharactersticsDump":{"dataType":"union","subSchemas":[{"ref":"Maybe_string_"},{"dataType":"undefined"}]},"scrapeSources":{"dataType":"array","array":{"dataType":"string"},"required":true},"soilTypes":{"dataType":"union","subSchemas":[{"ref":"Maybe_string-Array_"},{"dataType":"undefined"}]},"spread":{"dataType":"union","subSchemas":[{"ref":"Maybe_PlantSize_"},{"dataType":"undefined"}]},"uses":{"dataType":"union","subSchemas":[{"ref":"Maybe_string-Array_"},{"dataType":"undefined"}]},"__typename":{"dataType":"union","subSchemas":[{"dataType":"enum","enums":["PlantData"]},{"dataType":"undefined"}]},"commonNames":{"dataType":"union","subSchemas":[{"ref":"Maybe_string-Array_"},{"dataType":"undefined"}]},"occurrenceCoords":{"dataType":"array","array":{"dataType":"array","array":{"dataType":"double"}},"required":true},"_id":{"dataType":"union","subSchemas":[{"ref":"ObjectId"},{"dataType":"undefined"}]},"otherTraits":{"dataType":"union","subSchemas":[{"ref":"Record_string.string_"},{"dataType":"undefined"}]}},"validators":{}},
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "Omit_PlantDataDocument.addedTimestamp-or-updatedTimestamp_": {
-        "dataType": "refAlias",
-        "type": {"ref":"Pick_PlantDataDocument.Exclude_keyofPlantDataDocument.addedTimestamp-or-updatedTimestamp__","validators":{}},
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "PartialPlantData": {
-        "dataType": "refAlias",
-        "type": {"ref":"Omit_PlantDataDocument.addedTimestamp-or-updatedTimestamp_","validators":{}},
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "OccurrenceScrapeResponse": {
-        "dataType": "refAlias",
-        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"endOfRecords":{"dataType":"boolean","required":true},"totalOccurrencesScraped":{"dataType":"double","required":true},"results":{"dataType":"array","array":{"dataType":"refAlias","ref":"PartialPlantData"},"required":true},"count":{"dataType":"double","required":true}},"validators":{}},
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 };
 const templateService = new ExpressTemplateService(models, {"noImplicitAdditionalProperties":"throw-on-extras","bodyCoercion":true});
 
@@ -214,37 +174,6 @@ export function RegisterRoutes(app: Router) {
 
               await templateService.apiHandler({
                 methodName: 'scrapeOccurrences',
-                controller,
-                response,
-                next,
-                validatedArgs,
-                successStatus: undefined,
-              });
-            } catch (err) {
-                return next(err);
-            }
-        });
-        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        const argsPlantController_scrapeOccurrencesLegacy: Record<string, TsoaRoute.ParameterSchema> = {
-                body: {"in":"body","name":"body","dataType":"union","subSchemas":[{"ref":"PlantSearchParams"},{"dataType":"undefined"}]},
-                errorResponse: {"in":"res","name":"500","required":true,"dataType":"string"},
-        };
-        app.post('/plants/scrapeOccurrencesLegacy',
-            ...(fetchMiddlewares<RequestHandler>(PlantController)),
-            ...(fetchMiddlewares<RequestHandler>(PlantController.prototype.scrapeOccurrencesLegacy)),
-
-            async function PlantController_scrapeOccurrencesLegacy(request: ExRequest, response: ExResponse, next: any) {
-
-            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-
-            let validatedArgs: any[] = [];
-            try {
-                validatedArgs = templateService.getValidatedArgs({ args: argsPlantController_scrapeOccurrencesLegacy, request, response });
-
-                const controller = new PlantController();
-
-              await templateService.apiHandler({
-                methodName: 'scrapeOccurrencesLegacy',
                 controller,
                 response,
                 next,
