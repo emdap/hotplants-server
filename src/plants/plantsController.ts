@@ -5,11 +5,7 @@ import { gbifClient, GbifOccurrenceSearchParams } from "../config/gbifClient";
 import { OccurrenceScrapeResponse } from "../config/types";
 import { SearchRecord, SearchRecordStatus } from "../graphql/graphql";
 import { parseBboxInput } from "../graphql/queryResolvers";
-import {
-  getCompletedGbifPlants,
-  reduceGbifResults,
-  searchGbifSpecies,
-} from "./util/gbifUtil";
+import { processGbifPlants, searchGbifSpecies } from "./util/gbifUtil";
 import {
   closeGbifSearchRecord,
   createGbifSearchRecord,
@@ -18,7 +14,6 @@ import {
 } from "./util/mongodbUtil";
 
 const EMPTY_OCCURRENCE_SCRAPE_RESPONSE: OccurrenceScrapeResponse = {
-  count: 0,
   totalOccurrencesScraped: 0,
   endOfRecords: true,
 };
@@ -26,7 +21,7 @@ const EMPTY_OCCURRENCE_SCRAPE_RESPONSE: OccurrenceScrapeResponse = {
 const DEFAULT_GBIF_SEARCH_PARAMS: PlantSearchParams = {
   kingdomKey: [6],
   basisOfRecord: ["HUMAN_OBSERVATION", "OBSERVATION", "MACHINE_OBSERVATION"],
-
+  limit: 300,
   // @ts-expect-error API spec is incorrect
   mediaType: "StillImage",
 };
@@ -69,18 +64,18 @@ const startPlantSearch = async (
   gbifQuery: GbifOccurrenceSearchParams,
   searchRecord: WithId<SearchRecord>
 ) => {
+  let scrapeResponse = EMPTY_OCCURRENCE_SCRAPE_RESPONSE;
+
   try {
     const results = await searchGbifOccurrences(
       gbifQuery,
       searchRecord.totalOccurrences
     );
-    return closeGbifSearchRecord(searchRecord, results);
+    scrapeResponse = results;
   } catch (error) {
     console.error(error);
-    return closeGbifSearchRecord(
-      searchRecord,
-      EMPTY_OCCURRENCE_SCRAPE_RESPONSE
-    );
+  } finally {
+    return closeGbifSearchRecord(searchRecord, scrapeResponse);
   }
 };
 
@@ -123,15 +118,9 @@ const searchGbifOccurrences = async (
   }
 
   const { results, endOfRecords } = data;
-  const reducedResults = reduceGbifResults(results);
-
-  const uniqueResults = await getCompletedGbifPlants(
-    reducedResults,
-    previousSearchOffset === 0
-  );
+  await processGbifPlants(results);
 
   return {
-    count: uniqueResults.length,
     totalOccurrencesScraped: results.length,
     endOfRecords: Boolean(endOfRecords),
   };

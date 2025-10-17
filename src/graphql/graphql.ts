@@ -110,10 +110,8 @@ export type SearchRecord = {
   __typename?: 'SearchRecord';
   endOfRecords?: Maybe<Scalars['Boolean']['output']>;
   jsonStringSearch: Scalars['String']['output'];
-  lastAddedCount?: Maybe<Scalars['Int']['output']>;
   status: SearchRecordStatus;
   totalOccurrences: Scalars['Int']['output'];
-  uniqueOccurrences: Scalars['Int']['output'];
 };
 
 export enum SearchRecordStatus {
@@ -281,10 +279,8 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
 export type SearchRecordResolvers<ContextType = any, ParentType extends ResolversParentTypes['SearchRecord'] = ResolversParentTypes['SearchRecord']> = ResolversObject<{
   endOfRecords?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   jsonStringSearch?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  lastAddedCount?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   status?: Resolver<ResolversTypes['SearchRecordStatus'], ParentType, ContextType>;
   totalOccurrences?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  uniqueOccurrences?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 

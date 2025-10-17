@@ -35,27 +35,21 @@ export type PlantSearchParams = Omit<
  */
 export const lookupPlantByName = async (
   scientificName: string
-): Promise<{
-  existing: boolean;
-  data: PartialPlantData;
-}> => {
+): Promise<PartialPlantData> => {
   const lowercaseName = scientificName.toLowerCase();
   const existingPlant = await plantCollection.findOne({
     scientificName: lowercaseName,
   });
 
   if (existingPlant) {
-    return { existing: true, data: existingPlant };
+    return existingPlant;
   }
   const scrapedPlant = await scrapePFAF(lowercaseName);
   return {
-    existing: false,
-    data: {
-      ...scrapedPlant,
-      occurrenceCoords: [],
-      occurrenceIds: [],
-      mediaUrls: [],
-    },
+    ...scrapedPlant,
+    occurrenceCoords: [],
+    occurrenceIds: [],
+    mediaUrls: [],
   };
 };
 
@@ -110,9 +104,7 @@ export const createGbifSearchRecord = async (
   const insertedRecord = await gbifSearchesCollection.insertOne({
     jsonStringSearch,
     status: initialStatus,
-
     totalOccurrences: 0,
-    uniqueOccurrences: 0,
   });
 
   return (
@@ -123,13 +115,11 @@ export const createGbifSearchRecord = async (
 
 export const closeGbifSearchRecord = (
   searchRecord: WithId<SearchRecord>,
-  { count, totalOccurrencesScraped, endOfRecords }: OccurrenceScrapeResponse
+  { totalOccurrencesScraped, endOfRecords }: OccurrenceScrapeResponse
 ) => {
   // Enforce strict typechecking on the updated record
   const updatedSearchRecord: Omit<SearchRecord, "jsonStringSearch"> = {
     status: SearchRecordStatus.Done,
-    lastAddedCount: count,
-    uniqueOccurrences: searchRecord.uniqueOccurrences + count,
     totalOccurrences: searchRecord.totalOccurrences + totalOccurrencesScraped,
     endOfRecords,
   };

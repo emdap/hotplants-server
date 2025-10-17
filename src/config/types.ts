@@ -19,13 +19,11 @@ export type PartialPlantData = Omit<
 >;
 
 /**
- * @property count: Count of unique occurrences found
  * @property totalOccurrencesScraped: The total (non-unique) occurrences found
  * @property endOfRecords: Direct property from GBIF response, whether there are more occurrences
  *   via this search
  */
 export type OccurrenceScrapeResponse = {
-  count: number;
   totalOccurrencesScraped: number;
   endOfRecords: boolean;
 };

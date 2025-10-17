@@ -6,12 +6,8 @@ enum SearchRecordStatus {
 type SearchRecord {
   jsonStringSearch: String!
   status: SearchRecordStatus!
-
   totalOccurrences: Int!
-  uniqueOccurrences: Int!
-
   endOfRecords: Boolean
-  lastAddedCount: Int
 }
 
 type Query {
