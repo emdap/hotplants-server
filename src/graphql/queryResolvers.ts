@@ -23,9 +23,10 @@ export const plantsResolver: QueryResolvers["plantSearch"] = async (
   const plantFilter = where ? extractPlantFilter(where) : {};
 
   const cursor = plantCollection.find(plantFilter);
-  sort && cursor.sort(sort as Sort);
-  limit && cursor.limit(limit);
+  sort &&
+    cursor.sort({ ...sort, scientificName: sort.scientificName || -1 } as Sort);
   offset && cursor.skip(offset);
+  limit && cursor.limit(limit);
 
   const [count, results] = await Promise.all([
     plantCollection.countDocuments(plantFilter),
