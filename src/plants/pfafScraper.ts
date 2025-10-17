@@ -124,6 +124,7 @@ const scrapePlantPhysicalChars = (document: Document) => {
   )?.textContent;
 
   if (plantCharData) {
+    plantData.physicalCharactersticsDump = plantCharData;
     plantData.isPerennial = plantCharData.indexOf("perennial") !== -1;
     plantData = { ...plantData, ...extractPlantSize(plantCharData) };
   }

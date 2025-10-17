@@ -13,6 +13,7 @@ const PlantDataCommonFields = `
   isPerennial: Boolean
   maturityTime: String
   habitat: String
+  physicalCharactersticsDump: String
 
   bloomColors: [String!]
   bloomTimes: [String!]
@@ -20,6 +21,7 @@ const PlantDataCommonFields = `
   lightLevels: [String!]
   hardiness: [Int!]
   uses: [String!]
+
 
   occurrenceIds: [Float!]!
   mediaUrls: [String!]!

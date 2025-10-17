@@ -1382,6 +1382,9 @@
 					"occurrenceIds": {
 						"$ref": "#/components/schemas/InputMaybe_number-Array_"
 					},
+					"physicalCharactersticsDump": {
+						"$ref": "#/components/schemas/InputMaybe_string_"
+					},
 					"scrapeSources": {
 						"$ref": "#/components/schemas/InputMaybe_string-Array_"
 					},
@@ -1492,6 +1495,9 @@
 							"format": "double"
 						},
 						"type": "array"
+					},
+					"physicalCharactersticsDump": {
+						"$ref": "#/components/schemas/Maybe_string_"
 					},
 					"scrapeSources": {
 						"items": {
