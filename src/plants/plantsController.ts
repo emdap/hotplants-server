@@ -19,7 +19,6 @@ import {
 
 const EMPTY_OCCURRENCE_SCRAPE_RESPONSE: OccurrenceScrapeResponse = {
   count: 0,
-  results: [],
   totalOccurrencesScraped: 0,
   endOfRecords: true,
 };
@@ -133,8 +132,6 @@ const searchGbifOccurrences = async (
 
   return {
     count: uniqueResults.length,
-    results: uniqueResults,
-
     totalOccurrencesScraped: results.length,
     endOfRecords: Boolean(endOfRecords),
   };
