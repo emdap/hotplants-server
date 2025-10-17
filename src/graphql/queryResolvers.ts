@@ -50,6 +50,9 @@ const extractPlantFilter = (filter: PlantDataInput) =>
         };
       } else if (valueIsArray) {
         prev[property] = { $all: value };
+      } else if (typeof value === "string") {
+        const regex = new RegExp(value, "i");
+        prev[property] = { $regex: regex };
       } else {
         prev[property] = value;
       }
