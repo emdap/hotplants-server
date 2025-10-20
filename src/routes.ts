@@ -83,8 +83,8 @@ const models: TsoaRoute.Models = {
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "PlantSizeUnit": {
-        "dataType": "refEnum",
-        "enums": ["cm","ft","in","m"],
+        "dataType": "refAlias",
+        "type": {"dataType":"union","subSchemas":[{"dataType":"enum","enums":["cm"]},{"dataType":"enum","enums":["ft"]},{"dataType":"enum","enums":["in"]},{"dataType":"enum","enums":["m"]}],"validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "Maybe_PlantSizeUnit_": {

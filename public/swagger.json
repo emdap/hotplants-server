@@ -1290,13 +1290,13 @@
 				"$ref": "#/components/schemas/Maybe_Scalars-at-Int_91_input_93__"
 			},
 			"PlantSizeUnit": {
+				"type": "string",
 				"enum": [
 					"cm",
 					"ft",
 					"in",
 					"m"
-				],
-				"type": "string"
+				]
 			},
 			"Maybe_PlantSizeUnit_": {
 				"allOf": [
