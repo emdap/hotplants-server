@@ -43,7 +43,10 @@ const normalizePlant = (gbifOccurrence: GbifOccurenceResult) => {
   const { media, decimalLatitude, decimalLongitude, ...rest } = gbifOccurrence;
   const normalizedPlant: NormalizedGbifResult = {
     ...rest,
-    mediaUrls: media.map(({ identifier }) => identifier),
+    mediaUrls: media.map(({ identifier }) => ({
+      url: identifier,
+      occurrenceId: gbifOccurrence.key,
+    })),
     occurrenceCoords: [],
     occurrenceIds: [gbifOccurrence.key],
     scrapeSources: [],

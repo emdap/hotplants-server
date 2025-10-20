@@ -1,5 +1,10 @@
 import { buildSchema } from "graphql";
 
+const PlantMedia = `
+  url: String!
+  occurrenceId: Float!
+`;
+
 const PlantSize = `
     amount: Int
     unit: PlantSizeUnit
@@ -24,7 +29,6 @@ const PlantDataCommonFields = `
 
 
   occurrenceIds: [Float!]!
-  mediaUrls: [String!]!
   scrapeSources: [String!]!
 `;
 
@@ -39,6 +43,7 @@ export const plantDataSchema = buildSchema(`
 
     commonNames: [String!]
     occurrenceCoords: [[Float!]!]!
+    mediaUrls: [PlantMedia!]!
   }
 
   input PlantDataInput {
@@ -64,6 +69,10 @@ export const plantDataSchema = buildSchema(`
   
   input PlantSizeInput {
     ${PlantSize}
+  }
+
+  type PlantMedia {
+    ${PlantMedia}
   }
 
   enum SortDirection {

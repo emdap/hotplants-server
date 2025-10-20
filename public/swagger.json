@@ -1376,9 +1376,6 @@
 					"maturityTime": {
 						"$ref": "#/components/schemas/InputMaybe_string_"
 					},
-					"mediaUrls": {
-						"$ref": "#/components/schemas/InputMaybe_string-Array_"
-					},
 					"occurrenceIds": {
 						"$ref": "#/components/schemas/InputMaybe_number-Array_"
 					},

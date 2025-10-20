@@ -28,7 +28,7 @@ export type PlantData = {
   isPerennial?: Maybe<Scalars['Boolean']['output']>;
   lightLevels?: Maybe<Array<Scalars['String']['output']>>;
   maturityTime?: Maybe<Scalars['String']['output']>;
-  mediaUrls: Array<Scalars['String']['output']>;
+  mediaUrls: Array<PlantMedia>;
   occurrenceCoords: Array<Array<Scalars['Float']['output']>>;
   occurrenceIds: Array<Scalars['Float']['output']>;
   physicalCharactersticsDump?: Maybe<Scalars['String']['output']>;
@@ -52,7 +52,6 @@ export type PlantDataInput = {
   isPerennial?: InputMaybe<Scalars['Boolean']['input']>;
   lightLevels?: InputMaybe<Array<Scalars['String']['input']>>;
   maturityTime?: InputMaybe<Scalars['String']['input']>;
-  mediaUrls?: InputMaybe<Array<Scalars['String']['input']>>;
   occurrenceIds?: InputMaybe<Array<Scalars['Float']['input']>>;
   physicalCharactersticsDump?: InputMaybe<Scalars['String']['input']>;
   scientificName?: InputMaybe<Scalars['String']['input']>;
@@ -61,6 +60,12 @@ export type PlantDataInput = {
   spread?: InputMaybe<PlantSizeInput>;
   updatedTimestamp?: InputMaybe<Scalars['Float']['input']>;
   uses?: InputMaybe<Array<Scalars['String']['input']>>;
+};
+
+export type PlantMedia = {
+  __typename?: 'PlantMedia';
+  occurrenceId: Scalars['Float']['output'];
+  url: Scalars['String']['output'];
 };
 
 export type PlantSearchResults = {
@@ -205,6 +210,7 @@ export type ResolversTypes = ResolversObject<{
   Int: ResolverTypeWrapper<Scalars['Int']['output']>;
   PlantData: ResolverTypeWrapper<PlantData>;
   PlantDataInput: PlantDataInput;
+  PlantMedia: ResolverTypeWrapper<PlantMedia>;
   PlantSearchResults: ResolverTypeWrapper<PlantSearchResults>;
   PlantSize: ResolverTypeWrapper<PlantSize>;
   PlantSizeInput: PlantSizeInput;
@@ -224,6 +230,7 @@ export type ResolversParentTypes = ResolversObject<{
   Int: Scalars['Int']['output'];
   PlantData: PlantData;
   PlantDataInput: PlantDataInput;
+  PlantMedia: PlantMedia;
   PlantSearchResults: PlantSearchResults;
   PlantSize: PlantSize;
   PlantSizeInput: PlantSizeInput;
@@ -244,7 +251,7 @@ export type PlantDataResolvers<ContextType = any, ParentType extends ResolversPa
   isPerennial?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   lightLevels?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, ContextType>;
   maturityTime?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  mediaUrls?: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType>;
+  mediaUrls?: Resolver<Array<ResolversTypes['PlantMedia']>, ParentType, ContextType>;
   occurrenceCoords?: Resolver<Array<Array<ResolversTypes['Float']>>, ParentType, ContextType>;
   occurrenceIds?: Resolver<Array<ResolversTypes['Float']>, ParentType, ContextType>;
   physicalCharactersticsDump?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
@@ -254,6 +261,12 @@ export type PlantDataResolvers<ContextType = any, ParentType extends ResolversPa
   spread?: Resolver<Maybe<ResolversTypes['PlantSize']>, ParentType, ContextType>;
   updatedTimestamp?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
   uses?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
+export type PlantMediaResolvers<ContextType = any, ParentType extends ResolversParentTypes['PlantMedia'] = ResolversParentTypes['PlantMedia']> = ResolversObject<{
+  occurrenceId?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  url?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
@@ -285,6 +298,7 @@ export type SearchRecordResolvers<ContextType = any, ParentType extends Resolver
 
 export type Resolvers<ContextType = any> = ResolversObject<{
   PlantData?: PlantDataResolvers<ContextType>;
+  PlantMedia?: PlantMediaResolvers<ContextType>;
   PlantSearchResults?: PlantSearchResultsResolvers<ContextType>;
   PlantSize?: PlantSizeResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
