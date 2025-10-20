@@ -26,22 +26,17 @@ const extractScientificName = ({
     : scientificName;
 
 export const searchGbifSpecies = async (commonName: string) => {
-  try {
-    // TODO: Create way to get all species instead of capping out at 100 limit
-    const { data } = await gbifClient.GET("/species/search", {
-      params: {
-        query: {
-          limit: 5,
-          higherTaxonKey: "6",
-          q: commonName,
-        },
+  // TODO: Create way to get all species instead of capping out at 100 limit
+  const { data } = await gbifClient.GET("/species/search", {
+    params: {
+      query: {
+        limit: 5,
+        higherTaxonKey: "6",
+        q: commonName,
       },
-    });
-    return data?.results?.flatMap(({ key }) => key ?? []);
-  } catch (error) {
-    console.error(error);
-    return;
-  }
+    },
+  });
+  return data?.results?.flatMap(({ key }) => key ?? []);
 };
 
 const normalizePlant = (gbifOccurrence: GbifOccurenceResult) => {
