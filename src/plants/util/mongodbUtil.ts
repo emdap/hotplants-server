@@ -57,8 +57,8 @@ export const storePlantData = async ({
   _id,
   ...plantData
 }: PartialPlantData & { _id?: ObjectId; addedTimestamp?: number }) => {
-  // Enforce strict typechecking
   const unixTimestamp = Date.now();
+  // Enforce strict typechecking
   const fullData: PlantDataDocument = {
     ...plantData,
     addedTimestamp: plantData.addedTimestamp ?? unixTimestamp,
@@ -104,6 +104,7 @@ export const createGbifSearchRecord = async (
   const insertedRecord = await gbifSearchesCollection.insertOne({
     jsonStringSearch,
     status: initialStatus,
+    statusUpdated: Date.now(),
     totalOccurrences: 0,
   });
 
@@ -120,6 +121,7 @@ export const closeGbifSearchRecord = (
   // Enforce strict typechecking on the updated record
   const updatedSearchRecord: Omit<SearchRecord, "jsonStringSearch"> = {
     status: SearchRecordStatus.Done,
+    statusUpdated: Date.now(),
     totalOccurrences: searchRecord.totalOccurrences + totalOccurrencesScraped,
     endOfRecords,
   };

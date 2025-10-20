@@ -18,7 +18,7 @@ export type Scalars = {
 
 export type PlantData = {
   __typename?: 'PlantData';
-  addedTimestamp: Scalars['Int']['output'];
+  addedTimestamp: Scalars['Float']['output'];
   bloomColors?: Maybe<Array<Scalars['String']['output']>>;
   bloomTimes?: Maybe<Array<Scalars['String']['output']>>;
   commonNames?: Maybe<Array<Scalars['String']['output']>>;
@@ -36,12 +36,12 @@ export type PlantData = {
   scrapeSources: Array<Scalars['String']['output']>;
   soilTypes?: Maybe<Array<Scalars['String']['output']>>;
   spread?: Maybe<PlantSize>;
-  updatedTimestamp: Scalars['Int']['output'];
+  updatedTimestamp: Scalars['Float']['output'];
   uses?: Maybe<Array<Scalars['String']['output']>>;
 };
 
 export type PlantDataInput = {
-  addedTimestamp?: InputMaybe<Scalars['Int']['input']>;
+  addedTimestamp?: InputMaybe<Scalars['Float']['input']>;
   bloomColors?: InputMaybe<Array<Scalars['String']['input']>>;
   bloomTimes?: InputMaybe<Array<Scalars['String']['input']>>;
   boundingBox?: InputMaybe<Array<Scalars['Float']['input']>>;
@@ -59,7 +59,7 @@ export type PlantDataInput = {
   scrapeSources?: InputMaybe<Array<Scalars['String']['input']>>;
   soilTypes?: InputMaybe<Array<Scalars['String']['input']>>;
   spread?: InputMaybe<PlantSizeInput>;
-  updatedTimestamp?: InputMaybe<Scalars['Int']['input']>;
+  updatedTimestamp?: InputMaybe<Scalars['Float']['input']>;
   uses?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
@@ -111,6 +111,7 @@ export type SearchRecord = {
   endOfRecords?: Maybe<Scalars['Boolean']['output']>;
   jsonStringSearch: Scalars['String']['output'];
   status: SearchRecordStatus;
+  statusUpdated: Scalars['Float']['output'];
   totalOccurrences: Scalars['Int']['output'];
 };
 
@@ -236,7 +237,7 @@ export type ResolversParentTypes = ResolversObject<{
 }>;
 
 export type PlantDataResolvers<ContextType = any, ParentType extends ResolversParentTypes['PlantData'] = ResolversParentTypes['PlantData']> = ResolversObject<{
-  addedTimestamp?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  addedTimestamp?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
   bloomColors?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, ContextType>;
   bloomTimes?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, ContextType>;
   commonNames?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, ContextType>;
@@ -254,7 +255,7 @@ export type PlantDataResolvers<ContextType = any, ParentType extends ResolversPa
   scrapeSources?: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType>;
   soilTypes?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, ContextType>;
   spread?: Resolver<Maybe<ResolversTypes['PlantSize']>, ParentType, ContextType>;
-  updatedTimestamp?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  updatedTimestamp?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
   uses?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
@@ -280,6 +281,7 @@ export type SearchRecordResolvers<ContextType = any, ParentType extends Resolver
   endOfRecords?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   jsonStringSearch?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   status?: Resolver<ResolversTypes['SearchRecordStatus'], ParentType, ContextType>;
+  statusUpdated?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
   totalOccurrences?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;

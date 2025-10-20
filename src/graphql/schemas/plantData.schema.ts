@@ -7,8 +7,8 @@ const PlantSize = `
 
 const PlantDataCommonFields = `
   scientificName: String!
-  addedTimestamp: Int!
-  updatedTimestamp: Int!
+  addedTimestamp: Float!
+  updatedTimestamp: Float!
 
   isPerennial: Boolean
   maturityTime: String
