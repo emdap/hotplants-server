@@ -1,7 +1,8 @@
 import { gbifClient, GbifOccurenceResult } from "../../config/gbifClient";
 import { GbifDataArrays } from "../../config/types";
 import { PlantData } from "../../graphql/graphql";
-import { lookupPlantByName, storePlantData } from "./mongodbUtil";
+import { scrapePlantByname } from "../pfafScraper";
+import { getPlantByName, storePlantData } from "./mongodbUtil";
 
 type NormalizedGbifResult = Omit<
   GbifOccurenceResult,
@@ -134,7 +135,9 @@ export const processGbifPlants = (gbifResults: GbifOccurenceResult[]) => {
     plantKey: string,
     occurrenceData: NormalizedGbifResult
   ) => {
-    const plantData = await lookupPlantByName(plantKey);
+    const existingPlantData = await getPlantByName(plantKey);
+    const plantData = existingPlantData ?? (await scrapePlantByname(plantKey));
+
     const { hasNewData, ...combinedData } = combinePlantData(
       plantData,
       occurrenceData

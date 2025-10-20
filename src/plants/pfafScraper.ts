@@ -1,5 +1,9 @@
 import { JSDOM } from "jsdom";
-import { GbifDataArrayKeys, PartialPlantData } from "../config/types";
+import {
+  GbifDataArrayKeys,
+  GbifDataArrays,
+  PartialPlantData,
+} from "../config/types";
 import { PlantSizeUnit } from "../graphql/graphql";
 
 const PFAF_URL = "https://pfaf.org/user/Plant.aspx?LatinName=";
@@ -13,6 +17,27 @@ const PLANT_FIELD_MAPPING: Record<string, keyof PfafScrapedData> = {
   "bloom color": "bloomColors",
   "bloom time": "bloomTimes",
   "main bloom time": "bloomTimes",
+};
+
+/**
+ *
+ * Helper function to scrape plant data from PFAF
+ *
+ * @param scientificName The plant name to search for
+ * @returns Data for the plant, with empty GBIF data array fields added
+ */
+export const scrapePlantByname = async (
+  scientificName: string
+): Promise<PartialPlantData & GbifDataArrays> => {
+  const lowercaseName = scientificName.toLowerCase();
+
+  const scrapedPlant = await scrapePFAF(lowercaseName);
+  return {
+    ...scrapedPlant,
+    occurrenceCoords: [],
+    occurrenceIds: [],
+    mediaUrls: [],
+  };
 };
 
 const cleanText = (text: string) =>

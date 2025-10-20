@@ -15,7 +15,6 @@ import {
   SearchRecord,
   SearchRecordStatus,
 } from "../../graphql/graphql";
-import { scrapePFAF } from "../pfafScraper";
 
 export type PlantSearchParams = Omit<
   GbifOccurrenceSearchParams,
@@ -27,30 +26,16 @@ export type PlantSearchParams = Omit<
 
 /**
  *
- * Helper function to either return existing plant data from mongodb, or scrape the data from PFAF.
- * Indicate whether the data already existed, or was newly scraped.
+ * Helper function to return existing plant data from mongodb.
  *
- * @param scientificName The plant name to search for. Search mongodb, scrape PFAF if not entry found
- * @returns Data for the plant. Property `existing` is true if the plant was already in mongodb.
+ * @param scientificName The plant name to search for
+ * @returns Data for the plant
  */
-export const lookupPlantByName = async (
-  scientificName: string
-): Promise<PartialPlantData> => {
+export const getPlantByName = (scientificName: string) => {
   const lowercaseName = scientificName.toLowerCase();
-  const existingPlant = await plantCollection.findOne({
+  return plantCollection.findOne({
     scientificName: lowercaseName,
   });
-
-  if (existingPlant) {
-    return existingPlant;
-  }
-  const scrapedPlant = await scrapePFAF(lowercaseName);
-  return {
-    ...scrapedPlant,
-    occurrenceCoords: [],
-    occurrenceIds: [],
-    mediaUrls: [],
-  };
 };
 
 export const storePlantData = async ({
