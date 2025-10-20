@@ -76,13 +76,13 @@ export const openGbifSearchRecord = (
     {
       jsonStringSearch,
     },
-    { $set: { status: SearchRecordStatus.Scraping, lastAddedCount: undefined } }
+    { $set: { status: "SCRAPING", lastAddedCount: undefined } }
   );
 };
 
 export const createGbifSearchRecord = async (
   searchParams: PlantSearchParams | null,
-  initialStatus: SearchRecordStatus = SearchRecordStatus.Scraping
+  initialStatus: SearchRecordStatus = "SCRAPING"
 ) => {
   const jsonStringSearch = stringifySearch(searchParams);
 
@@ -105,7 +105,7 @@ export const closeGbifSearchRecord = (
 ) => {
   // Enforce strict typechecking on the updated record
   const updatedSearchRecord: Omit<SearchRecord, "jsonStringSearch"> = {
-    status: SearchRecordStatus.Done,
+    status: "DONE",
     statusUpdated: Date.now(),
     totalOccurrences: searchRecord.totalOccurrences + totalOccurrencesScraped,
     endOfRecords,

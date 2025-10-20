@@ -1,30 +1,15 @@
-import { ObjectId, WithId } from "mongodb";
+import { ObjectId } from "mongodb";
 import { Body, Post, Res, Route, TsoaResponse } from "tsoa";
-import { stringify } from "wkt";
-import { gbifClient, GbifOccurrenceSearchParams } from "../config/gbifClient";
-import { OccurrenceScrapeResponse } from "../config/types";
-import { SearchRecord, SearchRecordStatus } from "../graphql/graphql";
-import { parseBboxInput } from "../graphql/queryResolvers";
-import { processGbifPlants, searchGbifSpecies } from "./util/gbifUtil";
 import {
-  closeGbifSearchRecord,
   createGbifSearchRecord,
   openGbifSearchRecord,
   PlantSearchParams,
 } from "./util/mongodbUtil";
-
-const EMPTY_OCCURRENCE_SCRAPE_RESPONSE: OccurrenceScrapeResponse = {
-  totalOccurrencesScraped: 0,
-  endOfRecords: true,
-};
-
-const DEFAULT_GBIF_SEARCH_PARAMS: PlantSearchParams = {
-  kingdomKey: [6],
-  basisOfRecord: ["HUMAN_OBSERVATION", "OBSERVATION", "MACHINE_OBSERVATION"],
-  limit: 300,
-  // @ts-expect-error API spec is incorrect
-  mediaType: "StillImage",
-};
+import {
+  createGbifQuery,
+  searchGbifOccurrences,
+  shouldStartScraping,
+} from "./util/scrapeOccurrencesUtil";
 
 @Route("plants")
 export class PlantController {
@@ -43,7 +28,7 @@ export class PlantController {
       openGbifSearchRecord(plantSearch),
     ]);
 
-    if (existingSearchRecord?.status === SearchRecordStatus.Scraping) {
+    if (existingSearchRecord && !shouldStartScraping(existingSearchRecord)) {
       return existingSearchRecord._id;
     }
 
@@ -54,74 +39,8 @@ export class PlantController {
       return errorResponse(500, "Unable to create search record");
     }
 
-    startPlantSearch(gbifQuery, searchRecord);
+    searchGbifOccurrences(gbifQuery, searchRecord);
 
     return searchRecord._id;
   }
 }
-
-const startPlantSearch = async (
-  gbifQuery: GbifOccurrenceSearchParams,
-  searchRecord: WithId<SearchRecord>
-) => {
-  let scrapeResponse = EMPTY_OCCURRENCE_SCRAPE_RESPONSE;
-
-  try {
-    const results = await searchGbifOccurrences(
-      gbifQuery,
-      searchRecord.totalOccurrences
-    );
-    scrapeResponse = results;
-  } catch (error) {
-    console.error(error);
-  } finally {
-    return closeGbifSearchRecord(searchRecord, scrapeResponse);
-  }
-};
-
-const createGbifQuery = async (
-  body: PlantSearchParams | null = {}
-): Promise<GbifOccurrenceSearchParams> => {
-  const { boundingBox, commonName, scientificName, ...searchParams } = {
-    ...body,
-    ...DEFAULT_GBIF_SEARCH_PARAMS,
-  };
-
-  const bboxPoly = boundingBox && parseBboxInput(boundingBox);
-  const geometry = bboxPoly ? ([stringify(bboxPoly)] as string[]) : undefined;
-
-  const taxonKey = commonName ? await searchGbifSpecies(commonName) : undefined;
-
-  return {
-    geometry,
-    taxonKey,
-    scientificName: scientificName ? [scientificName] : undefined,
-    ...searchParams,
-  };
-};
-
-const searchGbifOccurrences = async (
-  baseQuery: GbifOccurrenceSearchParams,
-  previousSearchOffset: number
-): Promise<OccurrenceScrapeResponse> => {
-  const { data } = await gbifClient.GET("/occurrence/search", {
-    params: {
-      query: {
-        ...baseQuery,
-        offset: previousSearchOffset,
-      },
-    },
-  });
-
-  if (!data?.results?.length) {
-    return EMPTY_OCCURRENCE_SCRAPE_RESPONSE;
-  }
-
-  const { results, endOfRecords } = data;
-  await processGbifPlants(results);
-
-  return {
-    totalOccurrencesScraped: results.length,
-    endOfRecords: Boolean(endOfRecords),
-  };
-};
