@@ -8,14 +8,13 @@ export type GbifDataArrayKeys =
 
 export type GbifDataArrays = Pick<PartialPlantData, GbifDataArrayKeys>;
 
-export type PlantDataDocument = PlantData & {
-  _id?: ObjectId;
-  otherTraits?: Record<string, string>;
+export type PlantDataDocument = Omit<PlantData, "_id"> & {
+  _id: ObjectId;
 };
 
 export type PartialPlantData = Omit<
   PlantDataDocument,
-  "addedTimestamp" | "updatedTimestamp"
+  "_id" | "addedTimestamp" | "updatedTimestamp"
 >;
 
 /**

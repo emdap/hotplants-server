@@ -6,8 +6,8 @@ const PlantMedia = `
 `;
 
 const PlantSize = `
-    amount: Int
-    unit: PlantSizeUnit
+  amount: Int
+  unit: PlantSizeUnit
 `;
 
 const PlantDataCommonFields = `
@@ -36,6 +36,7 @@ const makeFieldsOptional = (str: String) => str.replaceAll(/!$/gm, "");
 
 export const plantDataSchema = buildSchema(`
   type PlantData {
+    _id: String!
     ${PlantDataCommonFields}
 
     height: PlantSize

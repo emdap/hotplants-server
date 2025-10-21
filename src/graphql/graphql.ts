@@ -18,6 +18,7 @@ export type Scalars = {
 
 export type PlantData = {
   __typename?: 'PlantData';
+  _id: Scalars['String']['output'];
   addedTimestamp: Scalars['Float']['output'];
   bloomColors?: Maybe<Array<Scalars['String']['output']>>;
   bloomTimes?: Maybe<Array<Scalars['String']['output']>>;
@@ -241,6 +242,7 @@ export type ResolversParentTypes = ResolversObject<{
 }>;
 
 export type PlantDataResolvers<ContextType = any, ParentType extends ResolversParentTypes['PlantData'] = ResolversParentTypes['PlantData']> = ResolversObject<{
+  _id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   addedTimestamp?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
   bloomColors?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, ContextType>;
   bloomTimes?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, ContextType>;

@@ -1,4 +1,4 @@
-import { MongoClient } from "mongodb";
+import { MongoClient, OptionalId } from "mongodb";
 import { SearchRecord } from "../graphql/graphql";
 import { PlantDataDocument } from "./types";
 
@@ -8,7 +8,7 @@ const client = new MongoClient(process.env.MONGODB_CONNECTION_STRING!);
 
 const plantsDb = client.db("plants");
 export const plantCollection =
-  plantsDb.collection<PlantDataDocument>("plantData");
+  plantsDb.collection<OptionalId<PlantDataDocument>>("plantData");
 
 export const gbifSearchesCollection =
   plantsDb.collection<SearchRecord>("gbifSearches");

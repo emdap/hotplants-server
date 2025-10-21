@@ -44,7 +44,7 @@ export const storePlantData = async ({
 }: PartialPlantData & { _id?: ObjectId; addedTimestamp?: number }) => {
   const unixTimestamp = Date.now();
   // Enforce strict typechecking
-  const fullData: PlantDataDocument = {
+  const fullData: Omit<PlantDataDocument, "_id"> = {
     ...plantData,
     addedTimestamp: plantData.addedTimestamp ?? unixTimestamp,
     updatedTimestamp: unixTimestamp,
