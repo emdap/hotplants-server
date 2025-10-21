@@ -72,6 +72,8 @@ export const openGbifSearchRecord = (
 ) => {
   const jsonStringSearch = stringifySearch(searchParams);
 
+  console.info("open search record", jsonStringSearch);
+
   return gbifSearchesCollection.findOneAndUpdate(
     {
       jsonStringSearch,
@@ -103,6 +105,17 @@ export const closeGbifSearchRecord = (
   searchRecord: WithId<SearchRecord>,
   { totalOccurrencesScraped, endOfRecords }: OccurrenceScrapeResponse
 ) => {
+  console.info(
+    "close search record",
+    searchRecord._id,
+    "; current total occurrences:",
+    searchRecord.totalOccurrences,
+    "; new occurrences found:",
+    totalOccurrencesScraped,
+    "; end of records?",
+    endOfRecords
+  );
+
   // Enforce strict typechecking on the updated record
   const updatedSearchRecord: Omit<SearchRecord, "jsonStringSearch"> = {
     status: "DONE",
