@@ -35,8 +35,10 @@ const PlantDataCommonFields = `
 const makeFieldsOptional = (str: String) => str.replaceAll(/!$/gm, "");
 
 export const plantDataSchema = buildSchema(`
+  scalar ObjectId
+
   type PlantData {
-    _id: String!
+    _id: ObjectId!
     ${PlantDataCommonFields}
 
     height: PlantSize
