@@ -1,4 +1,4 @@
-import { GraphQLResolveInfo } from 'graphql';
+import { GraphQLResolveInfo, GraphQLScalarType, GraphQLScalarTypeConfig } from 'graphql';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
@@ -14,11 +14,12 @@ export type Scalars = {
   Boolean: { input: boolean; output: boolean; }
   Int: { input: number; output: number; }
   Float: { input: number; output: number; }
+  ObjectId: { input: any; output: any; }
 };
 
 export type PlantData = {
   __typename?: 'PlantData';
-  _id: Scalars['String']['output'];
+  _id: Scalars['ObjectId']['output'];
   addedTimestamp: Scalars['Float']['output'];
   bloomColors?: Maybe<Array<Scalars['String']['output']>>;
   bloomTimes?: Maybe<Array<Scalars['String']['output']>>;
@@ -209,6 +210,7 @@ export type ResolversTypes = ResolversObject<{
   Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
   Float: ResolverTypeWrapper<Scalars['Float']['output']>;
   Int: ResolverTypeWrapper<Scalars['Int']['output']>;
+  ObjectId: ResolverTypeWrapper<Scalars['ObjectId']['output']>;
   PlantData: ResolverTypeWrapper<PlantData>;
   PlantDataInput: PlantDataInput;
   PlantMedia: ResolverTypeWrapper<PlantMedia>;
@@ -229,6 +231,7 @@ export type ResolversParentTypes = ResolversObject<{
   Boolean: Scalars['Boolean']['output'];
   Float: Scalars['Float']['output'];
   Int: Scalars['Int']['output'];
+  ObjectId: Scalars['ObjectId']['output'];
   PlantData: PlantData;
   PlantDataInput: PlantDataInput;
   PlantMedia: PlantMedia;
@@ -241,8 +244,12 @@ export type ResolversParentTypes = ResolversObject<{
   String: Scalars['String']['output'];
 }>;
 
+export interface ObjectIdScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['ObjectId'], any> {
+  name: 'ObjectId';
+}
+
 export type PlantDataResolvers<ContextType = any, ParentType extends ResolversParentTypes['PlantData'] = ResolversParentTypes['PlantData']> = ResolversObject<{
-  _id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  _id?: Resolver<ResolversTypes['ObjectId'], ParentType, ContextType>;
   addedTimestamp?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
   bloomColors?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, ContextType>;
   bloomTimes?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, ContextType>;
@@ -299,6 +306,7 @@ export type SearchRecordResolvers<ContextType = any, ParentType extends Resolver
 }>;
 
 export type Resolvers<ContextType = any> = ResolversObject<{
+  ObjectId?: GraphQLScalarType;
   PlantData?: PlantDataResolvers<ContextType>;
   PlantMedia?: PlantMediaResolvers<ContextType>;
   PlantSearchResults?: PlantSearchResultsResolvers<ContextType>;
