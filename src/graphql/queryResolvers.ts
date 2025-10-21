@@ -40,9 +40,11 @@ const extractPlantFilter = (filter: PlantDataInput) =>
   Object.entries(filter).reduce<Filter<PlantDataDocument>>(
     (prev, [property, value]) => {
       const valueIsArray = Array.isArray(value);
-      if (property === "commonName" && typeof value === "string") {
-        const regex = new RegExp(value, "i");
-        prev.commonNames = { $regex: regex };
+      if (typeof value === "string") {
+        const regex = new RegExp(value.trim(), "i");
+        prev[property === "commonName" ? "commonNames" : property] = {
+          $regex: regex,
+        };
       } else if (property === "boundingBox" && valueIsArray) {
         const inputPolygon = parseBboxInput(value as number[]);
         prev.occurrenceCoords = inputPolygon && {
@@ -50,9 +52,6 @@ const extractPlantFilter = (filter: PlantDataInput) =>
         };
       } else if (valueIsArray) {
         prev[property] = { $all: value };
-      } else if (typeof value === "string") {
-        const regex = new RegExp(value, "i");
-        prev[property] = { $regex: regex };
       } else {
         prev[property] = value;
       }
