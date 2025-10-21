@@ -12,7 +12,7 @@ import { closeGbifSearchRecord, PlantSearchParams } from "./mongodbUtil";
 
 const EMPTY_OCCURRENCE_SCRAPE_RESPONSE: OccurrenceScrapeResponse = {
   totalOccurrencesScraped: 0,
-  endOfRecords: true,
+  endOfRecords: false,
 };
 
 const DEFAULT_GBIF_SEARCH_PARAMS: PlantSearchParams = {
@@ -26,7 +26,11 @@ const DEFAULT_GBIF_SEARCH_PARAMS: PlantSearchParams = {
 const MAX_STALE_SEARCH_MILLISECONDS = 300000; // 5 minutes
 
 export const shouldStartScraping = (searchRecord: SearchRecord) => {
-  if (searchRecord?.status === "SCRAPING") {
+  if (searchRecord.endOfRecords) {
+    return false;
+  }
+
+  if (searchRecord.status === "SCRAPING") {
     const now = Date.now();
     const timeDifference = now - searchRecord.statusUpdated;
     return timeDifference >= MAX_STALE_SEARCH_MILLISECONDS;
@@ -39,6 +43,7 @@ export const searchGbifOccurrences = async (
   gbifQuery: GbifOccurrenceSearchParams,
   searchRecord: WithId<SearchRecord>
 ) => {
+  let scrapeResult = EMPTY_OCCURRENCE_SCRAPE_RESPONSE;
   try {
     const { data } = await gbifClient.GET("/occurrence/search", {
       params: {
@@ -51,18 +56,16 @@ export const searchGbifOccurrences = async (
 
     if (data?.results) {
       await processGbifPlants(data.results);
-      const scrapeResult = {
+      scrapeResult = {
         totalOccurrencesScraped: data.results.length,
         endOfRecords: Boolean(data.endOfRecords),
       };
-
-      closeGbifSearchRecord(searchRecord, scrapeResult);
     }
   } catch (error) {
     console.error(error);
   }
 
-  closeGbifSearchRecord(searchRecord, EMPTY_OCCURRENCE_SCRAPE_RESPONSE);
+  closeGbifSearchRecord(searchRecord, scrapeResult);
 };
 
 export const createGbifQuery = async (
