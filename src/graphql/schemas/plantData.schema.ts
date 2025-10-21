@@ -3,6 +3,7 @@ import { buildSchema } from "graphql";
 const PlantMedia = `
   url: String!
   occurrenceId: Float!
+  isProxyUrl: Boolean
 `;
 
 const PlantSize = `
@@ -96,5 +97,14 @@ export const plantDataSchema = buildSchema(`
 
   type Query {
     plantSearch(sort: SortInput, limit: Int, offset: Int, where: PlantDataInput): PlantSearchResults!
+  }
+
+  type ReplaceWithProxyUrlResponse {
+    success: Boolean!
+    proxyUrl: String
+  }
+
+  type Mutation {
+    replaceWithProxyUrl(plantId: ObjectId!, replaceUrl: String!): ReplaceWithProxyUrlResponse!
   }
 `);

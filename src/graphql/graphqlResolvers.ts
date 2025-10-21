@@ -1,4 +1,5 @@
 import { bboxPolygon } from "@turf/turf";
+import { createHash } from "crypto";
 import { BBox } from "geojson";
 import { Filter, ObjectId, Sort } from "mongodb";
 import {
@@ -6,15 +7,7 @@ import {
   plantCollection,
 } from "../config/mongodbClient";
 import { PlantDataDocument } from "../config/types";
-import { PlantDataInput, QueryResolvers } from "./graphql";
-
-export const parseBboxInput = (bbox: number[]) => {
-  try {
-    return bbox?.length === 4 ? bboxPolygon(bbox as BBox) : undefined;
-  } catch (error) {
-    console.error("Error converting input to BBox:", error);
-  }
-};
+import { MutationResolvers, PlantDataInput, QueryResolvers } from "./graphql";
 
 export const plantsResolver: QueryResolvers["plantSearch"] = async (
   _,
@@ -34,6 +27,14 @@ export const plantsResolver: QueryResolvers["plantSearch"] = async (
   ]);
 
   return { count, results };
+};
+
+export const parseBboxInput = (bbox: number[]) => {
+  try {
+    return bbox?.length === 4 ? bboxPolygon(bbox as BBox) : undefined;
+  } catch (error) {
+    console.error("Error converting input to BBox:", error);
+  }
 };
 
 const extractPlantFilter = (filter: PlantDataInput) =>
@@ -60,6 +61,38 @@ const extractPlantFilter = (filter: PlantDataInput) =>
     },
     {}
   );
+
+export const replaceWithProxyUrlResolver: MutationResolvers["replaceWithProxyUrl"] =
+  async (_, { plantId, replaceUrl }) => {
+    const plantData = await plantCollection.findOne(
+      new ObjectId(plantId as string)
+    );
+
+    if (plantData) {
+      const mediaIndex = plantData.mediaUrls.findIndex(
+        ({ url }) => url === replaceUrl
+      );
+      if (mediaIndex !== -1) {
+        const { url, occurrenceId } = plantData.mediaUrls[mediaIndex];
+        const md5Url = createHash("md5").update(url).digest("hex");
+        const proxyUrl = `https://api.gbif.org/v1/image/cache/occurrence/${occurrenceId}/media/${md5Url}`;
+
+        const { modifiedCount } = await plantCollection.updateOne(
+          { _id: new ObjectId(plantId as string) },
+          {
+            $set: {
+              [`mediaUrls.${mediaIndex}.url`]: proxyUrl,
+              [`mediaUrls.${mediaIndex}.isProxyUrl`]: true,
+            },
+          }
+        );
+
+        return { success: !!modifiedCount, proxyUrl };
+      }
+    }
+
+    return { success: false };
+  };
 
 export const searchRecordResolver: QueryResolvers["searchRecord"] = (
   _,
