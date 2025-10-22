@@ -6,7 +6,7 @@ import {
 } from "../../config/gbifClient";
 import { OccurrenceScrapeResponse } from "../../config/types";
 import { SearchRecord } from "../../graphql/graphql";
-import { parseBboxInput } from "../../graphql/resolvers/simpleResolvers";
+import { parseBboxInput } from "../../graphql/resolvers/plantSearchResolver";
 import { processGbifPlants, searchGbifSpecies } from "./gbifUtil";
 import { closeGbifSearchRecord, PlantSearchParams } from "./mongodbUtil";
 
