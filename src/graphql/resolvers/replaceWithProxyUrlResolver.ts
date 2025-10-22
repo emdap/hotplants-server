@@ -1,7 +1,7 @@
 import { createHash } from "crypto";
 import { ObjectId } from "mongodb";
 import { plantCollection } from "../../config/mongodbClient";
-import { MutationResolvers } from "../graphql";
+import { MutationResolvers, PlantData } from "../graphql";
 
 export const replaceWithProxyUrlResolver: MutationResolvers["replaceWithProxyUrl"] =
   async (_, { plantId, occurrenceId, replaceUrl }) => {
@@ -10,31 +10,25 @@ export const replaceWithProxyUrlResolver: MutationResolvers["replaceWithProxyUrl
     );
 
     if (plantData) {
-      const occurrenceIndex = plantData.occurrences.findIndex(
-        (occurrence) => occurrence.occurrenceId === occurrenceId
+      const { occurrenceIndex, mediaIndex } = getIndexes(
+        plantData,
+        occurrenceId,
+        replaceUrl
       );
-
-      if (occurrenceIndex === -1) {
+      if (occurrenceIndex === -1 || mediaIndex === -1) {
         return null;
       }
 
-      const mediaIndex = plantData.occurrences[occurrenceIndex].media.findIndex(
-        ({ url }) => url === replaceUrl
-      );
-      if (mediaIndex === -1) {
-        return null;
-      }
-
-      const { url } = plantData.occurrences[occurrenceIndex].media[mediaIndex];
-      const md5Url = createHash("md5").update(url).digest("hex");
+      const md5Url = createHash("md5").update(replaceUrl).digest("hex");
       const proxyUrl = `https://api.gbif.org/v1/image/cache/occurrence/${occurrenceId}/media/${md5Url}`;
+      const updateKey = `occurrences.${occurrenceIndex}.media.${mediaIndex}`;
 
       const { modifiedCount } = await plantCollection.updateOne(
         { _id: new ObjectId(plantId as string) },
         {
           $set: {
-            [`mediaUrls.${mediaIndex}.url`]: proxyUrl,
-            [`mediaUrls.${mediaIndex}.isProxyUrl`]: true,
+            [`${updateKey}.url`]: proxyUrl,
+            [`${updateKey}.isProxyUrl`]: true,
           },
         }
       );
@@ -44,3 +38,22 @@ export const replaceWithProxyUrlResolver: MutationResolvers["replaceWithProxyUrl
 
     return null;
   };
+
+const getIndexes = (
+  plantData: PlantData,
+  occurrenceId: number,
+  replaceUrl: string
+) => {
+  const occurrenceIndex = plantData.occurrences.findIndex(
+    (occurrence) => occurrence.occurrenceId === occurrenceId
+  );
+
+  const mediaIndex =
+    occurrenceIndex === -1
+      ? -1
+      : plantData.occurrences[occurrenceIndex].media.findIndex(
+          ({ url }) => url === replaceUrl
+        );
+
+  return { occurrenceIndex, mediaIndex };
+};
