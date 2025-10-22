@@ -33,10 +33,15 @@ const PlantDataCommonFields = `
   scrapeSources: [String!]!
 `;
 
-const PlantData = `
-    _id: ObjectId!
-    ${PlantDataCommonFields}
+const makeFieldsOptional = (str: String) => str.replaceAll(/!$/gm, "");
 
+export const plantDataSchema = buildSchema(`
+  scalar ObjectId
+
+  type PlantData {
+    ${PlantDataCommonFields}
+    
+    _id: ObjectId!
     height: PlantSize
     spread: PlantSize
 
@@ -44,15 +49,6 @@ const PlantData = `
     occurrenceCoords: [[Float!]!]!
     mediaUrls: [PlantMedia!]!
     fullMediaCount: Int
-`;
-
-const makeFieldsOptional = (str: String) => str.replaceAll(/!$/gm, "");
-
-export const plantDataSchema = buildSchema(`
-  scalar ObjectId
-
-  type PlantData {
-    ${PlantData}
   }
 
   input PlantDataInput {
@@ -107,6 +103,6 @@ export const plantDataSchema = buildSchema(`
   }
 
   type Mutation {
-    replaceWithProxyUrl(plantId: ObjectId!, replaceUrl: String!): String
+    replaceWithProxyUrl(plantId: String!, replaceUrl: String!): String
   }
 `);

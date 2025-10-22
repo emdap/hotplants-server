@@ -24,7 +24,7 @@ export type Mutation = {
 
 
 export type MutationReplaceWithProxyUrlArgs = {
-  plantId: Scalars['ObjectId']['input'];
+  plantId: Scalars['String']['input'];
   replaceUrl: Scalars['String']['input'];
 };
 
