@@ -77,16 +77,10 @@ export const plantDataSchema = buildSchema(`
     ${PlantSize}
   }
 
-
-  enum SortDirection {
-    asc
-    desc
-  }
-
   input SortInput {
-    scientificName: SortDirection
-    addedTimestamp: SortDirection
-    updatedTimestamp: SortDirection
+    scientificName: Int
+    addedTimestamp: Int
+    updatedTimestamp: Int
   }
 
   type PlantSearchResults {

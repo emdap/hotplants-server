@@ -162,14 +162,10 @@ export type SearchRecordStatus =
   | 'DONE'
   | 'SCRAPING';
 
-export type SortDirection =
-  | 'asc'
-  | 'desc';
-
 export type SortInput = {
-  addedTimestamp?: InputMaybe<SortDirection>;
-  scientificName?: InputMaybe<SortDirection>;
-  updatedTimestamp?: InputMaybe<SortDirection>;
+  addedTimestamp?: InputMaybe<Scalars['Int']['input']>;
+  scientificName?: InputMaybe<Scalars['Int']['input']>;
+  updatedTimestamp?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type WithIndex<TObject> = TObject & Record<string, any>;
@@ -261,7 +257,6 @@ export type ResolversTypes = ResolversObject<{
   Query: ResolverTypeWrapper<{}>;
   SearchRecord: ResolverTypeWrapper<SearchRecord>;
   SearchRecordStatus: SearchRecordStatus;
-  SortDirection: SortDirection;
   SortInput: SortInput;
   String: ResolverTypeWrapper<Scalars['String']['output']>;
 }>;
