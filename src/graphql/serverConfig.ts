@@ -15,11 +15,20 @@ import { plantDataSchema } from "./schemas/plantData.schema";
 const schemaPath = path.join(__dirname, "schemas/mainSchema.graphql");
 const resolvers: Resolvers = {
   PlantData: {
-    fullOccurrencesCount: ({ occurrences }) => occurrences.length,
+    fullOccurrencesCount: (
+      { occurrences, fullOccurrencesCount },
+      _args,
+      _context,
+      { operation }
+    ) =>
+      operation.name?.value === "plant" || fullOccurrencesCount === undefined
+        ? occurrences.length
+        : fullOccurrencesCount,
+
     occurrences: ({ occurrences }, _args, _context, { operation }) =>
       operation.name?.value === "plantOccurrences"
         ? occurrences
-        : occurrences.slice(0, 10),
+        : occurrences.slice(0, 100),
   },
   Query: {
     plant: plantResolver,

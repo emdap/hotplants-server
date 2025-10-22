@@ -1,17 +1,15 @@
 import { bboxPolygon } from "@turf/turf";
 import { BBox } from "geojson";
-import { Filter, Sort } from "mongodb";
+import { AggregationCursor, Filter, FindCursor, Sort } from "mongodb";
 import { plantCollection } from "../../config/mongodbClient";
 import { PlantDataDocument } from "../../config/types";
-import { PlantDataInput, QueryResolvers } from "../graphql";
+import { InputMaybe, PlantDataInput, QueryResolvers } from "../graphql";
 
 export const plantSearchResolver: QueryResolvers["plantSearch"] = async (
   _,
   { sort, limit, offset, where }
 ) => {
-  const plantFilter = where ? extractPlantFilter(where) : {};
-
-  const cursor = plantCollection.find(plantFilter);
+  const { cursor, filter } = createFilteredCursor(where);
 
   sort &&
     cursor.sort({ ...sort, scientificName: sort.scientificName || -1 } as Sort);
@@ -19,19 +17,61 @@ export const plantSearchResolver: QueryResolvers["plantSearch"] = async (
   limit && cursor.limit(limit);
 
   const [count, results] = await Promise.all([
-    plantCollection.countDocuments(plantFilter),
+    plantCollection.countDocuments(filter),
     cursor.toArray(),
   ]);
 
   return { count, results };
 };
 
-export const parseBboxInput = (bbox: number[]) => {
-  try {
-    return bbox?.length === 4 ? bboxPolygon(bbox as BBox) : undefined;
-  } catch (error) {
-    console.error("Error converting input to BBox:", error);
+const createFilteredCursor = (where?: InputMaybe<PlantDataInput>) => {
+  let cursor: FindCursor | AggregationCursor;
+  const filter = where ? extractPlantFilter(where) : {};
+
+  if (!where?.boundingBox) {
+    cursor = plantCollection.find(filter);
+  } else {
+    const occurrenceFilter = constructBboxFilter(where.boundingBox);
+
+    cursor = plantCollection.aggregate([
+      { $match: filter },
+
+      {
+        $addFields: {
+          fullOccurrencesCount: { $size: "$occurrences" },
+        },
+      },
+
+      { $unwind: "$occurrences" },
+      { $match: occurrenceFilter },
+
+      {
+        $group: {
+          _id: "$_id",
+          plant: { $first: "$$ROOT" },
+
+          occurrences: { $push: "$occurrences" },
+          fullOccurrencesCount: { $first: "$fullOccurrencesCount" },
+        },
+      },
+
+      {
+        $replaceRoot: {
+          newRoot: {
+            $mergeObjects: [
+              "$plant",
+              {
+                occurrences: "$occurrences",
+                fullOccurrencesCount: "$fullOccurrencesCount",
+              },
+            ],
+          },
+        },
+      },
+    ]);
   }
+
+  return { cursor, filter };
 };
 
 const extractPlantFilter = (filter: PlantDataInput) =>
@@ -44,10 +84,7 @@ const extractPlantFilter = (filter: PlantDataInput) =>
           $regex: regex,
         };
       } else if (property === "boundingBox" && valueIsArray) {
-        const inputPolygon = parseBboxInput(value as number[]);
-        prev.occurrenceCoords = inputPolygon && {
-          $geoIntersects: { $geometry: inputPolygon.geometry },
-        };
+        prev = { ...prev, ...constructBboxFilter(value as number[]) };
       } else if (valueIsArray) {
         prev[property] = { $all: value };
       } else {
@@ -58,3 +95,22 @@ const extractPlantFilter = (filter: PlantDataInput) =>
     },
     {}
   );
+
+export const parseBboxInput = (bbox: number[]) => {
+  try {
+    return bbox?.length === 4 ? bboxPolygon(bbox as BBox) : undefined;
+  } catch (error) {
+    console.error("Error converting input to BBox:", error);
+  }
+};
+
+const constructBboxFilter = (value: number[]) => {
+  const inputPolygon = parseBboxInput(value as number[]);
+  return (
+    inputPolygon && {
+      "occurrences.occurrenceCoords": {
+        $geoWithin: { $geometry: inputPolygon.geometry },
+      },
+    }
+  );
+};
