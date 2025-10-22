@@ -28,7 +28,7 @@ const resolvers: Resolvers = {
     occurrences: ({ occurrences }, _args, _context, { operation }) =>
       operation.name?.value === "plantOccurrences"
         ? occurrences
-        : occurrences.slice(0, 100),
+        : occurrences.slice(0, 10),
   },
   Query: {
     plant: plantResolver,
