@@ -8,7 +8,7 @@ export type GbifDataArrayKeys =
 
 export type GbifDataArrays = Pick<PartialPlantData, GbifDataArrayKeys>;
 
-export type PlantDataDocument = Omit<PlantData, "_id"> & {
+export type PlantDataDocument = Omit<PlantData, "_id" | "fullMediaCount"> & {
   _id: ObjectId;
 };
 

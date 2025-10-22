@@ -9,7 +9,21 @@ import {
 import { PlantDataDocument } from "../config/types";
 import { MutationResolvers, PlantDataInput, QueryResolvers } from "./graphql";
 
-export const plantsResolver: QueryResolvers["plantSearch"] = async (
+export const plantResolver: QueryResolvers["plant"] = (_, { id }) =>
+  plantCollection.findOne(new ObjectId(id));
+
+export const plantMediaResolver: QueryResolvers["plantMedia"] = async (
+  _,
+  { id, offset, limit }
+) => {
+  const plant = await plantCollection.findOne(new ObjectId(id));
+  const useOffset = offset ?? 0;
+  return plant
+    ? plant.mediaUrls.slice(useOffset, limit ? limit + useOffset : undefined)
+    : [];
+};
+
+export const plantSearchResolver: QueryResolvers["plantSearch"] = async (
   _,
   { sort, limit, offset, where }
 ) => {

@@ -33,12 +33,7 @@ const PlantDataCommonFields = `
   scrapeSources: [String!]!
 `;
 
-const makeFieldsOptional = (str: String) => str.replaceAll(/!$/gm, "");
-
-export const plantDataSchema = buildSchema(`
-  scalar ObjectId
-
-  type PlantData {
+const PlantData = `
     _id: ObjectId!
     ${PlantDataCommonFields}
 
@@ -48,6 +43,16 @@ export const plantDataSchema = buildSchema(`
     commonNames: [String!]
     occurrenceCoords: [[Float!]!]!
     mediaUrls: [PlantMedia!]!
+    fullMediaCount: Int
+`;
+
+const makeFieldsOptional = (str: String) => str.replaceAll(/!$/gm, "");
+
+export const plantDataSchema = buildSchema(`
+  scalar ObjectId
+
+  type PlantData {
+    ${PlantData}
   }
 
   input PlantDataInput {
@@ -96,6 +101,8 @@ export const plantDataSchema = buildSchema(`
   }
 
   type Query {
+    plant(id: String!): PlantData
+    plantMedia(id: String!, offset: Int, limit: Int): [PlantMedia!]!
     plantSearch(sort: SortInput, limit: Int, offset: Int, where: PlantDataInput): PlantSearchResults!
   }
 

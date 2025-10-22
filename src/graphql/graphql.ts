@@ -35,6 +35,7 @@ export type PlantData = {
   bloomColors?: Maybe<Array<Scalars['String']['output']>>;
   bloomTimes?: Maybe<Array<Scalars['String']['output']>>;
   commonNames?: Maybe<Array<Scalars['String']['output']>>;
+  fullMediaCount?: Maybe<Scalars['Int']['output']>;
   habitat?: Maybe<Scalars['String']['output']>;
   hardiness?: Maybe<Array<Scalars['Int']['output']>>;
   height?: Maybe<PlantSize>;
@@ -107,8 +108,22 @@ export type PlantSizeUnit =
 
 export type Query = {
   __typename?: 'Query';
+  plant?: Maybe<PlantData>;
+  plantMedia: Array<PlantMedia>;
   plantSearch: PlantSearchResults;
   searchRecord?: Maybe<SearchRecord>;
+};
+
+
+export type QueryPlantArgs = {
+  id: Scalars['String']['input'];
+};
+
+
+export type QueryPlantMediaArgs = {
+  id: Scalars['String']['input'];
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
 };
 
 
@@ -272,6 +287,7 @@ export type PlantDataResolvers<ContextType = any, ParentType extends ResolversPa
   bloomColors?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, ContextType>;
   bloomTimes?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, ContextType>;
   commonNames?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, ContextType>;
+  fullMediaCount?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   habitat?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   hardiness?: Resolver<Maybe<Array<ResolversTypes['Int']>>, ParentType, ContextType>;
   height?: Resolver<Maybe<ResolversTypes['PlantSize']>, ParentType, ContextType>;
@@ -311,6 +327,8 @@ export type PlantSizeResolvers<ContextType = any, ParentType extends ResolversPa
 }>;
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
+  plant?: Resolver<Maybe<ResolversTypes['PlantData']>, ParentType, ContextType, RequireFields<QueryPlantArgs, 'id'>>;
+  plantMedia?: Resolver<Array<ResolversTypes['PlantMedia']>, ParentType, ContextType, RequireFields<QueryPlantMediaArgs, 'id'>>;
   plantSearch?: Resolver<ResolversTypes['PlantSearchResults'], ParentType, ContextType, Partial<QueryPlantSearchArgs>>;
   searchRecord?: Resolver<Maybe<ResolversTypes['SearchRecord']>, ParentType, ContextType, RequireFields<QuerySearchRecordArgs, 'id'>>;
 }>;

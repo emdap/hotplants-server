@@ -4,7 +4,9 @@ import gql from "graphql-tag";
 import path from "path";
 import { Resolvers } from "./graphql";
 import {
-  plantsResolver,
+  plantMediaResolver,
+  plantResolver,
+  plantSearchResolver,
   replaceWithProxyUrlResolver,
   searchRecordResolver,
 } from "./graphqlResolvers";
@@ -12,8 +14,17 @@ import { plantDataSchema } from "./schemas/plantData.schema";
 
 const schemaPath = path.join(__dirname, "schemas/mainSchema.graphql");
 const resolvers: Resolvers = {
+  PlantData: {
+    fullMediaCount: ({ mediaUrls }) => mediaUrls.length,
+    mediaUrls: ({ mediaUrls }, _args, _context, { operation }) =>
+      operation.name?.value === "plantMedia"
+        ? mediaUrls
+        : mediaUrls.slice(0, 10),
+  },
   Query: {
-    plantSearch: plantsResolver,
+    plant: plantResolver,
+    plantMedia: plantMediaResolver,
+    plantSearch: plantSearchResolver,
     searchRecord: searchRecordResolver,
   },
   Mutation: {
