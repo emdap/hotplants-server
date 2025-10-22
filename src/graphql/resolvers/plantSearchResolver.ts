@@ -1,0 +1,60 @@
+import { bboxPolygon } from "@turf/turf";
+import { BBox } from "geojson";
+import { Filter, Sort } from "mongodb";
+import { plantCollection } from "../../config/mongodbClient";
+import { PlantDataDocument } from "../../config/types";
+import { PlantDataInput, QueryResolvers } from "../graphql";
+
+export const plantSearchResolver: QueryResolvers["plantSearch"] = async (
+  _,
+  { sort, limit, offset, where }
+) => {
+  const plantFilter = where ? extractPlantFilter(where) : {};
+
+  const cursor = plantCollection.find(plantFilter);
+
+  sort &&
+    cursor.sort({ ...sort, scientificName: sort.scientificName || -1 } as Sort);
+  offset && cursor.skip(offset);
+  limit && cursor.limit(limit);
+
+  const [count, results] = await Promise.all([
+    plantCollection.countDocuments(plantFilter),
+    cursor.toArray(),
+  ]);
+
+  return { count, results };
+};
+
+export const parseBboxInput = (bbox: number[]) => {
+  try {
+    return bbox?.length === 4 ? bboxPolygon(bbox as BBox) : undefined;
+  } catch (error) {
+    console.error("Error converting input to BBox:", error);
+  }
+};
+
+const extractPlantFilter = (filter: PlantDataInput) =>
+  Object.entries(filter).reduce<Filter<PlantDataDocument>>(
+    (prev, [property, value]) => {
+      const valueIsArray = Array.isArray(value);
+      if (typeof value === "string") {
+        const regex = new RegExp(value.trim(), "i");
+        prev[property === "commonName" ? "commonNames" : property] = {
+          $regex: regex,
+        };
+      } else if (property === "boundingBox" && valueIsArray) {
+        const inputPolygon = parseBboxInput(value as number[]);
+        prev.occurrenceCoords = inputPolygon && {
+          $geoIntersects: { $geometry: inputPolygon.geometry },
+        };
+      } else if (valueIsArray) {
+        prev[property] = { $all: value };
+      } else {
+        prev[property] = value;
+      }
+
+      return prev;
+    },
+    {}
+  );

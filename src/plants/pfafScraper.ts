@@ -1,14 +1,10 @@
 import { JSDOM } from "jsdom";
-import {
-  GbifDataArrayKeys,
-  GbifDataArrays,
-  PartialPlantData,
-} from "../config/types";
+import { PartialPlantData } from "../config/types";
 import { PlantSizeUnit } from "../graphql/graphql";
 
 const PFAF_URL = "https://pfaf.org/user/Plant.aspx?LatinName=";
 
-export type PfafScrapedData = Omit<PartialPlantData, GbifDataArrayKeys>;
+export type PfafScrapedData = Omit<PartialPlantData, "occurrences">;
 
 const PLANT_FIELD_MAPPING: Record<string, keyof PfafScrapedData> = {
   "common name": "commonNames",
@@ -28,15 +24,13 @@ const PLANT_FIELD_MAPPING: Record<string, keyof PfafScrapedData> = {
  */
 export const scrapePlantByname = async (
   scientificName: string
-): Promise<PartialPlantData & GbifDataArrays> => {
+): Promise<PartialPlantData> => {
   const lowercaseName = scientificName.toLowerCase();
 
   const scrapedPlant = await scrapePFAF(lowercaseName);
   return {
     ...scrapedPlant,
-    occurrenceCoords: [],
-    occurrenceIds: [],
-    mediaUrls: [],
+    occurrences: [],
   };
 };
 

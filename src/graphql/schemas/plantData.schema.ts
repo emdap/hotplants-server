@@ -1,11 +1,5 @@
 import { buildSchema } from "graphql";
 
-const PlantMedia = `
-  url: String!
-  occurrenceId: Float!
-  isProxyUrl: Boolean
-`;
-
 const PlantSize = `
   amount: Int
   unit: PlantSizeUnit
@@ -15,6 +9,7 @@ const PlantDataCommonFields = `
   scientificName: String!
   addedTimestamp: Float!
   updatedTimestamp: Float!
+  scrapeSources: [String!]!
 
   isPerennial: Boolean
   maturityTime: String
@@ -27,16 +22,24 @@ const PlantDataCommonFields = `
   lightLevels: [String!]
   hardiness: [Int!]
   uses: [String!]
-
-
-  occurrenceIds: [Float!]!
-  scrapeSources: [String!]!
 `;
 
 const makeFieldsOptional = (str: String) => str.replaceAll(/!$/gm, "");
 
 export const plantDataSchema = buildSchema(`
   scalar ObjectId
+
+  type PlantMedia {
+    url: String!
+    occurrenceId: Float!
+    isProxyUrl: Boolean
+  }
+
+  type PlantOccurrence { 
+    occurrenceId: Float!
+    occurrenceCoords: [Float!]!
+    media: [PlantMedia!]!
+  }
 
   type PlantData {
     ${PlantDataCommonFields}
@@ -46,9 +49,8 @@ export const plantDataSchema = buildSchema(`
     spread: PlantSize
 
     commonNames: [String!]
-    occurrenceCoords: [[Float!]!]!
-    mediaUrls: [PlantMedia!]!
-    fullMediaCount: Int
+    fullOccurrencesCount: Int
+    occurrences: [PlantOccurrence!]!
   }
 
   input PlantDataInput {
@@ -76,9 +78,6 @@ export const plantDataSchema = buildSchema(`
     ${PlantSize}
   }
 
-  type PlantMedia {
-    ${PlantMedia}
-  }
 
   enum SortDirection {
     asc
@@ -96,13 +95,18 @@ export const plantDataSchema = buildSchema(`
    results: [PlantData!]!
   }
 
+  type PlantOccurrencesResults {
+    count: Float!
+    results: [PlantOccurrence!]!
+  }
+
   type Query {
     plant(id: String!): PlantData
-    plantMedia(id: String!, offset: Int, limit: Int): [PlantMedia!]!
+    plantOccurrences(id: String!, offset: Int, limit: Int): PlantOccurrencesResults
     plantSearch(sort: SortInput, limit: Int, offset: Int, where: PlantDataInput): PlantSearchResults!
   }
 
   type Mutation {
-    replaceWithProxyUrl(plantId: String!, replaceUrl: String!): String
+    replaceWithProxyUrl(plantId: String!, occurrenceId: Float!, replaceUrl: String!): String
   }
 `);

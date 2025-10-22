@@ -3,27 +3,27 @@ import { readFileSync } from "fs";
 import gql from "graphql-tag";
 import path from "path";
 import { Resolvers } from "./graphql";
+import { plantSearchResolver } from "./resolvers/plantSearchResolver";
+import { replaceWithProxyUrlResolver } from "./resolvers/replaceWithProxyUrlResolver";
 import {
-  plantMediaResolver,
+  plantOccurrencesResolver,
   plantResolver,
-  plantSearchResolver,
-  replaceWithProxyUrlResolver,
   searchRecordResolver,
-} from "./graphqlResolvers";
+} from "./resolvers/simpleResolvers";
 import { plantDataSchema } from "./schemas/plantData.schema";
 
 const schemaPath = path.join(__dirname, "schemas/mainSchema.graphql");
 const resolvers: Resolvers = {
   PlantData: {
-    fullMediaCount: ({ mediaUrls }) => mediaUrls.length,
-    mediaUrls: ({ mediaUrls }, _args, _context, { operation }) =>
-      operation.name?.value === "plantMedia"
-        ? mediaUrls
-        : mediaUrls.slice(0, 10),
+    fullOccurrencesCount: ({ occurrences }) => occurrences.length,
+    occurrences: ({ occurrences }, _args, _context, { operation }) =>
+      operation.name?.value === "plantOccurrences"
+        ? occurrences
+        : occurrences.slice(0, 10),
   },
   Query: {
     plant: plantResolver,
-    plantMedia: plantMediaResolver,
+    plantOccurrences: plantOccurrencesResolver,
     plantSearch: plantSearchResolver,
     searchRecord: searchRecordResolver,
   },

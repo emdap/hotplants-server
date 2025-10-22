@@ -24,6 +24,7 @@ export type Mutation = {
 
 
 export type MutationReplaceWithProxyUrlArgs = {
+  occurrenceId: Scalars['Float']['input'];
   plantId: Scalars['String']['input'];
   replaceUrl: Scalars['String']['input'];
 };
@@ -35,16 +36,14 @@ export type PlantData = {
   bloomColors?: Maybe<Array<Scalars['String']['output']>>;
   bloomTimes?: Maybe<Array<Scalars['String']['output']>>;
   commonNames?: Maybe<Array<Scalars['String']['output']>>;
-  fullMediaCount?: Maybe<Scalars['Int']['output']>;
+  fullOccurrencesCount?: Maybe<Scalars['Int']['output']>;
   habitat?: Maybe<Scalars['String']['output']>;
   hardiness?: Maybe<Array<Scalars['Int']['output']>>;
   height?: Maybe<PlantSize>;
   isPerennial?: Maybe<Scalars['Boolean']['output']>;
   lightLevels?: Maybe<Array<Scalars['String']['output']>>;
   maturityTime?: Maybe<Scalars['String']['output']>;
-  mediaUrls: Array<PlantMedia>;
-  occurrenceCoords: Array<Array<Scalars['Float']['output']>>;
-  occurrenceIds: Array<Scalars['Float']['output']>;
+  occurrences: Array<PlantOccurrence>;
   physicalCharactersticsDump?: Maybe<Scalars['String']['output']>;
   scientificName: Scalars['String']['output'];
   scrapeSources: Array<Scalars['String']['output']>;
@@ -66,7 +65,6 @@ export type PlantDataInput = {
   isPerennial?: InputMaybe<Scalars['Boolean']['input']>;
   lightLevels?: InputMaybe<Array<Scalars['String']['input']>>;
   maturityTime?: InputMaybe<Scalars['String']['input']>;
-  occurrenceIds?: InputMaybe<Array<Scalars['Float']['input']>>;
   physicalCharactersticsDump?: InputMaybe<Scalars['String']['input']>;
   scientificName?: InputMaybe<Scalars['String']['input']>;
   scrapeSources?: InputMaybe<Array<Scalars['String']['input']>>;
@@ -81,6 +79,19 @@ export type PlantMedia = {
   isProxyUrl?: Maybe<Scalars['Boolean']['output']>;
   occurrenceId: Scalars['Float']['output'];
   url: Scalars['String']['output'];
+};
+
+export type PlantOccurrence = {
+  __typename?: 'PlantOccurrence';
+  media: Array<PlantMedia>;
+  occurrenceCoords: Array<Scalars['Float']['output']>;
+  occurrenceId: Scalars['Float']['output'];
+};
+
+export type PlantOccurrencesResults = {
+  __typename?: 'PlantOccurrencesResults';
+  count: Scalars['Float']['output'];
+  results: Array<PlantOccurrence>;
 };
 
 export type PlantSearchResults = {
@@ -109,7 +120,7 @@ export type PlantSizeUnit =
 export type Query = {
   __typename?: 'Query';
   plant?: Maybe<PlantData>;
-  plantMedia: Array<PlantMedia>;
+  plantOccurrences?: Maybe<PlantOccurrencesResults>;
   plantSearch: PlantSearchResults;
   searchRecord?: Maybe<SearchRecord>;
 };
@@ -120,7 +131,7 @@ export type QueryPlantArgs = {
 };
 
 
-export type QueryPlantMediaArgs = {
+export type QueryPlantOccurrencesArgs = {
   id: Scalars['String']['input'];
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -242,6 +253,8 @@ export type ResolversTypes = ResolversObject<{
   PlantData: ResolverTypeWrapper<PlantData>;
   PlantDataInput: PlantDataInput;
   PlantMedia: ResolverTypeWrapper<PlantMedia>;
+  PlantOccurrence: ResolverTypeWrapper<PlantOccurrence>;
+  PlantOccurrencesResults: ResolverTypeWrapper<PlantOccurrencesResults>;
   PlantSearchResults: ResolverTypeWrapper<PlantSearchResults>;
   PlantSize: ResolverTypeWrapper<PlantSize>;
   PlantSizeInput: PlantSizeInput;
@@ -264,6 +277,8 @@ export type ResolversParentTypes = ResolversObject<{
   PlantData: PlantData;
   PlantDataInput: PlantDataInput;
   PlantMedia: PlantMedia;
+  PlantOccurrence: PlantOccurrence;
+  PlantOccurrencesResults: PlantOccurrencesResults;
   PlantSearchResults: PlantSearchResults;
   PlantSize: PlantSize;
   PlantSizeInput: PlantSizeInput;
@@ -274,7 +289,7 @@ export type ResolversParentTypes = ResolversObject<{
 }>;
 
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = ResolversObject<{
-  replaceWithProxyUrl?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType, RequireFields<MutationReplaceWithProxyUrlArgs, 'plantId' | 'replaceUrl'>>;
+  replaceWithProxyUrl?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType, RequireFields<MutationReplaceWithProxyUrlArgs, 'occurrenceId' | 'plantId' | 'replaceUrl'>>;
 }>;
 
 export interface ObjectIdScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['ObjectId'], any> {
@@ -287,16 +302,14 @@ export type PlantDataResolvers<ContextType = any, ParentType extends ResolversPa
   bloomColors?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, ContextType>;
   bloomTimes?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, ContextType>;
   commonNames?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, ContextType>;
-  fullMediaCount?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  fullOccurrencesCount?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   habitat?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   hardiness?: Resolver<Maybe<Array<ResolversTypes['Int']>>, ParentType, ContextType>;
   height?: Resolver<Maybe<ResolversTypes['PlantSize']>, ParentType, ContextType>;
   isPerennial?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   lightLevels?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, ContextType>;
   maturityTime?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  mediaUrls?: Resolver<Array<ResolversTypes['PlantMedia']>, ParentType, ContextType>;
-  occurrenceCoords?: Resolver<Array<Array<ResolversTypes['Float']>>, ParentType, ContextType>;
-  occurrenceIds?: Resolver<Array<ResolversTypes['Float']>, ParentType, ContextType>;
+  occurrences?: Resolver<Array<ResolversTypes['PlantOccurrence']>, ParentType, ContextType>;
   physicalCharactersticsDump?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   scientificName?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   scrapeSources?: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType>;
@@ -314,6 +327,19 @@ export type PlantMediaResolvers<ContextType = any, ParentType extends ResolversP
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
+export type PlantOccurrenceResolvers<ContextType = any, ParentType extends ResolversParentTypes['PlantOccurrence'] = ResolversParentTypes['PlantOccurrence']> = ResolversObject<{
+  media?: Resolver<Array<ResolversTypes['PlantMedia']>, ParentType, ContextType>;
+  occurrenceCoords?: Resolver<Array<ResolversTypes['Float']>, ParentType, ContextType>;
+  occurrenceId?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
+export type PlantOccurrencesResultsResolvers<ContextType = any, ParentType extends ResolversParentTypes['PlantOccurrencesResults'] = ResolversParentTypes['PlantOccurrencesResults']> = ResolversObject<{
+  count?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  results?: Resolver<Array<ResolversTypes['PlantOccurrence']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
 export type PlantSearchResultsResolvers<ContextType = any, ParentType extends ResolversParentTypes['PlantSearchResults'] = ResolversParentTypes['PlantSearchResults']> = ResolversObject<{
   count?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
   results?: Resolver<Array<ResolversTypes['PlantData']>, ParentType, ContextType>;
@@ -328,7 +354,7 @@ export type PlantSizeResolvers<ContextType = any, ParentType extends ResolversPa
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
   plant?: Resolver<Maybe<ResolversTypes['PlantData']>, ParentType, ContextType, RequireFields<QueryPlantArgs, 'id'>>;
-  plantMedia?: Resolver<Array<ResolversTypes['PlantMedia']>, ParentType, ContextType, RequireFields<QueryPlantMediaArgs, 'id'>>;
+  plantOccurrences?: Resolver<Maybe<ResolversTypes['PlantOccurrencesResults']>, ParentType, ContextType, RequireFields<QueryPlantOccurrencesArgs, 'id'>>;
   plantSearch?: Resolver<ResolversTypes['PlantSearchResults'], ParentType, ContextType, Partial<QueryPlantSearchArgs>>;
   searchRecord?: Resolver<Maybe<ResolversTypes['SearchRecord']>, ParentType, ContextType, RequireFields<QuerySearchRecordArgs, 'id'>>;
 }>;
@@ -347,6 +373,8 @@ export type Resolvers<ContextType = any> = ResolversObject<{
   ObjectId?: GraphQLScalarType;
   PlantData?: PlantDataResolvers<ContextType>;
   PlantMedia?: PlantMediaResolvers<ContextType>;
+  PlantOccurrence?: PlantOccurrenceResolvers<ContextType>;
+  PlantOccurrencesResults?: PlantOccurrencesResultsResolvers<ContextType>;
   PlantSearchResults?: PlantSearchResultsResolvers<ContextType>;
   PlantSize?: PlantSizeResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;

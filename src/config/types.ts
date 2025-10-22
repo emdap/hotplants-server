@@ -1,14 +1,10 @@
 import { ObjectId } from "mongodb";
 import { PlantData } from "../graphql/graphql";
 
-export type GbifDataArrayKeys =
-  | "occurrenceCoords"
-  | "mediaUrls"
-  | "occurrenceIds";
-
-export type GbifDataArrays = Pick<PartialPlantData, GbifDataArrayKeys>;
-
-export type PlantDataDocument = Omit<PlantData, "_id" | "fullMediaCount"> & {
+export type PlantDataDocument = Omit<
+  PlantData,
+  "_id" | "fullOccurrencesCount"
+> & {
   _id: ObjectId;
 };
 

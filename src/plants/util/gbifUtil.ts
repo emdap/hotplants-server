@@ -1,6 +1,5 @@
 import { gbifClient, GbifOccurenceResult } from "../../config/gbifClient";
-import { GbifDataArrays } from "../../config/types";
-import { PlantData } from "../../graphql/graphql";
+import { PlantData, PlantMedia, PlantOccurrence } from "../../graphql/graphql";
 import { scrapePlantByname } from "../pfafScraper";
 import { getPlantByName, storePlantData } from "./mongodbUtil";
 
@@ -8,8 +7,7 @@ type NormalizedGbifResult = Omit<
   GbifOccurenceResult,
   "media" | "decimalLatitude" | "decimalLongitude"
 > &
-  Required<GbifDataArrays> &
-  Pick<PlantData, "scrapeSources">;
+  Pick<PlantData, "scrapeSources" | "occurrences">;
 
 /**
  * A dictionary where the key is the plants scientific name, and the entry is
@@ -41,23 +39,34 @@ export const searchGbifSpecies = async (commonName: string) => {
 
 const normalizePlant = (gbifOccurrence: GbifOccurenceResult) => {
   const { media, decimalLatitude, decimalLongitude, ...rest } = gbifOccurrence;
+
+  const mediaObjects: PlantMedia[] = media.map(({ identifier }) => ({
+    url: identifier,
+    occurrenceId: gbifOccurrence.key,
+  }));
+
+  const coordinates =
+    decimalLatitude && decimalLongitude
+      ? [decimalLongitude, decimalLatitude]
+      : [];
+
   const normalizedPlant: NormalizedGbifResult = {
     ...rest,
-    mediaUrls: media.map(({ identifier }) => ({
-      url: identifier,
-      occurrenceId: gbifOccurrence.key,
-    })),
-    occurrenceCoords: [],
-    occurrenceIds: [gbifOccurrence.key],
     scrapeSources: [],
+    occurrences: [
+      {
+        occurrenceId: gbifOccurrence.key,
+        occurrenceCoords: coordinates,
+        media: mediaObjects,
+      },
+    ],
   };
-
-  if (decimalLatitude && decimalLongitude) {
-    normalizedPlant.occurrenceCoords.push([decimalLongitude, decimalLatitude]);
-  }
 
   return normalizedPlant;
 };
+
+const extractOccurrenceIds = (occurrences?: PlantOccurrence[]) =>
+  occurrences ? occurrences.map(({ occurrenceId }) => occurrenceId) : [];
 
 /** Combine GBIF occurrence results into a dictionary, where each entry is a unique plant,
  * and the value is all occurrence data for that plant in `gbifResults`, combined
@@ -70,7 +79,11 @@ const reduceGbifResults = (gbifResults: GbifOccurenceResult[]) =>
       return prev;
     }
 
-    if (!prev[plantKey] || !prev[plantKey].occurrenceIds.includes(result.key)) {
+    const existingOccurrenceIds = extractOccurrenceIds(
+      prev[plantKey]?.occurrences
+    );
+
+    if (!existingOccurrenceIds.includes(result.key)) {
       const normalizedGbifPlant = normalizePlant(result);
       if (prev[plantKey]) {
         prev[plantKey] = combinePlantData(prev[plantKey], normalizedGbifPlant);
@@ -82,12 +95,17 @@ const reduceGbifResults = (gbifResults: GbifOccurenceResult[]) =>
     return prev;
   }, {});
 
-const combinePlantData = <T extends GbifDataArrays>(
+const combinePlantData = <
+  T extends Pick<PlantData, "scrapeSources" | "occurrences">
+>(
   normalizedData: T,
   newGbifData: NormalizedGbifResult
 ): T & { hasNewData: boolean } => {
-  const newOccurrenceIds = newGbifData.occurrenceIds.filter(
-    (id) => !normalizedData.occurrenceIds.includes(id)
+  const existingOccurrences = normalizedData.occurrences.map(
+    ({ occurrenceId }) => occurrenceId
+  );
+  const newOccurrences = newGbifData.occurrences.filter(
+    ({ occurrenceId }) => !existingOccurrences.includes(occurrenceId)
   );
 
   const combinedData = {
@@ -95,28 +113,12 @@ const combinePlantData = <T extends GbifDataArrays>(
     hasNewData: false,
   };
 
-  if (!newOccurrenceIds.length) {
+  if (!newOccurrences.length) {
     return combinedData;
   }
 
   combinedData.hasNewData = true;
-  combinedData.occurrenceIds.push(...newOccurrenceIds);
-
-  if (newGbifData.mediaUrls.length) {
-    combinedData.mediaUrls = Array.from(
-      new Set(combinedData.mediaUrls.concat(newGbifData.mediaUrls))
-    );
-  }
-
-  newGbifData.occurrenceCoords.forEach((newCoord) => {
-    if (
-      !combinedData.occurrenceCoords.find(
-        (coord) => coord && coord[0] === newCoord[0] && coord[1] === newCoord[1]
-      )
-    ) {
-      combinedData.occurrenceCoords.push(newCoord);
-    }
-  });
+  combinedData.occurrences.push(...newOccurrences);
 
   return combinedData;
 };
