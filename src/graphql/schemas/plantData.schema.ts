@@ -31,7 +31,6 @@ export const plantDataSchema = buildSchema(`
 
   type PlantMedia {
     url: String!
-    occurrenceId: Float!
     isProxyUrl: Boolean
   }
 

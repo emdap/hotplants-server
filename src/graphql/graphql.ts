@@ -77,7 +77,6 @@ export type PlantDataInput = {
 export type PlantMedia = {
   __typename?: 'PlantMedia';
   isProxyUrl?: Maybe<Scalars['Boolean']['output']>;
-  occurrenceId: Scalars['Float']['output'];
   url: Scalars['String']['output'];
 };
 
@@ -322,7 +321,6 @@ export type PlantDataResolvers<ContextType = any, ParentType extends ResolversPa
 
 export type PlantMediaResolvers<ContextType = any, ParentType extends ResolversParentTypes['PlantMedia'] = ResolversParentTypes['PlantMedia']> = ResolversObject<{
   isProxyUrl?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
-  occurrenceId?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
   url?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;

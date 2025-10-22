@@ -42,7 +42,6 @@ const normalizePlant = (gbifOccurrence: GbifOccurenceResult) => {
 
   const mediaObjects: PlantMedia[] = media.map(({ identifier }) => ({
     url: identifier,
-    occurrenceId: gbifOccurrence.key,
   }));
 
   const coordinates =
