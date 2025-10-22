@@ -19,7 +19,7 @@ export type Scalars = {
 
 export type Mutation = {
   __typename?: 'Mutation';
-  replaceWithProxyUrl: ReplaceWithProxyUrlResponse;
+  replaceWithProxyUrl?: Maybe<Scalars['String']['output']>;
 };
 
 
@@ -122,12 +122,6 @@ export type QueryPlantSearchArgs = {
 
 export type QuerySearchRecordArgs = {
   id: Scalars['String']['input'];
-};
-
-export type ReplaceWithProxyUrlResponse = {
-  __typename?: 'ReplaceWithProxyUrlResponse';
-  proxyUrl?: Maybe<Scalars['String']['output']>;
-  success: Scalars['Boolean']['output'];
 };
 
 export type SearchRecord = {
@@ -238,7 +232,6 @@ export type ResolversTypes = ResolversObject<{
   PlantSizeInput: PlantSizeInput;
   PlantSizeUnit: PlantSizeUnit;
   Query: ResolverTypeWrapper<{}>;
-  ReplaceWithProxyUrlResponse: ResolverTypeWrapper<ReplaceWithProxyUrlResponse>;
   SearchRecord: ResolverTypeWrapper<SearchRecord>;
   SearchRecordStatus: SearchRecordStatus;
   SortDirection: SortDirection;
@@ -260,14 +253,13 @@ export type ResolversParentTypes = ResolversObject<{
   PlantSize: PlantSize;
   PlantSizeInput: PlantSizeInput;
   Query: {};
-  ReplaceWithProxyUrlResponse: ReplaceWithProxyUrlResponse;
   SearchRecord: SearchRecord;
   SortInput: SortInput;
   String: Scalars['String']['output'];
 }>;
 
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = ResolversObject<{
-  replaceWithProxyUrl?: Resolver<ResolversTypes['ReplaceWithProxyUrlResponse'], ParentType, ContextType, RequireFields<MutationReplaceWithProxyUrlArgs, 'plantId' | 'replaceUrl'>>;
+  replaceWithProxyUrl?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType, RequireFields<MutationReplaceWithProxyUrlArgs, 'plantId' | 'replaceUrl'>>;
 }>;
 
 export interface ObjectIdScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['ObjectId'], any> {
@@ -323,12 +315,6 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   searchRecord?: Resolver<Maybe<ResolversTypes['SearchRecord']>, ParentType, ContextType, RequireFields<QuerySearchRecordArgs, 'id'>>;
 }>;
 
-export type ReplaceWithProxyUrlResponseResolvers<ContextType = any, ParentType extends ResolversParentTypes['ReplaceWithProxyUrlResponse'] = ResolversParentTypes['ReplaceWithProxyUrlResponse']> = ResolversObject<{
-  proxyUrl?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  success?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-}>;
-
 export type SearchRecordResolvers<ContextType = any, ParentType extends ResolversParentTypes['SearchRecord'] = ResolversParentTypes['SearchRecord']> = ResolversObject<{
   endOfRecords?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   jsonStringSearch?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
@@ -346,7 +332,6 @@ export type Resolvers<ContextType = any> = ResolversObject<{
   PlantSearchResults?: PlantSearchResultsResolvers<ContextType>;
   PlantSize?: PlantSizeResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
-  ReplaceWithProxyUrlResponse?: ReplaceWithProxyUrlResponseResolvers<ContextType>;
   SearchRecord?: SearchRecordResolvers<ContextType>;
 }>;
 

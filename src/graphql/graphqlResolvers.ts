@@ -87,11 +87,11 @@ export const replaceWithProxyUrlResolver: MutationResolvers["replaceWithProxyUrl
           }
         );
 
-        return { success: !!modifiedCount, proxyUrl };
+        return modifiedCount ? proxyUrl : null;
       }
     }
 
-    return { success: false };
+    return null;
   };
 
 export const searchRecordResolver: QueryResolvers["searchRecord"] = (

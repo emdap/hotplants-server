@@ -99,12 +99,7 @@ export const plantDataSchema = buildSchema(`
     plantSearch(sort: SortInput, limit: Int, offset: Int, where: PlantDataInput): PlantSearchResults!
   }
 
-  type ReplaceWithProxyUrlResponse {
-    success: Boolean!
-    proxyUrl: String
-  }
-
   type Mutation {
-    replaceWithProxyUrl(plantId: ObjectId!, replaceUrl: String!): ReplaceWithProxyUrlResponse!
+    replaceWithProxyUrl(plantId: ObjectId!, replaceUrl: String!): String
   }
 `);
