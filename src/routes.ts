@@ -52,16 +52,6 @@ const models: TsoaRoute.Models = {
         "type": {"ref":"Maybe_number_","validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "Maybe_number-Array-Array-Array_": {
-        "dataType": "refAlias",
-        "type": {"dataType":"union","subSchemas":[{"dataType":"array","array":{"dataType":"array","array":{"dataType":"array","array":{"dataType":"double"}}}},{"dataType":"enum","enums":[null]}],"validators":{}},
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "InputMaybe_number-Array-Array-Array_": {
-        "dataType": "refAlias",
-        "type": {"ref":"Maybe_number-Array-Array-Array_","validators":{}},
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "Maybe_string-Array_": {
         "dataType": "refAlias",
         "type": {"dataType":"union","subSchemas":[{"dataType":"array","array":{"dataType":"string"}},{"dataType":"enum","enums":[null]}],"validators":{}},
@@ -70,6 +60,16 @@ const models: TsoaRoute.Models = {
     "InputMaybe_string-Array_": {
         "dataType": "refAlias",
         "type": {"ref":"Maybe_string-Array_","validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "Maybe_number-Array-Array-Array_": {
+        "dataType": "refAlias",
+        "type": {"dataType":"union","subSchemas":[{"dataType":"array","array":{"dataType":"array","array":{"dataType":"array","array":{"dataType":"double"}}}},{"dataType":"enum","enums":[null]}],"validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "InputMaybe_number-Array-Array-Array_": {
+        "dataType": "refAlias",
+        "type": {"ref":"Maybe_number-Array-Array-Array_","validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "Maybe_number-Array_": {
@@ -134,7 +134,7 @@ const models: TsoaRoute.Models = {
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "Pick_PlantDataInput.Exclude_keyofPlantDataInput.__": {
         "dataType": "refAlias",
-        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"scientificName":{"dataType":"union","subSchemas":[{"ref":"InputMaybe_string_"},{"dataType":"undefined"}]},"addedTimestamp":{"dataType":"union","subSchemas":[{"ref":"InputMaybe_number_"},{"dataType":"undefined"}]},"bboxPolyCoords":{"dataType":"union","subSchemas":[{"ref":"InputMaybe_number-Array-Array-Array_"},{"dataType":"undefined"}]},"bloomColors":{"dataType":"union","subSchemas":[{"ref":"InputMaybe_string-Array_"},{"dataType":"undefined"}]},"bloomTimes":{"dataType":"union","subSchemas":[{"ref":"InputMaybe_string-Array_"},{"dataType":"undefined"}]},"commonName":{"dataType":"union","subSchemas":[{"ref":"InputMaybe_string_"},{"dataType":"undefined"}]},"habitat":{"dataType":"union","subSchemas":[{"ref":"InputMaybe_string_"},{"dataType":"undefined"}]},"hardiness":{"dataType":"union","subSchemas":[{"ref":"InputMaybe_number-Array_"},{"dataType":"undefined"}]},"height":{"dataType":"union","subSchemas":[{"ref":"InputMaybe_PlantSizeInput_"},{"dataType":"undefined"}]},"isPerennial":{"dataType":"union","subSchemas":[{"ref":"InputMaybe_boolean_"},{"dataType":"undefined"}]},"lightLevels":{"dataType":"union","subSchemas":[{"ref":"InputMaybe_string-Array_"},{"dataType":"undefined"}]},"maturityTime":{"dataType":"union","subSchemas":[{"ref":"InputMaybe_string_"},{"dataType":"undefined"}]},"physicalCharactersticsDump":{"dataType":"union","subSchemas":[{"ref":"InputMaybe_string_"},{"dataType":"undefined"}]},"scrapeSources":{"dataType":"union","subSchemas":[{"ref":"InputMaybe_string-Array_"},{"dataType":"undefined"}]},"soilTypes":{"dataType":"union","subSchemas":[{"ref":"InputMaybe_string-Array_"},{"dataType":"undefined"}]},"spread":{"dataType":"union","subSchemas":[{"ref":"InputMaybe_PlantSizeInput_"},{"dataType":"undefined"}]},"updatedTimestamp":{"dataType":"union","subSchemas":[{"ref":"InputMaybe_number_"},{"dataType":"undefined"}]},"uses":{"dataType":"union","subSchemas":[{"ref":"InputMaybe_string-Array_"},{"dataType":"undefined"}]}},"validators":{}},
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"scientificName":{"dataType":"union","subSchemas":[{"ref":"InputMaybe_string_"},{"dataType":"undefined"}]},"_id":{"dataType":"any"},"addedTimestamp":{"dataType":"union","subSchemas":[{"ref":"InputMaybe_number_"},{"dataType":"undefined"}]},"bloomColors":{"dataType":"union","subSchemas":[{"ref":"InputMaybe_string-Array_"},{"dataType":"undefined"}]},"bloomTimes":{"dataType":"union","subSchemas":[{"ref":"InputMaybe_string-Array_"},{"dataType":"undefined"}]},"boundingPolyCoords":{"dataType":"union","subSchemas":[{"ref":"InputMaybe_number-Array-Array-Array_"},{"dataType":"undefined"}]},"commonName":{"dataType":"union","subSchemas":[{"ref":"InputMaybe_string_"},{"dataType":"undefined"}]},"habitat":{"dataType":"union","subSchemas":[{"ref":"InputMaybe_string_"},{"dataType":"undefined"}]},"hardiness":{"dataType":"union","subSchemas":[{"ref":"InputMaybe_number-Array_"},{"dataType":"undefined"}]},"height":{"dataType":"union","subSchemas":[{"ref":"InputMaybe_PlantSizeInput_"},{"dataType":"undefined"}]},"isPerennial":{"dataType":"union","subSchemas":[{"ref":"InputMaybe_boolean_"},{"dataType":"undefined"}]},"lightLevels":{"dataType":"union","subSchemas":[{"ref":"InputMaybe_string-Array_"},{"dataType":"undefined"}]},"maturityTime":{"dataType":"union","subSchemas":[{"ref":"InputMaybe_string_"},{"dataType":"undefined"}]},"physicalCharactersticsDump":{"dataType":"union","subSchemas":[{"ref":"InputMaybe_string_"},{"dataType":"undefined"}]},"scrapeSources":{"dataType":"union","subSchemas":[{"ref":"InputMaybe_string-Array_"},{"dataType":"undefined"}]},"soilTypes":{"dataType":"union","subSchemas":[{"ref":"InputMaybe_string-Array_"},{"dataType":"undefined"}]},"spread":{"dataType":"union","subSchemas":[{"ref":"InputMaybe_PlantSizeInput_"},{"dataType":"undefined"}]},"updatedTimestamp":{"dataType":"union","subSchemas":[{"ref":"InputMaybe_number_"},{"dataType":"undefined"}]},"uses":{"dataType":"union","subSchemas":[{"ref":"InputMaybe_string-Array_"},{"dataType":"undefined"}]}},"validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "Omit_PlantDataInput._": {

@@ -4,9 +4,20 @@ import {
   plantCollection,
 } from "../../config/mongodbClient";
 import { QueryResolvers } from "../graphql";
+import { createFilteredCursor } from "./plantSearchResolver";
 
-export const plantResolver: QueryResolvers["plant"] = (_, { id }) =>
-  plantCollection.findOne(new ObjectId(id));
+export const plantResolver: QueryResolvers["plant"] = async (
+  _,
+  { id, boundingPolyCoords }
+) => {
+  if (!boundingPolyCoords) {
+    return plantCollection.findOne(new ObjectId(id));
+  }
+
+  const { cursor } = createFilteredCursor({ _id: id, boundingPolyCoords });
+  const array = await cursor.toArray();
+  return array[0];
+};
 
 export const plantOccurrencesResolver: QueryResolvers["plantOccurrences"] =
   async (_, { id, offset, limit }) => {

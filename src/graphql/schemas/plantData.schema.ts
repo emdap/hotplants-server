@@ -6,6 +6,8 @@ const PlantSize = `
 `;
 
 const PlantDataCommonFields = `
+  _id: ObjectId!
+
   scientificName: String!
   addedTimestamp: Float!
   updatedTimestamp: Float!
@@ -43,7 +45,6 @@ export const plantDataSchema = buildSchema(`
   type PlantData {
     ${PlantDataCommonFields}
     
-    _id: ObjectId!
     height: PlantSize
     spread: PlantSize
 
@@ -59,7 +60,7 @@ export const plantDataSchema = buildSchema(`
     spread: PlantSizeInput
 
     commonName: String
-    bboxPolyCoords: [[[Float!]!]!]
+    boundingPolyCoords: [[[Float!]!]!]
   }
 
     enum PlantSizeUnit {
@@ -94,7 +95,7 @@ export const plantDataSchema = buildSchema(`
   }
 
   type Query {
-    plant(id: String!): PlantData
+    plant(id: String!, boundingPolyCoords: [[[Float!]!]!]): PlantData
     plantOccurrences(id: String!, offset: Int, limit: Int): PlantOccurrencesResults
     plantSearch(sort: SortInput, limit: Int, offset: Int, where: PlantDataInput): PlantSearchResults!
   }

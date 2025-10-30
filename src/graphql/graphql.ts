@@ -54,10 +54,11 @@ export type PlantData = {
 };
 
 export type PlantDataInput = {
+  _id?: InputMaybe<Scalars['ObjectId']['input']>;
   addedTimestamp?: InputMaybe<Scalars['Float']['input']>;
-  bboxPolyCoords?: InputMaybe<Array<Array<Array<Scalars['Float']['input']>>>>;
   bloomColors?: InputMaybe<Array<Scalars['String']['input']>>;
   bloomTimes?: InputMaybe<Array<Scalars['String']['input']>>;
+  boundingPolyCoords?: InputMaybe<Array<Array<Array<Scalars['Float']['input']>>>>;
   commonName?: InputMaybe<Scalars['String']['input']>;
   habitat?: InputMaybe<Scalars['String']['input']>;
   hardiness?: InputMaybe<Array<Scalars['Int']['input']>>;
@@ -126,6 +127,7 @@ export type Query = {
 
 
 export type QueryPlantArgs = {
+  boundingPolyCoords?: InputMaybe<Array<Array<Array<Scalars['Float']['input']>>>>;
   id: Scalars['String']['input'];
 };
 

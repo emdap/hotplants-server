@@ -3,7 +3,12 @@ import { Position } from "geojson";
 import { AggregationCursor, Filter, FindCursor, Sort } from "mongodb";
 import { plantCollection } from "../../config/mongodbClient";
 import { PlantDataDocument } from "../../config/types";
-import { InputMaybe, PlantDataInput, QueryResolvers } from "../graphql";
+import {
+  InputMaybe,
+  PlantData,
+  PlantDataInput,
+  QueryResolvers,
+} from "../graphql";
 
 export const plantSearchResolver: QueryResolvers["plantSearch"] = async (
   _,
@@ -24,14 +29,14 @@ export const plantSearchResolver: QueryResolvers["plantSearch"] = async (
   return { count, results };
 };
 
-const createFilteredCursor = (where?: InputMaybe<PlantDataInput>) => {
-  let cursor: FindCursor | AggregationCursor;
+export const createFilteredCursor = (where?: InputMaybe<PlantDataInput>) => {
+  let cursor: FindCursor<PlantData> | AggregationCursor<PlantData>;
   const filter = where ? extractPlantFilter(where) : {};
 
-  if (!where?.bboxPolyCoords) {
+  if (!where?.boundingPolyCoords) {
     cursor = plantCollection.find(filter);
   } else {
-    const occurrenceFilter = constructBboxFilter(where.bboxPolyCoords);
+    const occurrenceFilter = constructBboxFilter(where.boundingPolyCoords);
 
     cursor = plantCollection.aggregate([
       { $match: filter },
@@ -83,7 +88,7 @@ const extractPlantFilter = (filter: PlantDataInput) =>
         prev[property === "commonName" ? "commonNames" : property] = {
           $regex: regex,
         };
-      } else if (property === "bboxPolyCoords") {
+      } else if (property === "boundingPolyCoords") {
         prev = { ...prev, ...constructBboxFilter(value as Position[][]) };
       } else if (valueIsArray) {
         prev[property] = { $all: value };

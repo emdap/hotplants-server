@@ -1260,6 +1260,16 @@
 			"InputMaybe_number_": {
 				"$ref": "#/components/schemas/Maybe_number_"
 			},
+			"Maybe_string-Array_": {
+				"items": {
+					"type": "string"
+				},
+				"type": "array",
+				"nullable": true
+			},
+			"InputMaybe_string-Array_": {
+				"$ref": "#/components/schemas/Maybe_string-Array_"
+			},
 			"Maybe_number-Array-Array-Array_": {
 				"items": {
 					"items": {
@@ -1276,16 +1286,6 @@
 			},
 			"InputMaybe_number-Array-Array-Array_": {
 				"$ref": "#/components/schemas/Maybe_number-Array-Array-Array_"
-			},
-			"Maybe_string-Array_": {
-				"items": {
-					"type": "string"
-				},
-				"type": "array",
-				"nullable": true
-			},
-			"InputMaybe_string-Array_": {
-				"$ref": "#/components/schemas/Maybe_string-Array_"
 			},
 			"Maybe_number-Array_": {
 				"items": {
@@ -1360,17 +1360,18 @@
 					"scientificName": {
 						"$ref": "#/components/schemas/InputMaybe_string_"
 					},
+					"_id": {},
 					"addedTimestamp": {
 						"$ref": "#/components/schemas/InputMaybe_number_"
-					},
-					"bboxPolyCoords": {
-						"$ref": "#/components/schemas/InputMaybe_number-Array-Array-Array_"
 					},
 					"bloomColors": {
 						"$ref": "#/components/schemas/InputMaybe_string-Array_"
 					},
 					"bloomTimes": {
 						"$ref": "#/components/schemas/InputMaybe_string-Array_"
+					},
+					"boundingPolyCoords": {
+						"$ref": "#/components/schemas/InputMaybe_number-Array-Array-Array_"
 					},
 					"commonName": {
 						"$ref": "#/components/schemas/InputMaybe_string_"
