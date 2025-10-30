@@ -59,7 +59,7 @@ export const plantDataSchema = buildSchema(`
     spread: PlantSizeInput
 
     commonName: String
-    boundingBox: [Float!]
+    bboxPolyCoords: [[[Float!]!]!]
   }
 
     enum PlantSizeUnit {

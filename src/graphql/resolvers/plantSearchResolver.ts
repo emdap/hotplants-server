@@ -1,5 +1,5 @@
-import { bboxPolygon } from "@turf/turf";
-import { BBox } from "geojson";
+import { polygon } from "@turf/turf";
+import { Position } from "geojson";
 import { AggregationCursor, Filter, FindCursor, Sort } from "mongodb";
 import { plantCollection } from "../../config/mongodbClient";
 import { PlantDataDocument } from "../../config/types";
@@ -28,10 +28,10 @@ const createFilteredCursor = (where?: InputMaybe<PlantDataInput>) => {
   let cursor: FindCursor | AggregationCursor;
   const filter = where ? extractPlantFilter(where) : {};
 
-  if (!where?.boundingBox) {
+  if (!where?.bboxPolyCoords) {
     cursor = plantCollection.find(filter);
   } else {
-    const occurrenceFilter = constructBboxFilter(where.boundingBox);
+    const occurrenceFilter = constructBboxFilter(where.bboxPolyCoords);
 
     cursor = plantCollection.aggregate([
       { $match: filter },
@@ -83,8 +83,8 @@ const extractPlantFilter = (filter: PlantDataInput) =>
         prev[property === "commonName" ? "commonNames" : property] = {
           $regex: regex,
         };
-      } else if (property === "boundingBox" && valueIsArray) {
-        prev = { ...prev, ...constructBboxFilter(value as number[]) };
+      } else if (property === "bboxPolyCoords") {
+        prev = { ...prev, ...constructBboxFilter(value as Position[][]) };
       } else if (valueIsArray) {
         prev[property] = { $all: value };
       } else {
@@ -96,16 +96,22 @@ const extractPlantFilter = (filter: PlantDataInput) =>
     {}
   );
 
-export const parseBboxInput = (bbox: number[]) => {
+export const parseBboxInput = (bbox: Position[][]) => {
   try {
-    return bbox?.length === 4 ? bboxPolygon(bbox as BBox) : undefined;
+    return polygon(bbox);
   } catch (error) {
-    console.error("Error converting input to BBox:", error);
+    console.error(
+      "Error converting input to polygon:",
+      bbox,
+      "\nError:",
+      error
+    );
+    return null;
   }
 };
 
-const constructBboxFilter = (value: number[]) => {
-  const inputPolygon = parseBboxInput(value as number[]);
+const constructBboxFilter = (value: Position[][]) => {
+  const inputPolygon = parseBboxInput(value);
   return (
     inputPolygon && {
       "occurrences.occurrenceCoords": {

@@ -1260,6 +1260,23 @@
 			"InputMaybe_number_": {
 				"$ref": "#/components/schemas/Maybe_number_"
 			},
+			"Maybe_number-Array-Array-Array_": {
+				"items": {
+					"items": {
+						"items": {
+							"type": "number",
+							"format": "double"
+						},
+						"type": "array"
+					},
+					"type": "array"
+				},
+				"type": "array",
+				"nullable": true
+			},
+			"InputMaybe_number-Array-Array-Array_": {
+				"$ref": "#/components/schemas/Maybe_number-Array-Array-Array_"
+			},
 			"Maybe_string-Array_": {
 				"items": {
 					"type": "string"
@@ -1346,14 +1363,14 @@
 					"addedTimestamp": {
 						"$ref": "#/components/schemas/InputMaybe_number_"
 					},
+					"bboxPolyCoords": {
+						"$ref": "#/components/schemas/InputMaybe_number-Array-Array-Array_"
+					},
 					"bloomColors": {
 						"$ref": "#/components/schemas/InputMaybe_string-Array_"
 					},
 					"bloomTimes": {
 						"$ref": "#/components/schemas/InputMaybe_string-Array_"
-					},
-					"boundingBox": {
-						"$ref": "#/components/schemas/InputMaybe_number-Array_"
 					},
 					"commonName": {
 						"$ref": "#/components/schemas/InputMaybe_string_"

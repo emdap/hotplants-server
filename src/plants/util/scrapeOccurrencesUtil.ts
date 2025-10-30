@@ -71,12 +71,12 @@ export const searchGbifOccurrences = async (
 export const createGbifQuery = async (
   body: PlantSearchParams | null = {}
 ): Promise<GbifOccurrenceSearchParams> => {
-  const { boundingBox, commonName, scientificName, ...searchParams } = {
+  const { bboxPolyCoords, commonName, scientificName, ...searchParams } = {
     ...body,
     ...DEFAULT_GBIF_SEARCH_PARAMS,
   };
 
-  const bboxPoly = boundingBox && parseBboxInput(boundingBox);
+  const bboxPoly = bboxPolyCoords && parseBboxInput(bboxPolyCoords);
   const geometry = bboxPoly ? ([stringify(bboxPoly)] as string[]) : undefined;
 
   const taxonKey = commonName ? await searchGbifSpecies(commonName) : undefined;
