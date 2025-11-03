@@ -14,7 +14,7 @@ app.use(cors({ origin: "*" }));
 app.use(express.json());
 app.use(express.static("public"));
 
-app.get("/health", (_req, res) =>
+app.get("/", (_req, res) =>
   res.status(200).json({
     status: "ok",
     uptime: process.uptime(),

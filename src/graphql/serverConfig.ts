@@ -46,4 +46,5 @@ const resolvers: Resolvers = {
 export const apolloServer = new ApolloServer({
   typeDefs: [gql(readFileSync(schemaPath, "utf-8")), plantDataSchema],
   resolvers,
+  introspection: true,
 });
