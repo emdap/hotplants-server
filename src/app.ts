@@ -6,7 +6,7 @@ import swaggerUi from "swagger-ui-express";
 import { apolloServer } from "./graphql/serverConfig";
 import { RegisterRoutes } from "./routes";
 
-const hostname = "127.0.0.1";
+const hostname = "0.0.0.0";
 const port = 3000;
 
 const app = express();
@@ -27,7 +27,7 @@ RegisterRoutes(router);
 app.use("/api", router);
 
 app.listen(port, hostname, async () => {
-  console.info("i'm listening here");
+  console.info("i'm listening here", port, hostname);
 });
 
 app.use(

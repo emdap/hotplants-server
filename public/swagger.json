@@ -1434,7 +1434,7 @@
 		"securitySchemes": {}
 	},
 	"info": {
-		"title": "hot-plants-server",
+		"title": "hotplants-server",
 		"version": "1.0.0",
 		"license": {
 			"name": "ISC"
