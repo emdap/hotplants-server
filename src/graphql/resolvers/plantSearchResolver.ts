@@ -8,7 +8,13 @@ import {
   PlantData,
   PlantDataInput,
   QueryResolvers,
+  SortInput,
 } from "../graphql";
+
+const DEFAULT_SORT: SortInput = {
+  addedTimestamp: 1,
+  scientificName: 1,
+};
 
 export const plantSearchResolver: QueryResolvers["plantSearch"] = async (
   _,
@@ -16,8 +22,14 @@ export const plantSearchResolver: QueryResolvers["plantSearch"] = async (
 ) => {
   const { cursor, filter } = createFilteredCursor(where);
 
-  sort &&
-    cursor.sort({ ...sort, scientificName: sort.scientificName || -1 } as Sort);
+  // TODO: Return distinct options per geographic area for fields like bloom color, bloom time
+  // plantData.distinct("bloomColors", {
+  //   "occurrences.occurrenceCoords": {
+  //     $geoWithin: { $geometry: boundingPolyCoords },
+  //   },
+  // });
+
+  sort && cursor.sort({ ...DEFAULT_SORT, ...sort } as Sort);
   offset && cursor.skip(offset);
   limit && cursor.limit(limit);
 
