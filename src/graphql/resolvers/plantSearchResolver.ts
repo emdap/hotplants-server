@@ -1,6 +1,12 @@
 import { polygon } from "@turf/turf";
 import { Position } from "geojson";
-import { AggregationCursor, Filter, FindCursor, Sort } from "mongodb";
+import {
+  AggregationCursor,
+  Filter,
+  FindCursor,
+  Sort,
+  SortDirection,
+} from "mongodb";
 import { plantCollection } from "../../config/mongodbClient";
 import { PlantDataDocument } from "../../config/types";
 import {
@@ -11,16 +17,12 @@ import {
   SortInput,
 } from "../graphql";
 
-const DEFAULT_SORT: SortInput = {
-  addedTimestamp: 1,
-  scientificName: 1,
-};
-
 export const plantSearchResolver: QueryResolvers["plantSearch"] = async (
   _,
   { sort, limit, offset, where }
 ) => {
   const { cursor, filter } = createFilteredCursor(where);
+  const sortObject = getSortObject(sort);
 
   // TODO: Return distinct options per geographic area for fields like bloom color, bloom time
   // plantData.distinct("bloomColors", {
@@ -29,7 +31,7 @@ export const plantSearchResolver: QueryResolvers["plantSearch"] = async (
   //   },
   // });
 
-  sort && cursor.sort({ ...DEFAULT_SORT, ...sort } as Sort);
+  sortObject && cursor.sort(sortObject);
   offset && cursor.skip(offset);
   limit && cursor.limit(limit);
 
@@ -40,6 +42,12 @@ export const plantSearchResolver: QueryResolvers["plantSearch"] = async (
 
   return { count, results };
 };
+
+const getSortObject = (sort?: InputMaybe<SortInput[]>): Sort | undefined =>
+  sort?.reduce<Record<string, SortDirection>>((prev, { field, direction }) => {
+    prev[field] = direction as SortDirection;
+    return prev;
+  }, {});
 
 export const createFilteredCursor = (where?: InputMaybe<PlantDataInput>) => {
   let cursor: FindCursor<PlantData> | AggregationCursor<PlantData>;

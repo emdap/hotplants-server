@@ -78,10 +78,15 @@ export const plantDataSchema = buildSchema(`
     ${PlantSize}
   }
 
+  enum SortField {
+    addedTimestamp
+    updatedTimestamp
+    scientificName
+  }
+
   input SortInput {
-    scientificName: Int
-    addedTimestamp: Int
-    updatedTimestamp: Int
+    field: SortField!
+    direction: Int!
   }
 
   type PlantSearchResults {
@@ -97,7 +102,7 @@ export const plantDataSchema = buildSchema(`
   type Query {
     plant(id: String!, boundingPolyCoords: [[[Float!]!]!]): PlantData
     plantOccurrences(id: String!, offset: Int, limit: Int): PlantOccurrencesResults
-    plantSearch(sort: SortInput, limit: Int, offset: Int, where: PlantDataInput): PlantSearchResults!
+    plantSearch(sort: [SortInput!], limit: Int, offset: Int, where: PlantDataInput): PlantSearchResults!
   }
 
   type Mutation {

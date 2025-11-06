@@ -142,7 +142,7 @@ export type QueryPlantOccurrencesArgs = {
 export type QueryPlantSearchArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<SortInput>;
+  sort?: InputMaybe<Array<SortInput>>;
   where?: InputMaybe<PlantDataInput>;
 };
 
@@ -164,10 +164,14 @@ export type SearchRecordStatus =
   | 'DONE'
   | 'SCRAPING';
 
+export type SortField =
+  | 'addedTimestamp'
+  | 'scientificName'
+  | 'updatedTimestamp';
+
 export type SortInput = {
-  addedTimestamp?: InputMaybe<Scalars['Int']['input']>;
-  scientificName?: InputMaybe<Scalars['Int']['input']>;
-  updatedTimestamp?: InputMaybe<Scalars['Int']['input']>;
+  direction: Scalars['Int']['input'];
+  field: SortField;
 };
 
 export type WithIndex<TObject> = TObject & Record<string, any>;
@@ -259,6 +263,7 @@ export type ResolversTypes = ResolversObject<{
   Query: ResolverTypeWrapper<{}>;
   SearchRecord: ResolverTypeWrapper<SearchRecord>;
   SearchRecordStatus: SearchRecordStatus;
+  SortField: SortField;
   SortInput: SortInput;
   String: ResolverTypeWrapper<Scalars['String']['output']>;
 }>;
