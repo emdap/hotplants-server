@@ -95,6 +95,13 @@ const extractPlantFilter = (filter: PlantDataInput) =>
   Object.entries(filter).reduce<Filter<PlantDataDocument>>(
     (prev, [property, value]) => {
       const valueIsArray = Array.isArray(value);
+      if (
+        !value ||
+        ((typeof value === "string" || valueIsArray) && !value.length)
+      ) {
+        return prev;
+      }
+
       if (typeof value === "string") {
         const regex = new RegExp(value.trim(), "i");
         prev[property === "commonName" ? "commonNames" : property] = {
