@@ -1,46 +1,71 @@
 import { ObjectId } from "mongodb";
-import { Body, Post, Res, Route, TsoaResponse } from "tsoa";
-import {
-  createGbifSearchRecord,
-  openGbifSearchRecord,
-  PlantSearchParams,
-} from "./util/mongodbUtil";
+import { Body, Get, Path, Post, Res, Route, TsoaResponse } from "tsoa";
+import { gbifSearchesCollection } from "../config/mongodbClient";
+import { PlantSearchParams } from "../config/types";
+import { createSearchRecord, findGbifSearchRecord } from "./util/mongodbUtil";
 import {
   createGbifQuery,
+  extractSearchRecordResponse,
   searchGbifOccurrences,
+  SearchRecordResponse,
   shouldStartScraping,
 } from "./util/scrapeOccurrencesUtil";
 
 @Route("plants")
 export class PlantController {
-  /**
-   * Initiate a new scrape of occurrences from GBIF and combine with PFAF data.
-   * Return the searchRecord, which can be queried against in graphQL to check
-   * the status of the scrape.
-   */
-  @Post("scrapeOccurrences")
-  public async scrapeOccurrences(
+  @Post("getSearchRecord")
+  public async getSearchRecord(
     @Body() plantSearch: PlantSearchParams = {},
     @Res() errorResponse: TsoaResponse<500, string>
-  ): Promise<ObjectId | undefined> {
-    const [gbifQuery, existingSearchRecord] = await Promise.all([
-      createGbifQuery(plantSearch),
-      openGbifSearchRecord(plantSearch),
-    ]);
-
-    if (existingSearchRecord && !shouldStartScraping(existingSearchRecord)) {
-      return existingSearchRecord._id;
+  ): Promise<SearchRecordResponse> {
+    const existingSearchRecord = await findGbifSearchRecord(plantSearch);
+    if (existingSearchRecord) {
+      return extractSearchRecordResponse(existingSearchRecord);
     }
 
-    const searchRecord =
-      existingSearchRecord ?? (await createGbifSearchRecord(plantSearch));
+    const newSearchRecord = await createSearchRecord(plantSearch);
+    return newSearchRecord
+      ? extractSearchRecordResponse(newSearchRecord)
+      : errorResponse(500, "Unable to create search record");
+  }
+
+  /**
+   * Initiate a new scrape of occurrences from GBIF and combine with PFAF data.
+   */
+  @Get("scrapeOccurrences/{searchRecordId}")
+  public async scrapeOccurrences(
+    @Path() searchRecordId: string,
+    @Res() errorResponse: TsoaResponse<500, string>
+  ): Promise<SearchRecordResponse> {
+    const searchRecord = await gbifSearchesCollection.findOne({
+      _id: new ObjectId(searchRecordId),
+    });
 
     if (!searchRecord) {
-      return errorResponse(500, "Unable to create search record");
+      return errorResponse(500, "Unable to find search record");
     }
 
-    searchGbifOccurrences(gbifQuery, searchRecord);
+    if (shouldStartScraping(searchRecord)) {
+      const updatedSearch = await gbifSearchesCollection.findOneAndUpdate(
+        { _id: searchRecord._id },
+        { $set: { status: "SCRAPING", statusUpdated: Date.now() } },
+        { returnDocument: "after" }
+      );
 
-    return searchRecord._id;
+      if (!updatedSearch) {
+        return errorResponse(
+          500,
+          "Error updating search record, please try again"
+        );
+      }
+
+      const gbifQuery = await createGbifQuery(searchRecord.originalSearch);
+      searchGbifOccurrences(gbifQuery, searchRecord);
+
+      return extractSearchRecordResponse(updatedSearch);
+    } else {
+      console.info("Will not start scraping");
+      return extractSearchRecordResponse(searchRecord);
+    }
   }
 }

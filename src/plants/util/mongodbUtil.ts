@@ -1,6 +1,5 @@
 import { Feature, Polygon } from "geojson";
-import { ObjectId, WithId } from "mongodb";
-import { GbifOccurrenceSearchParams } from "../../config/gbifClient";
+import { ObjectId } from "mongodb";
 import {
   gbifSearchesCollection,
   plantCollection,
@@ -9,20 +8,11 @@ import {
   OccurrenceScrapeResponse,
   PartialPlantData,
   PlantDataDocument,
+  PlantSearchParams,
+  SearchRecordDocument,
 } from "../../config/types";
-import {
-  PlantDataInput,
-  SearchRecord,
-  SearchRecordStatus,
-} from "../../graphql/graphql";
-
-export type PlantSearchParams = Omit<
-  GbifOccurrenceSearchParams,
-  "geometry" | "scientificName"
-> &
-  // TODO: Strange error, if given PlantDataInput as-is, TSOA has error
-  // "GenerateMetadataError: Cannot read properties of undefined (reading 'kind')""
-  Omit<PlantDataInput, "">;
+import { SearchRecord } from "../../graphql/graphql";
+import { convertPolygon } from "./scrapeOccurrencesUtil";
 
 /**
  *
@@ -67,32 +57,25 @@ export const lookupPlantByCoordinates = async ({
 const stringifySearch = (searchParams: PlantSearchParams | null) =>
   JSON.stringify(searchParams ?? undefined);
 
-export const openGbifSearchRecord = (
+export const findGbifSearchRecord = (
   searchParams: PlantSearchParams | null
 ) => {
   const jsonStringSearch = stringifySearch(searchParams);
-
-  console.info("open search record", jsonStringSearch);
-
-  return gbifSearchesCollection.findOneAndUpdate(
-    {
-      jsonStringSearch,
-    },
-    { $set: { status: "SCRAPING", lastAddedCount: undefined } }
-  );
+  return gbifSearchesCollection.findOne({ jsonStringSearch });
 };
 
-export const createGbifSearchRecord = async (
-  searchParams: PlantSearchParams | null,
-  initialStatus: SearchRecordStatus = "SCRAPING"
-) => {
+export const createSearchRecord = async (searchParams: PlantSearchParams) => {
+  // Converting polygon will error out with invalid input, test conversion before creating
+  convertPolygon(searchParams.boundingPolyCoords);
+
   const jsonStringSearch = stringifySearch(searchParams);
 
   const insertedRecord = await gbifSearchesCollection.insertOne({
     jsonStringSearch,
-    status: initialStatus,
+    status: "READY",
     statusUpdated: Date.now(),
     totalOccurrences: 0,
+    originalSearch: searchParams,
   });
 
   return (
@@ -101,9 +84,9 @@ export const createGbifSearchRecord = async (
   );
 };
 
-export const closeGbifSearchRecord = (
-  searchRecord: WithId<SearchRecord>,
-  { totalOccurrencesScraped, endOfRecords }: OccurrenceScrapeResponse
+export const updateSearchRecordResults = (
+  searchRecord: SearchRecordDocument,
+  scrapeResults?: OccurrenceScrapeResponse
 ) => {
   console.info(
     "close search record",
@@ -111,17 +94,18 @@ export const closeGbifSearchRecord = (
     "; current total occurrences:",
     searchRecord.totalOccurrences,
     "; new occurrences found:",
-    totalOccurrencesScraped,
+    scrapeResults?.totalOccurrencesScraped,
     "; end of records?",
-    endOfRecords
+    scrapeResults?.endOfRecords
   );
 
   // Enforce strict typechecking on the updated record
-  const updatedSearchRecord: Omit<SearchRecord, "jsonStringSearch"> = {
-    status: "DONE",
+  const updatedSearchRecord: Omit<SearchRecord, "jsonStringSearch" | "_id"> = {
     statusUpdated: Date.now(),
-    totalOccurrences: searchRecord.totalOccurrences + totalOccurrencesScraped,
-    endOfRecords,
+    status: scrapeResults?.endOfRecords ? "COMPLETE" : "READY",
+    totalOccurrences:
+      searchRecord.totalOccurrences +
+      (scrapeResults ? scrapeResults?.totalOccurrencesScraped : 0),
   };
 
   return gbifSearchesCollection.updateOne(

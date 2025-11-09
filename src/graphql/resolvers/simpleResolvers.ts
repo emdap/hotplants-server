@@ -6,6 +6,11 @@ import {
 import { QueryResolvers } from "../graphql";
 import { createFilteredCursor } from "./plantSearchResolver";
 
+export const searchRecordResolver: QueryResolvers["searchRecord"] = (
+  _,
+  { id }
+) => gbifSearchesCollection.findOne(new ObjectId(id));
+
 export const plantResolver: QueryResolvers["plant"] = async (
   _,
   { id, boundingPolyCoords }
@@ -34,8 +39,3 @@ export const plantOccurrencesResolver: QueryResolvers["plantOccurrences"] =
       }
     );
   };
-
-export const searchRecordResolver: QueryResolvers["searchRecord"] = (
-  _,
-  { id }
-) => gbifSearchesCollection.findOne(new ObjectId(id));

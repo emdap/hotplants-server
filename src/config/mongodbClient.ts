@@ -1,6 +1,5 @@
 import { MongoClient, OptionalId } from "mongodb";
-import { SearchRecord } from "../graphql/graphql";
-import { PlantDataDocument } from "./types";
+import { PlantDataDocument, SearchRecordDocument } from "./types";
 
 export type PlantSizeData = { amount: number; unit: "m" | "cm" | string };
 
@@ -11,4 +10,4 @@ export const plantCollection =
   plantsDb.collection<OptionalId<PlantDataDocument>>("plantData");
 
 export const gbifSearchesCollection =
-  plantsDb.collection<SearchRecord>("gbifSearches");
+  plantsDb.collection<OptionalId<SearchRecordDocument>>("gbifSearches");

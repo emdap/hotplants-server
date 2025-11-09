@@ -12,9 +12,14 @@ import type { Request as ExRequest, Response as ExResponse, RequestHandler, Rout
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 
 const models: TsoaRoute.Models = {
-    "ObjectId": {
+    "SearchRecordStatus": {
         "dataType": "refAlias",
-        "type": {"dataType":"string","validators":{}},
+        "type": {"dataType":"union","subSchemas":[{"dataType":"enum","enums":["COMPLETE"]},{"dataType":"enum","enums":["READY"]},{"dataType":"enum","enums":["SCRAPING"]}],"validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "SearchRecordResponse": {
+        "dataType": "refAlias",
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"status":{"ref":"SearchRecordStatus","required":true},"id":{"dataType":"string","required":true}},"validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "Record_string.never_": {
@@ -164,11 +169,42 @@ export function RegisterRoutes(app: Router) {
 
 
     
-        const argsPlantController_scrapeOccurrences: Record<string, TsoaRoute.ParameterSchema> = {
+        const argsPlantController_getSearchRecord: Record<string, TsoaRoute.ParameterSchema> = {
                 plantSearch: {"in":"body","name":"plantSearch","ref":"PlantSearchParams"},
                 errorResponse: {"in":"res","name":"500","required":true,"dataType":"string"},
         };
-        app.post('/plants/scrapeOccurrences',
+        app.post('/plants/getSearchRecord',
+            ...(fetchMiddlewares<RequestHandler>(PlantController)),
+            ...(fetchMiddlewares<RequestHandler>(PlantController.prototype.getSearchRecord)),
+
+            async function PlantController_getSearchRecord(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsPlantController_getSearchRecord, request, response });
+
+                const controller = new PlantController();
+
+              await templateService.apiHandler({
+                methodName: 'getSearchRecord',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsPlantController_scrapeOccurrences: Record<string, TsoaRoute.ParameterSchema> = {
+                searchRecordId: {"in":"path","name":"searchRecordId","required":true,"dataType":"string"},
+                errorResponse: {"in":"res","name":"500","required":true,"dataType":"string"},
+        };
+        app.get('/plants/scrapeOccurrences/:searchRecordId',
             ...(fetchMiddlewares<RequestHandler>(PlantController)),
             ...(fetchMiddlewares<RequestHandler>(PlantController.prototype.scrapeOccurrences)),
 

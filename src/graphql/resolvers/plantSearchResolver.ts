@@ -138,7 +138,8 @@ export const parseBboxInput = (bbox: Position[][]) => {
       "\nError:",
       error
     );
-    return null;
+
+    throw error;
   }
 };
 

@@ -1,14 +1,17 @@
-import { WithId } from "mongodb";
 import { stringify } from "wkt";
 import {
   gbifClient,
   GbifOccurrenceSearchParams,
 } from "../../config/gbifClient";
-import { OccurrenceScrapeResponse } from "../../config/types";
-import { SearchRecord } from "../../graphql/graphql";
+import {
+  OccurrenceScrapeResponse,
+  PlantSearchParams,
+  SearchRecordDocument,
+} from "../../config/types";
+import { SearchRecordStatus } from "../../graphql/graphql";
 import { parseBboxInput } from "../../graphql/resolvers/plantSearchResolver";
 import { processGbifPlants, searchGbifSpecies } from "./gbifUtil";
-import { closeGbifSearchRecord, PlantSearchParams } from "./mongodbUtil";
+import { updateSearchRecordResults } from "./mongodbUtil";
 
 const EMPTY_OCCURRENCE_SCRAPE_RESPONSE: OccurrenceScrapeResponse = {
   totalOccurrencesScraped: 0,
@@ -25,23 +28,34 @@ const DEFAULT_GBIF_SEARCH_PARAMS: PlantSearchParams = {
 
 const MAX_STALE_SEARCH_MILLISECONDS = 300000; // 5 minutes
 
-export const shouldStartScraping = (searchRecord: SearchRecord) => {
-  if (searchRecord.endOfRecords) {
-    return false;
-  }
+export type SearchRecordResponse = { id: string; status: SearchRecordStatus };
 
-  if (searchRecord.status === "SCRAPING") {
-    const now = Date.now();
-    const timeDifference = now - searchRecord.statusUpdated;
-    return timeDifference >= MAX_STALE_SEARCH_MILLISECONDS;
-  }
+export const extractSearchRecordResponse = (
+  searchRecord: SearchRecordDocument
+): SearchRecordResponse => ({
+  id: searchRecord._id.toString(),
+  status: searchRecord.status,
+});
 
-  return true;
+export const shouldStartScraping = ({
+  status,
+  statusUpdated,
+}: SearchRecordDocument) => {
+  switch (status) {
+    case "READY":
+      return true;
+    case "SCRAPING":
+      const now = Date.now();
+      const timeDifference = now - statusUpdated;
+      return timeDifference >= MAX_STALE_SEARCH_MILLISECONDS;
+    default:
+      return false;
+  }
 };
 
 export const searchGbifOccurrences = async (
   gbifQuery: GbifOccurrenceSearchParams,
-  searchRecord: WithId<SearchRecord>
+  searchRecord: SearchRecordDocument
 ) => {
   let scrapeResult = EMPTY_OCCURRENCE_SCRAPE_RESPONSE;
   try {
@@ -65,19 +79,24 @@ export const searchGbifOccurrences = async (
     console.error(error);
   }
 
-  closeGbifSearchRecord(searchRecord, scrapeResult);
+  updateSearchRecordResults(searchRecord, scrapeResult);
+};
+
+/** Convert the coordinates to a polygon. Will error out if format is incorrect. */
+export const convertPolygon = (boundingPolyCoords?: number[][][] | null) => {
+  const validPoly = boundingPolyCoords && parseBboxInput(boundingPolyCoords);
+  return validPoly ? ([stringify(validPoly)] as string[]) : undefined;
 };
 
 export const createGbifQuery = async (
-  body: PlantSearchParams | null = {}
+  body: PlantSearchParams
 ): Promise<GbifOccurrenceSearchParams> => {
   const { boundingPolyCoords, commonName, scientificName, ...searchParams } = {
     ...body,
     ...DEFAULT_GBIF_SEARCH_PARAMS,
   };
 
-  const bboxPoly = boundingPolyCoords && parseBboxInput(boundingPolyCoords);
-  const geometry = bboxPoly ? ([stringify(bboxPoly)] as string[]) : undefined;
+  const geometry = convertPolygon(boundingPolyCoords);
 
   const taxonKey = commonName ? await searchGbifSpecies(commonName) : undefined;
 

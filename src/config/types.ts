@@ -1,5 +1,6 @@
 import { ObjectId } from "mongodb";
-import { PlantData } from "../graphql/graphql";
+import { PlantData, PlantDataInput, SearchRecord } from "../graphql/graphql";
+import { GbifOccurrenceSearchParams } from "./gbifClient";
 
 export type PlantDataDocument = Omit<
   PlantData,
@@ -12,6 +13,19 @@ export type PartialPlantData = Omit<
   PlantDataDocument,
   "_id" | "addedTimestamp" | "updatedTimestamp"
 >;
+
+export type PlantSearchParams = Omit<
+  GbifOccurrenceSearchParams,
+  "geometry" | "scientificName"
+> &
+  // TODO: Strange error, if given PlantDataInput as-is, TSOA has error
+  // "GenerateMetadataError: Cannot read properties of undefined (reading 'kind')""
+  Omit<PlantDataInput, "">;
+
+export type SearchRecordDocument = Omit<SearchRecord, "_id"> & {
+  _id: ObjectId;
+  originalSearch: PlantSearchParams;
+};
 
 /**
  * @property totalOccurrencesScraped: The total (non-unique) occurrences found

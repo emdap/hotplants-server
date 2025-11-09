@@ -153,7 +153,7 @@ export type QuerySearchRecordArgs = {
 
 export type SearchRecord = {
   __typename?: 'SearchRecord';
-  endOfRecords?: Maybe<Scalars['Boolean']['output']>;
+  _id: Scalars['ObjectId']['output'];
   jsonStringSearch: Scalars['String']['output'];
   status: SearchRecordStatus;
   statusUpdated: Scalars['Float']['output'];
@@ -161,7 +161,8 @@ export type SearchRecord = {
 };
 
 export type SearchRecordStatus =
-  | 'DONE'
+  | 'COMPLETE'
+  | 'READY'
   | 'SCRAPING';
 
 export type SortField =
@@ -360,7 +361,7 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
 }>;
 
 export type SearchRecordResolvers<ContextType = any, ParentType extends ResolversParentTypes['SearchRecord'] = ResolversParentTypes['SearchRecord']> = ResolversObject<{
-  endOfRecords?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
+  _id?: Resolver<ResolversTypes['ObjectId'], ParentType, ContextType>;
   jsonStringSearch?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   status?: Resolver<ResolversTypes['SearchRecordStatus'], ParentType, ContextType>;
   statusUpdated?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;

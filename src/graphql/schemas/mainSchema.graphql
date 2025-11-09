@@ -1,14 +1,15 @@
 enum SearchRecordStatus {
+  READY
   SCRAPING
-  DONE
+  COMPLETE
 }
 
 type SearchRecord {
+  _id: ObjectId!
   jsonStringSearch: String!
   status: SearchRecordStatus!
   statusUpdated: Float!
   totalOccurrences: Int!
-  endOfRecords: Boolean
 }
 
 type Query {
