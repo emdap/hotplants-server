@@ -5,7 +5,7 @@
   "scripts": {
     "start:prod": "node dist/app.js",
     "start": "ts-node --files src/app.ts",
-    "build": "tsc && cp src/graphql/schemas/mainSchema.graphql dist/graphql/schemas/mainSchema.graphql && pnpm generate-tsoa",
+    "build": "tsc && pnpm generate-tsoa",
     "local:build": "pnpm build && mkdir -p dist/public && cp public/swagger.json \"$_\"",
     "dev": "pnpm generate-graphql && pnpm generate-tsoa && ts-node-dev --files src/app.ts",
     "generate-gbif-types": "npx openapi-typescript src/config/schemas/gbif-schema.json -o src/config/schemas/gbif.d.ts",

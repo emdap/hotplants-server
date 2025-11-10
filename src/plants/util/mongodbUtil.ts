@@ -1,5 +1,5 @@
 import { Feature, Polygon } from "geojson";
-import { ObjectId } from "mongodb";
+import { ObjectId, OptionalId } from "mongodb";
 import {
   gbifSearchesCollection,
   plantCollection,
@@ -11,7 +11,6 @@ import {
   PlantSearchParams,
   SearchRecordDocument,
 } from "../../config/types";
-import { SearchRecord } from "../../graphql/graphql";
 import { convertPolygon } from "./scrapeOccurrencesUtil";
 
 /**
@@ -74,7 +73,7 @@ export const createSearchRecord = async (searchParams: PlantSearchParams) => {
     jsonStringSearch,
     status: "READY",
     statusUpdated: Date.now(),
-    totalOccurrences: 0,
+    occurrencesOffset: 0,
     originalSearch: searchParams,
   });
 
@@ -91,8 +90,8 @@ export const updateSearchRecordResults = (
   console.info(
     "close search record",
     searchRecord._id,
-    "; current total occurrences:",
-    searchRecord.totalOccurrences,
+    "; current total occurrences searched:",
+    searchRecord.occurrencesOffset,
     "; new occurrences found:",
     scrapeResults?.totalOccurrencesScraped,
     "; end of records?",
@@ -100,11 +99,14 @@ export const updateSearchRecordResults = (
   );
 
   // Enforce strict typechecking on the updated record
-  const updatedSearchRecord: Omit<SearchRecord, "jsonStringSearch" | "_id"> = {
+  const updatedSearchRecord: Omit<
+    OptionalId<SearchRecordDocument>,
+    "jsonStringSearch" | "originalSearch"
+  > = {
     statusUpdated: Date.now(),
     status: scrapeResults?.endOfRecords ? "COMPLETE" : "READY",
-    totalOccurrences:
-      searchRecord.totalOccurrences +
+    occurrencesOffset:
+      searchRecord.occurrencesOffset +
       (scrapeResults ? scrapeResults?.totalOccurrencesScraped : 0),
   };
 

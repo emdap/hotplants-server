@@ -1,15 +1,7 @@
 import { ObjectId } from "mongodb";
-import {
-  gbifSearchesCollection,
-  plantCollection,
-} from "../../config/mongodbClient";
+import { plantCollection } from "../../config/mongodbClient";
 import { QueryResolvers } from "../graphql";
 import { createFilteredCursor } from "./plantSearchResolver";
-
-export const searchRecordResolver: QueryResolvers["searchRecord"] = (
-  _,
-  { id }
-) => gbifSearchesCollection.findOne(new ObjectId(id));
 
 export const plantResolver: QueryResolvers["plant"] = async (
   _,

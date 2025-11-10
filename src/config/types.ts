@@ -1,5 +1,5 @@
 import { ObjectId } from "mongodb";
-import { PlantData, PlantDataInput, SearchRecord } from "../graphql/graphql";
+import { PlantData, PlantDataInput } from "../graphql/graphql";
 import { GbifOccurrenceSearchParams } from "./gbifClient";
 
 export type PlantDataDocument = Omit<
@@ -22,9 +22,15 @@ export type PlantSearchParams = Omit<
   // "GenerateMetadataError: Cannot read properties of undefined (reading 'kind')""
   Omit<PlantDataInput, "">;
 
-export type SearchRecordDocument = Omit<SearchRecord, "_id"> & {
+export type SearchRecordStatus = "READY" | "SCRAPING" | "COMPLETE";
+
+export type SearchRecordDocument = {
   _id: ObjectId;
+  jsonStringSearch: string;
   originalSearch: PlantSearchParams;
+  status: SearchRecordStatus;
+  statusUpdated: number;
+  occurrencesOffset: number;
 };
 
 /**

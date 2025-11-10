@@ -10,25 +10,45 @@
 			"SearchRecordStatus": {
 				"type": "string",
 				"enum": [
-					"COMPLETE",
 					"READY",
-					"SCRAPING"
+					"SCRAPING",
+					"COMPLETE"
 				]
 			},
-			"SearchRecordResponse": {
+			"Pick_SearchRecordDocument.status-or-occurrencesOffset_": {
 				"properties": {
 					"status": {
 						"$ref": "#/components/schemas/SearchRecordStatus"
 					},
-					"id": {
-						"type": "string"
+					"occurrencesOffset": {
+						"type": "number",
+						"format": "double"
 					}
 				},
 				"required": [
 					"status",
-					"id"
+					"occurrencesOffset"
 				],
-				"type": "object"
+				"type": "object",
+				"description": "From T, pick a set of properties whose keys are in the union K"
+			},
+			"SearchRecordResponse": {
+				"allOf": [
+					{
+						"properties": {
+							"id": {
+								"type": "string"
+							}
+						},
+						"required": [
+							"id"
+						],
+						"type": "object"
+					},
+					{
+						"$ref": "#/components/schemas/Pick_SearchRecordDocument.status-or-occurrencesOffset_"
+					}
+				]
 			},
 			"Record_string.never_": {
 				"properties": {},

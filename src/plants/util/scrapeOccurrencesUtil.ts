@@ -8,7 +8,6 @@ import {
   PlantSearchParams,
   SearchRecordDocument,
 } from "../../config/types";
-import { SearchRecordStatus } from "../../graphql/graphql";
 import { parseBboxInput } from "../../graphql/resolvers/plantSearchResolver";
 import { processGbifPlants, searchGbifSpecies } from "./gbifUtil";
 import { updateSearchRecordResults } from "./mongodbUtil";
@@ -28,13 +27,19 @@ const DEFAULT_GBIF_SEARCH_PARAMS: PlantSearchParams = {
 
 const MAX_STALE_SEARCH_MILLISECONDS = 300000; // 5 minutes
 
-export type SearchRecordResponse = { id: string; status: SearchRecordStatus };
+export type SearchRecordResponse = { id: string } & Pick<
+  SearchRecordDocument,
+  "status" | "occurrencesOffset"
+>;
 
-export const extractSearchRecordResponse = (
-  searchRecord: SearchRecordDocument
-): SearchRecordResponse => ({
-  id: searchRecord._id.toString(),
-  status: searchRecord.status,
+export const extractSearchRecordResponse = ({
+  _id,
+  status,
+  occurrencesOffset,
+}: SearchRecordDocument): SearchRecordResponse => ({
+  id: _id.toString(),
+  status: status,
+  occurrencesOffset: occurrencesOffset,
 });
 
 export const shouldStartScraping = ({
@@ -63,7 +68,7 @@ export const searchGbifOccurrences = async (
       params: {
         query: {
           ...gbifQuery,
-          offset: searchRecord.totalOccurrences,
+          offset: searchRecord.occurrencesOffset,
         },
       },
     });
@@ -74,6 +79,8 @@ export const searchGbifOccurrences = async (
         totalOccurrencesScraped: data.results.length,
         endOfRecords: Boolean(data.endOfRecords),
       };
+    } else {
+      scrapeResult = { totalOccurrencesScraped: 0, endOfRecords: true };
     }
   } catch (error) {
     console.error(error);

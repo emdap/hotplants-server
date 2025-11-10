@@ -122,7 +122,6 @@ export type Query = {
   plant?: Maybe<PlantData>;
   plantOccurrences?: Maybe<PlantOccurrencesResults>;
   plantSearch: PlantSearchResults;
-  searchRecord?: Maybe<SearchRecord>;
 };
 
 
@@ -145,25 +144,6 @@ export type QueryPlantSearchArgs = {
   sort?: InputMaybe<Array<SortInput>>;
   where?: InputMaybe<PlantDataInput>;
 };
-
-
-export type QuerySearchRecordArgs = {
-  id: Scalars['String']['input'];
-};
-
-export type SearchRecord = {
-  __typename?: 'SearchRecord';
-  _id: Scalars['ObjectId']['output'];
-  jsonStringSearch: Scalars['String']['output'];
-  status: SearchRecordStatus;
-  statusUpdated: Scalars['Float']['output'];
-  totalOccurrences: Scalars['Int']['output'];
-};
-
-export type SearchRecordStatus =
-  | 'COMPLETE'
-  | 'READY'
-  | 'SCRAPING';
 
 export type SortField =
   | 'addedTimestamp'
@@ -262,8 +242,6 @@ export type ResolversTypes = ResolversObject<{
   PlantSizeInput: PlantSizeInput;
   PlantSizeUnit: PlantSizeUnit;
   Query: ResolverTypeWrapper<{}>;
-  SearchRecord: ResolverTypeWrapper<SearchRecord>;
-  SearchRecordStatus: SearchRecordStatus;
   SortField: SortField;
   SortInput: SortInput;
   String: ResolverTypeWrapper<Scalars['String']['output']>;
@@ -285,7 +263,6 @@ export type ResolversParentTypes = ResolversObject<{
   PlantSize: PlantSize;
   PlantSizeInput: PlantSizeInput;
   Query: {};
-  SearchRecord: SearchRecord;
   SortInput: SortInput;
   String: Scalars['String']['output'];
 }>;
@@ -357,16 +334,6 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   plant?: Resolver<Maybe<ResolversTypes['PlantData']>, ParentType, ContextType, RequireFields<QueryPlantArgs, 'id'>>;
   plantOccurrences?: Resolver<Maybe<ResolversTypes['PlantOccurrencesResults']>, ParentType, ContextType, RequireFields<QueryPlantOccurrencesArgs, 'id'>>;
   plantSearch?: Resolver<ResolversTypes['PlantSearchResults'], ParentType, ContextType, Partial<QueryPlantSearchArgs>>;
-  searchRecord?: Resolver<Maybe<ResolversTypes['SearchRecord']>, ParentType, ContextType, RequireFields<QuerySearchRecordArgs, 'id'>>;
-}>;
-
-export type SearchRecordResolvers<ContextType = any, ParentType extends ResolversParentTypes['SearchRecord'] = ResolversParentTypes['SearchRecord']> = ResolversObject<{
-  _id?: Resolver<ResolversTypes['ObjectId'], ParentType, ContextType>;
-  jsonStringSearch?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  status?: Resolver<ResolversTypes['SearchRecordStatus'], ParentType, ContextType>;
-  statusUpdated?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
-  totalOccurrences?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
 export type Resolvers<ContextType = any> = ResolversObject<{
@@ -379,6 +346,5 @@ export type Resolvers<ContextType = any> = ResolversObject<{
   PlantSearchResults?: PlantSearchResultsResolvers<ContextType>;
   PlantSize?: PlantSizeResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
-  SearchRecord?: SearchRecordResolvers<ContextType>;
 }>;
 
