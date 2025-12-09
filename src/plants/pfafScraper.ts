@@ -1,12 +1,12 @@
 import { JSDOM } from "jsdom";
 import { PartialPlantData } from "../config/types";
 import { PlantSizeUnit } from "../graphql/graphql";
+import {
+  getScrapeUrl,
+  WebsiteScrapedDataWithSource,
+} from "./util/scrapingUtil";
 
-const PFAF_URL = "https://pfaf.org/user/Plant.aspx?LatinName=";
-
-export type PfafScrapedData = Omit<PartialPlantData, "occurrences">;
-
-const PLANT_FIELD_MAPPING: Record<string, keyof PfafScrapedData> = {
+const PFAF_PLANT_FIELD_MAPPING: Record<string, keyof PartialPlantData> = {
   "common name": "commonNames",
   "usda hardiness": "hardiness",
   habitats: "habitat",
@@ -15,37 +15,11 @@ const PLANT_FIELD_MAPPING: Record<string, keyof PfafScrapedData> = {
   "main bloom time": "bloomTimes",
 };
 
-/**
- *
- * Helper function to scrape plant data from PFAF
- *
- * @param scientificName The plant name to search for
- * @returns Data for the plant, with empty GBIF data array fields added
- */
-export const scrapePlantByname = async (
-  scientificName: string
-): Promise<PartialPlantData> => {
-  const lowercaseName = scientificName.toLowerCase();
-
-  const scrapedPlant = await scrapePFAF(lowercaseName);
-  return {
-    ...scrapedPlant,
-    occurrences: [],
-  };
-};
-
 const cleanText = (text: string) =>
   text
     .replace(/\[[^\]]*\]/g, "")
     .replace(/\s+/g, " ")
     .trim();
-
-const plantPageFound = (document: Document) => {
-  const plantTitle = document.getElementById(
-    "contentplaceholder1_lbldisplatinname"
-  );
-  return Boolean(plantTitle?.textContent);
-};
 
 const scrapeCareIcons = (document: Document) => {
   const careIconsTable = document.getElementById(
@@ -68,7 +42,7 @@ const scrapeCareIcons = (document: Document) => {
     }
   });
 
-  const plantData: Partial<PfafScrapedData> = {};
+  const plantData: Partial<PartialPlantData> = {};
   if (soilType.length) plantData.soilTypes = soilType;
   if (lightLevel.length) plantData.lightLevels = lightLevel;
 
@@ -83,7 +57,7 @@ const scrapeStructuredFields = (document: Document) => {
     const cells = element.querySelectorAll("td");
     const rowLabel = cells[0]?.textContent?.trim();
     const rowValue = cells[1]?.textContent?.trim();
-    const plantKey = rowLabel ? PLANT_FIELD_MAPPING[rowLabel] : null;
+    const plantKey = rowLabel ? PFAF_PLANT_FIELD_MAPPING[rowLabel] : null;
     if (plantKey && rowValue) {
       if (plantKey === "hardiness") {
         plantData.push([
@@ -96,7 +70,7 @@ const scrapeStructuredFields = (document: Document) => {
     }
   });
 
-  return Object.fromEntries(plantData) as Partial<PfafScrapedData>;
+  return Object.fromEntries(plantData) as Partial<PartialPlantData>;
 };
 
 const scrapePlantSummary = (document: Document) => {
@@ -107,19 +81,19 @@ const scrapePlantSummary = (document: Document) => {
 
   plantSummary?.textContent?.split(".").forEach((item) => {
     const data = item.split(":");
-    const plantKey = PLANT_FIELD_MAPPING[data[0].trim()];
+    const plantKey = PFAF_PLANT_FIELD_MAPPING[data[0].trim()];
     if (plantKey && data[1]) {
       plantData.push([plantKey, data[1].split(", ").map(cleanText)]);
     }
   });
 
-  return Object.fromEntries(plantData) as Partial<PfafScrapedData>;
+  return Object.fromEntries(plantData) as Partial<PartialPlantData>;
 };
 
 const extractPlantSize = (plantCharData: string) => {
   const plantSizeRegExp = /(\d+\.*\d*)+?\s*(m|cm)/g;
   const sizeMatches = Array.from(plantCharData.matchAll(plantSizeRegExp));
-  const plantData: Pick<PfafScrapedData, "height" | "spread"> = {};
+  const plantData: Pick<PartialPlantData, "height" | "spread"> = {};
 
   if (sizeMatches.length === 2) {
     // Size data typically listed as "<height> by <spread>", get the first 2 numbers listed
@@ -137,7 +111,7 @@ const extractPlantSize = (plantCharData: string) => {
 };
 
 const scrapePlantPhysicalChars = (document: Document) => {
-  let plantData: Partial<PfafScrapedData> = {};
+  let plantData: Partial<PartialPlantData> = {};
   const plantCharData = document.getElementById(
     "contentplaceholder1_lblphystatment"
   )?.textContent;
@@ -151,27 +125,45 @@ const scrapePlantPhysicalChars = (document: Document) => {
   return plantData;
 };
 
+const scrapeThumbnailImage = (
+  document: Document
+): Partial<PartialPlantData> | null => {
+  const images = document
+    .getElementById("ContentPlaceHolder1_tblPlantImges".toLowerCase())
+    ?.getElementsByTagName("img");
+
+  const lastImage = images ? Array.from(images).at(-1)?.src : null;
+
+  return lastImage ? { thumbnailUrl: lastImage } : null;
+};
+
+const PFAFPageFound = (document: Document) => {
+  const plantTitle = document.getElementById(
+    "contentplaceholder1_lbldisplatinname"
+  );
+  return Boolean(plantTitle?.textContent);
+};
+
 export const scrapePFAF = async (
   scientificName: string
-): Promise<PfafScrapedData> => {
-  const scrapeUrl = `${PFAF_URL}${scientificName.replace(/ /g, "+")}`;
+): Promise<WebsiteScrapedDataWithSource | null> => {
+  const scrapeUrl = getScrapeUrl(scientificName, "pfaf");
   const response = await fetch(scrapeUrl);
-  const html = (await response.text()).toLowerCase();
 
+  const html = (await response.text()).toLowerCase();
   const document = new JSDOM(html).window.document;
 
-  if (!plantPageFound(document)) {
-    return { scientificName, scrapeSources: [] };
+  if (PFAFPageFound(document)) {
+    return {
+      source: "pfaf",
+      scrapeSources: [scrapeUrl],
+      ...scrapeStructuredFields(document),
+      ...scrapeCareIcons(document),
+      ...scrapePlantSummary(document),
+      ...scrapePlantPhysicalChars(document),
+      ...scrapeThumbnailImage(document),
+    };
   }
 
-  const scrapedData: PfafScrapedData = {
-    scientificName: scientificName,
-    scrapeSources: [scrapeUrl],
-    ...scrapeStructuredFields(document),
-    ...scrapeCareIcons(document),
-    ...scrapePlantSummary(document),
-    ...scrapePlantPhysicalChars(document),
-  };
-
-  return scrapedData;
+  return null;
 };

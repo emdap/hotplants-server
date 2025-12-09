@@ -9,7 +9,7 @@ import {
   searchGbifOccurrences,
   SearchRecordResponse,
   shouldStartScraping,
-} from "./util/scrapeOccurrencesUtil";
+} from "./util/scrapingUtil";
 
 @Route("plants")
 export class PlantController {

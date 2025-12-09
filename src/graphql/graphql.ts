@@ -49,6 +49,7 @@ export type PlantData = {
   scrapeSources: Array<Scalars['String']['output']>;
   soilTypes?: Maybe<Array<Scalars['String']['output']>>;
   spread?: Maybe<PlantSize>;
+  thumbnailUrl?: Maybe<Scalars['String']['output']>;
   updatedTimestamp: Scalars['Float']['output'];
   uses?: Maybe<Array<Scalars['String']['output']>>;
 };
@@ -294,6 +295,7 @@ export type PlantDataResolvers<ContextType = any, ParentType extends ResolversPa
   scrapeSources?: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType>;
   soilTypes?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, ContextType>;
   spread?: Resolver<Maybe<ResolversTypes['PlantSize']>, ParentType, ContextType>;
+  thumbnailUrl?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   updatedTimestamp?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
   uses?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;

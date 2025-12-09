@@ -48,6 +48,7 @@ export const plantDataSchema = buildSchema(`
     height: PlantSize
     spread: PlantSize
 
+    thumbnailUrl: String
     commonNames: [String!]
     fullOccurrencesCount: Int
     occurrences: [PlantOccurrence!]!
@@ -63,11 +64,11 @@ export const plantDataSchema = buildSchema(`
     boundingPolyCoords: [[[Float!]!]!]
   }
 
-    enum PlantSizeUnit {
-      m
-      cm
-      in
-      ft
+  enum PlantSizeUnit {
+    m
+    cm
+    in
+    ft
   }
 
   type PlantSize {

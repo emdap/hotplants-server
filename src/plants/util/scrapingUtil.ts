@@ -5,11 +5,14 @@ import {
 } from "../../config/gbifClient";
 import {
   OccurrenceScrapeResponse,
+  PartialPlantData,
   PlantSearchParams,
   SearchRecordDocument,
 } from "../../config/types";
 import { parseBboxInput } from "../../graphql/resolvers/plantSearchResolver";
-import { processGbifPlants, searchGbifSpecies } from "./gbifUtil";
+import { scrapePermaPeople } from "../permaPeopleScraper";
+import { scrapePFAF } from "../pfafScraper";
+import { processGbifResults, searchGbifSpecies } from "./gbifUtil";
 import { updateSearchRecordResults } from "./mongodbUtil";
 
 const EMPTY_OCCURRENCE_SCRAPE_RESPONSE: OccurrenceScrapeResponse = {
@@ -26,6 +29,28 @@ const DEFAULT_GBIF_SEARCH_PARAMS: PlantSearchParams = {
 };
 
 const MAX_STALE_SEARCH_MILLISECONDS = 300000; // 5 minutes
+
+type WebsiteScrapedData = Omit<
+  PartialPlantData,
+  "scientificName" | "occurrences"
+>;
+
+export type WebsiteScrapedDataWithSource = WebsiteScrapedData & {
+  source: ScrapeSource;
+};
+
+export type ScrapeSource = "pfaf" | "perma";
+
+export const SCRAPE_SOURCE_INFO: Record<
+  ScrapeSource,
+  { url: string; spaceReplacement: string }
+> = {
+  pfaf: {
+    url: "https://pfaf.org/user/Plant.aspx?LatinName=",
+    spaceReplacement: "+",
+  },
+  perma: { url: "https://permapeople.org/plants/", spaceReplacement: "-" },
+};
 
 export type SearchRecordResponse = { id: string } & Pick<
   SearchRecordDocument,
@@ -74,7 +99,7 @@ export const searchGbifOccurrences = async (
     });
 
     if (data?.results) {
-      await processGbifPlants(data.results);
+      await processGbifResults(data.results);
       scrapeResult = {
         totalOccurrencesScraped: data.results.length,
         endOfRecords: Boolean(data.endOfRecords),
@@ -114,3 +139,63 @@ export const createGbifQuery = async (
     ...searchParams,
   };
 };
+
+export const iteratePlantScrapers = (
+  scientificName: string,
+  previousScrapeSources?: string[]
+) =>
+  Object.keys(SCRAPE_SOURCE_INFO).map((source) => {
+    const scrapeSource = source as ScrapeSource;
+    const scrapeUrl = getScrapeUrl(scientificName, scrapeSource);
+
+    if (!previousScrapeSources?.includes(scrapeUrl)) {
+      return scrapePlantByName(scientificName, scrapeSource);
+    }
+
+    return null;
+  });
+
+export const scrapePlantByName = async (
+  scientificName: string,
+  scrapeFrom: ScrapeSource
+) => {
+  switch (scrapeFrom) {
+    case "perma":
+      return scrapePermaPeople(scientificName);
+    case "pfaf":
+      return scrapePFAF(scientificName);
+  }
+};
+
+export const getScrapeUrl = (scientificName: string, source: ScrapeSource) => {
+  const { url, spaceReplacement } = SCRAPE_SOURCE_INFO[source];
+  return `${url}${scientificName.replace(/ /g, spaceReplacement)}`;
+};
+
+const PREFERRED_SOURCE: ScrapeSource = "perma";
+
+export const combineScrapedData = (
+  scrapedData: (WebsiteScrapedDataWithSource | null)[]
+) =>
+  scrapedData.reduce<WebsiteScrapedData | null>((prev, cur) => {
+    if (cur) {
+      const { source, scrapeSources, ...curPlantData } = cur;
+      const combinedSources = prev?.scrapeSources
+        ? prev.scrapeSources.concat(scrapeSources)
+        : scrapeSources;
+
+      if (!prev || source === PREFERRED_SOURCE) {
+        return { ...prev, ...curPlantData, scrapeSources: combinedSources };
+      } else {
+        Object.entries(curPlantData).forEach(([key, data]) => {
+          const typesafeKey = key as keyof WebsiteScrapedData;
+          if (data !== null && !prev[typesafeKey]) {
+            prev[typesafeKey] = data as never;
+          }
+        });
+      }
+      return { ...prev, scrapeSources: combinedSources };
+    }
+
+    return prev;
+  }, null);

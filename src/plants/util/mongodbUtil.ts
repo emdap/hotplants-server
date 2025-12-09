@@ -11,7 +11,7 @@ import {
   PlantSearchParams,
   SearchRecordDocument,
 } from "../../config/types";
-import { convertPolygon } from "./scrapeOccurrencesUtil";
+import { convertPolygon } from "./scrapingUtil";
 
 /**
  *

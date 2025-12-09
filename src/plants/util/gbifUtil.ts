@@ -1,7 +1,7 @@
 import { gbifClient, GbifOccurenceResult } from "../../config/gbifClient";
 import { PlantData, PlantMedia, PlantOccurrence } from "../../graphql/graphql";
-import { scrapePlantByname } from "../pfafScraper";
 import { getPlantByName, storePlantData } from "./mongodbUtil";
+import { combineScrapedData, iteratePlantScrapers } from "./scrapingUtil";
 
 type NormalizedGbifResult = Omit<
   GbifOccurenceResult,
@@ -73,28 +73,31 @@ const extractOccurrenceIds = (occurrences?: PlantOccurrence[]) =>
  */
 const reduceGbifResults = (gbifResults: GbifOccurenceResult[]) =>
   gbifResults.reduce<GbifResultDict>((prev, result) => {
-    const plantKey = extractScientificName(result);
-    if (!plantKey) {
+    const scientificName = extractScientificName(result)?.toLowerCase();
+    if (!scientificName) {
       return prev;
     }
 
     const existingOccurrenceIds = extractOccurrenceIds(
-      prev[plantKey]?.occurrences
+      prev[scientificName]?.occurrences
     );
 
     if (!existingOccurrenceIds.includes(result.key)) {
       const normalizedGbifPlant = normalizePlant(result);
-      if (prev[plantKey]) {
-        prev[plantKey] = combinePlantData(prev[plantKey], normalizedGbifPlant);
+      if (prev[scientificName]) {
+        prev[scientificName] = combineOccurrences(
+          prev[scientificName],
+          normalizedGbifPlant
+        );
       } else {
-        prev[plantKey] = normalizedGbifPlant;
+        prev[scientificName] = normalizedGbifPlant;
       }
     }
 
     return prev;
   }, {});
 
-const combinePlantData = <
+const combineOccurrences = <
   T extends Pick<PlantData, "scrapeSources" | "occurrences">
 >(
   normalizedData: T,
@@ -129,16 +132,28 @@ const combinePlantData = <
  *
  * @param gbifResults GBIF occurrence results directly from GBIF occurrence API
  */
-export const processGbifPlants = (gbifResults: GbifOccurenceResult[]) => {
+export const processGbifResults = (gbifResults: GbifOccurenceResult[]) => {
   const processGbifPlant = async (
-    plantKey: string,
+    scientificName: string,
     occurrenceData: NormalizedGbifResult
   ) => {
-    const existingPlantData = await getPlantByName(plantKey);
-    const plantData = existingPlantData ?? (await scrapePlantByname(plantKey));
+    const existingPlantData = await getPlantByName(scientificName);
 
-    const { hasNewData, ...combinedData } = combinePlantData(
-      plantData,
+    const scrapedData = await Promise.all(
+      iteratePlantScrapers(scientificName, existingPlantData?.scrapeSources)
+    );
+    const combinedScrapedData = combineScrapedData(scrapedData);
+
+    const normalizedData = {
+      scientificName,
+      occurrences: [],
+      scrapeSources: [],
+      ...existingPlantData,
+      ...combinedScrapedData,
+    };
+
+    const { hasNewData, ...combinedData } = combineOccurrences(
+      normalizedData,
       occurrenceData
     );
 
