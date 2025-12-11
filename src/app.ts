@@ -1,18 +1,27 @@
 import { apolloServer } from "@/graphqlConfig/serverConfig";
 import { RegisterRoutes } from "@/routes";
 import { expressMiddleware } from "@as-integrations/express5";
+import { toNodeHandler } from "better-auth/node";
 import cors from "cors";
 import "dotenv/config";
 import express from "express";
 import swaggerUi from "swagger-ui-express";
+import { auth, trustedOrigins } from "./auth";
 
 const hostname = "0.0.0.0";
 const port = 3000;
 
 const app = express();
-app.use(cors({ origin: "*" }));
+app.use(
+  cors({
+    origin: trustedOrigins,
+    credentials: true,
+  })
+);
 app.use(express.json());
 app.use(express.static("public"));
+
+app.all("/api/auth/*splat", toNodeHandler(auth));
 
 app.get("/", (_req, res) =>
   res.status(200).json({

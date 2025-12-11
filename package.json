@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node dist/app.js",
     "start:local": "tsx --env-file=.env src/app.ts",
-    "dev": "pnpm generate-docs && tsx watch --env-file=.env src/app.ts",
+    "dev": "pnpm generate-docs && NODE_ENV=dev tsx watch --env-file=.env src/app.ts",
     "build": "tsc && tsc-alias -f && pnpm generate-docs",
     "build:local": "pnpm build && mkdir -p dist/public && cp public/swagger.json \"$_\"",
     "generate-docs": "pnpm generate-graphql && pnpm generate-tsoa",
@@ -24,6 +24,7 @@
     "@tsoa/runtime": "^6.6.0",
     "@turf/turf": "^7.2.0",
     "@types/swagger-ui-express": "^4.1.8",
+    "better-auth": "^1.4.6",
     "cors": "^2.8.5",
     "dotenv": "^17.2.0",
     "express": "^5.1.0",
