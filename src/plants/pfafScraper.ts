@@ -1,6 +1,6 @@
 import { JSDOM } from "jsdom";
 import { PartialPlantData } from "../config/types";
-import { PlantSizeUnit } from "../graphql/graphql";
+import { PlantSizeUnit } from "../graphqlConfig/graphql";
 import {
   getScrapeUrl,
   WebsiteScrapedDataWithSource,

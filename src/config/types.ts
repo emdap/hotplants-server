@@ -1,5 +1,5 @@
 import { ObjectId } from "mongodb";
-import { PlantData, PlantDataInput } from "../graphql/graphql";
+import { PlantData, PlantDataInput } from "../graphqlConfig/graphql";
 import { GbifOccurrenceSearchParams } from "./gbifClient";
 
 export type PlantDataDocument = Omit<

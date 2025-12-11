@@ -1,10 +1,10 @@
+import { apolloServer } from "@/graphqlConfig/serverConfig";
+import { RegisterRoutes } from "@/routes";
 import { expressMiddleware } from "@as-integrations/express5";
 import cors from "cors";
 import "dotenv/config";
 import express from "express";
 import swaggerUi from "swagger-ui-express";
-import { apolloServer } from "./graphql/serverConfig";
-import { RegisterRoutes } from "./routes";
 
 const hostname = "0.0.0.0";
 const port = 3000;
@@ -27,7 +27,7 @@ RegisterRoutes(router);
 app.use("/api", router);
 
 app.listen(port, hostname, async () => {
-  console.info("i'm listening here", port, hostname);
+  console.info("i'm listening", port, hostname);
 });
 
 app.use(

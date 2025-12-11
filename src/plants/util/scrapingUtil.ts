@@ -9,7 +9,7 @@ import {
   PlantSearchParams,
   SearchRecordDocument,
 } from "../../config/types";
-import { parseBboxInput } from "../../graphql/resolvers/plantSearchResolver";
+import { parseBboxInput } from "../../graphqlConfig/resolvers/plantSearchResolver";
 import { scrapePermaPeople } from "../permaPeopleScraper";
 import { scrapePFAF } from "../pfafScraper";
 import { processGbifResults, searchGbifSpecies } from "./gbifUtil";

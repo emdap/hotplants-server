@@ -1,5 +1,9 @@
 import { gbifClient, GbifOccurenceResult } from "../../config/gbifClient";
-import { PlantData, PlantMedia, PlantOccurrence } from "../../graphql/graphql";
+import {
+  PlantData,
+  PlantMedia,
+  PlantOccurrence,
+} from "../../graphqlConfig/graphql";
 import { getPlantByName, storePlantData } from "./mongodbUtil";
 import { combineScrapedData, iteratePlantScrapers } from "./scrapingUtil";
 

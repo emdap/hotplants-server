@@ -32,7 +32,7 @@ RUN pnpm install --frozen-lockfile --prod=false
 COPY . .
 
 # Build application
-RUN pnpm run build
+RUN pnpm build
 RUN cp -r public dist/public
 
 # Remove development dependencies
@@ -47,4 +47,4 @@ COPY --from=build /app /app
 
 # Start the server by default, this can be overwritten at runtime
 EXPOSE 3000
-CMD [ "pnpm", "run", "start:prod" ]
+CMD [ "pnpm", "start" ]

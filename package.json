@@ -2,15 +2,17 @@
   "name": "hotplants-server",
   "version": "1.0.0",
   "main": "index.js",
+  "type": "module",
   "scripts": {
-    "start:prod": "node dist/app.js",
-    "start": "ts-node --files src/app.ts",
-    "build": "tsc && pnpm generate-tsoa",
-    "local:build": "pnpm build && mkdir -p dist/public && cp public/swagger.json \"$_\"",
-    "dev": "pnpm generate-graphql && pnpm generate-tsoa && ts-node-dev --files src/app.ts",
-    "generate-gbif-types": "npx openapi-typescript src/config/schemas/gbif-schema.json -o src/config/schemas/gbif.d.ts",
-    "generate-graphql": "graphql-codegen --config src/graphql/codegen.ts",
-    "generate-tsoa": "tsoa routes && tsoa spec"
+    "start": "node dist/app.js",
+    "start:local": "tsx --env-file=.env src/app.ts",
+    "dev": "pnpm generate-docs && tsx watch --env-file=.env src/app.ts",
+    "build": "tsc && tsc-alias -f && pnpm generate-docs",
+    "build:local": "pnpm build && mkdir -p dist/public && cp public/swagger.json \"$_\"",
+    "generate-docs": "pnpm generate-graphql && pnpm generate-tsoa",
+    "generate-graphql": "graphql-codegen --config src/graphqlConfig/codegen.ts",
+    "generate-tsoa": "tsoa routes && tsoa spec",
+    "generate-gbif-types": "npx openapi-typescript src/config/schemas/gbif-schema.json -o src/config/schemas/gbif.d.ts"
   },
   "keywords": [],
   "author": "",
@@ -49,8 +51,8 @@
     "concurrently": "^9.2.0",
     "geojson": "^0.5.0",
     "openapi-typescript": "^7.8.0",
-    "ts-node": "^10.9.2",
-    "ts-node-dev": "^2.0.0",
+    "tsc-alias": "^1.8.16",
+    "tsx": "^4.21.0",
     "typescript": "^5.8.3"
   }
 }

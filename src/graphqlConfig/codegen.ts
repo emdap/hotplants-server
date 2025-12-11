@@ -6,7 +6,7 @@ const config: CodegenConfig = {
   schema: printSchema(plantDataSchema),
 
   generates: {
-    "src/graphql/graphql.ts": {
+    "src/graphqlConfig/graphql.ts": {
       plugins: ["typescript", "typescript-resolvers"],
       config: {
         useIndexSignature: true,
