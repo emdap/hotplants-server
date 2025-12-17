@@ -3,7 +3,7 @@ import { printSchema } from "graphql";
 import { plantDataSchema } from "./schemas/plantData.schema";
 
 const config: CodegenConfig = {
-  schema: printSchema(plantDataSchema),
+  schema: ["src/graphqlConfig/schemas/**", printSchema(plantDataSchema)],
 
   generates: {
     "src/graphqlConfig/graphql.ts": {

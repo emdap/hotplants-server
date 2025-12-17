@@ -1,0 +1,17 @@
+enum SearchRecordStatus {
+  READY
+  SCRAPING
+  COMPLETE
+}
+
+type SearchRecord {
+  _id: ObjectId!
+  jsonStringSearch: String!
+  status: SearchRecordStatus!
+  statusUpdated: Float!
+  occurrencesOffset: Int!
+}
+
+type Query {
+  searchRecord(id: String!): SearchRecord
+}

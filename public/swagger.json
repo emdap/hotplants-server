@@ -10,9 +10,9 @@
 			"SearchRecordStatus": {
 				"type": "string",
 				"enum": [
+					"COMPLETE",
 					"READY",
-					"SCRAPING",
-					"COMPLETE"
+					"SCRAPING"
 				]
 			},
 			"Pick_SearchRecordDocument.status-or-occurrencesOffset_": {
@@ -20,10 +20,7 @@
 					"status": {
 						"$ref": "#/components/schemas/SearchRecordStatus"
 					},
-					"occurrencesOffset": {
-						"type": "number",
-						"format": "double"
-					}
+					"occurrencesOffset": {}
 				},
 				"required": [
 					"status",
@@ -1396,10 +1393,10 @@
 			},
 			"Pick_PlantDataInput.Exclude_keyofPlantDataInput.__": {
 				"properties": {
+					"_id": {},
 					"scientificName": {
 						"$ref": "#/components/schemas/InputMaybe_string_"
 					},
-					"_id": {},
 					"addedTimestamp": {
 						"$ref": "#/components/schemas/InputMaybe_number_"
 					},
