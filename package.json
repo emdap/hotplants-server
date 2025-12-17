@@ -7,7 +7,7 @@
     "start": "node dist/app.js",
     "start:local": "tsx --env-file=.env src/app.ts",
     "dev": "pnpm generate-docs && NODE_ENV=dev tsx watch --env-file=.env src/app.ts",
-    "build": "tsc && tsc-alias -f && cp src/graphql/schemas/mainSchema.graphql dist/graphql/schemas/mainSchema.graphql && pnpm generate-docs",
+    "build": "tsc && tsc-alias -f && cp src/graphqlConfig/schemas/mainSchema.graphql dist/graphqlConfig/schemas/mainSchema.graphql && pnpm generate-docs",
     "build:local": "pnpm build && mkdir -p dist/public && cp public/swagger.json \"$_\"",
     "generate-docs": "pnpm generate-graphql && pnpm generate-tsoa",
     "generate-graphql": "graphql-codegen --config src/graphqlConfig/codegen.ts",

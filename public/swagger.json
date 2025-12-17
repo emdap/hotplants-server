@@ -17,14 +17,17 @@
 			},
 			"Pick_SearchRecordDocument.status-or-occurrencesOffset_": {
 				"properties": {
+					"occurrencesOffset": {
+						"type": "number",
+						"format": "double"
+					},
 					"status": {
 						"$ref": "#/components/schemas/SearchRecordStatus"
-					},
-					"occurrencesOffset": {}
+					}
 				},
 				"required": [
-					"status",
-					"occurrencesOffset"
+					"occurrencesOffset",
+					"status"
 				],
 				"type": "object",
 				"description": "From T, pick a set of properties whose keys are in the union K"
