@@ -11,6 +11,7 @@ const config: CodegenConfig = {
       config: {
         useIndexSignature: true,
         enumsAsTypes: true,
+        contextType: "./types#ApolloContext",
       },
     },
   },

@@ -7,6 +7,7 @@ import {
   plantResolver,
 } from "./resolvers/simpleResolvers";
 import { plantDataSchema } from "./schemas/plantData.schema";
+import { ApolloContext } from "./types";
 
 const resolvers: Resolvers = {
   PlantData: {
@@ -37,7 +38,7 @@ const resolvers: Resolvers = {
 
 // The ApolloServer constructor requires two parameters: your schema
 // definition and your set of resolvers.
-export const apolloServer = new ApolloServer({
+export const apolloServer = new ApolloServer<ApolloContext>({
   typeDefs: [plantDataSchema],
   resolvers,
   introspection: true,

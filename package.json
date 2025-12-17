@@ -1,7 +1,7 @@
 {
   "name": "hotplants-server",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "app.js",
   "type": "module",
   "scripts": {
     "start": "node dist/app.js",
@@ -25,6 +25,7 @@
     "@turf/turf": "^7.2.0",
     "@types/swagger-ui-express": "^4.1.8",
     "better-auth": "^1.4.6",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^17.2.0",
     "express": "^5.1.0",
@@ -44,6 +45,7 @@
     "@graphql-tools/graphql-file-loader": "^8.1.2",
     "@graphql-tools/load": "^8.1.2",
     "@graphql-tools/schema": "^10.0.25",
+    "@types/cookie-parser": "^1.4.10",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.3",
     "@types/geojson": "^7946.0.16",

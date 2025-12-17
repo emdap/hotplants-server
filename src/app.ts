@@ -2,6 +2,7 @@ import { apolloServer } from "@/graphqlConfig/serverConfig";
 import { RegisterRoutes } from "@/routes";
 import { expressMiddleware } from "@as-integrations/express5";
 import { toNodeHandler } from "better-auth/node";
+import cookieParser from "cookie-parser";
 import cors from "cors";
 import "dotenv/config";
 import express from "express";
@@ -20,6 +21,7 @@ app.use(
 );
 app.use(express.json());
 app.use(express.static("public"));
+app.use(cookieParser());
 
 app.all("/api/auth/*splat", toNodeHandler(auth));
 
@@ -36,7 +38,7 @@ RegisterRoutes(router);
 app.use("/api", router);
 
 app.listen(port, hostname, async () => {
-  console.info("i'm listening", port, hostname);
+  console.info("send plants", hostname, port);
 });
 
 app.use(
@@ -51,7 +53,19 @@ app.use(
 
 const startGraphQlServer = async () => {
   await apolloServer.start();
-  app.use("/graphql", express.json(), expressMiddleware(apolloServer));
+  app.use(
+    "/graphql",
+    express.json(),
+    cookieParser(),
+    expressMiddleware(apolloServer, {
+      context: async ({ req, res }) => {
+        const session = await auth.api.getSession({
+          headers: req.headers as HeadersInit,
+        });
+        return { req, res, user: session?.user };
+      },
+    })
+  );
 };
 
 startGraphQlServer();

@@ -1,4 +1,5 @@
 import { GraphQLResolveInfo, GraphQLScalarType, GraphQLScalarTypeConfig } from 'graphql';
+import { ApolloContext } from './types';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
@@ -268,7 +269,7 @@ export type ResolversParentTypes = ResolversObject<{
   String: Scalars['String']['output'];
 }>;
 
-export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = ResolversObject<{
+export type MutationResolvers<ContextType = ApolloContext, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = ResolversObject<{
   replaceWithProxyUrl?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType, RequireFields<MutationReplaceWithProxyUrlArgs, 'occurrenceId' | 'plantId' | 'replaceUrl'>>;
 }>;
 
@@ -276,7 +277,7 @@ export interface ObjectIdScalarConfig extends GraphQLScalarTypeConfig<ResolversT
   name: 'ObjectId';
 }
 
-export type PlantDataResolvers<ContextType = any, ParentType extends ResolversParentTypes['PlantData'] = ResolversParentTypes['PlantData']> = ResolversObject<{
+export type PlantDataResolvers<ContextType = ApolloContext, ParentType extends ResolversParentTypes['PlantData'] = ResolversParentTypes['PlantData']> = ResolversObject<{
   _id?: Resolver<ResolversTypes['ObjectId'], ParentType, ContextType>;
   addedTimestamp?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
   bloomColors?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, ContextType>;
@@ -301,44 +302,44 @@ export type PlantDataResolvers<ContextType = any, ParentType extends ResolversPa
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
-export type PlantMediaResolvers<ContextType = any, ParentType extends ResolversParentTypes['PlantMedia'] = ResolversParentTypes['PlantMedia']> = ResolversObject<{
+export type PlantMediaResolvers<ContextType = ApolloContext, ParentType extends ResolversParentTypes['PlantMedia'] = ResolversParentTypes['PlantMedia']> = ResolversObject<{
   isProxyUrl?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   url?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
-export type PlantOccurrenceResolvers<ContextType = any, ParentType extends ResolversParentTypes['PlantOccurrence'] = ResolversParentTypes['PlantOccurrence']> = ResolversObject<{
+export type PlantOccurrenceResolvers<ContextType = ApolloContext, ParentType extends ResolversParentTypes['PlantOccurrence'] = ResolversParentTypes['PlantOccurrence']> = ResolversObject<{
   media?: Resolver<Array<ResolversTypes['PlantMedia']>, ParentType, ContextType>;
   occurrenceCoords?: Resolver<Array<ResolversTypes['Float']>, ParentType, ContextType>;
   occurrenceId?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
-export type PlantOccurrencesResultsResolvers<ContextType = any, ParentType extends ResolversParentTypes['PlantOccurrencesResults'] = ResolversParentTypes['PlantOccurrencesResults']> = ResolversObject<{
+export type PlantOccurrencesResultsResolvers<ContextType = ApolloContext, ParentType extends ResolversParentTypes['PlantOccurrencesResults'] = ResolversParentTypes['PlantOccurrencesResults']> = ResolversObject<{
   count?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
   results?: Resolver<Array<ResolversTypes['PlantOccurrence']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
-export type PlantSearchResultsResolvers<ContextType = any, ParentType extends ResolversParentTypes['PlantSearchResults'] = ResolversParentTypes['PlantSearchResults']> = ResolversObject<{
+export type PlantSearchResultsResolvers<ContextType = ApolloContext, ParentType extends ResolversParentTypes['PlantSearchResults'] = ResolversParentTypes['PlantSearchResults']> = ResolversObject<{
   count?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
   results?: Resolver<Array<ResolversTypes['PlantData']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
-export type PlantSizeResolvers<ContextType = any, ParentType extends ResolversParentTypes['PlantSize'] = ResolversParentTypes['PlantSize']> = ResolversObject<{
+export type PlantSizeResolvers<ContextType = ApolloContext, ParentType extends ResolversParentTypes['PlantSize'] = ResolversParentTypes['PlantSize']> = ResolversObject<{
   amount?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   unit?: Resolver<Maybe<ResolversTypes['PlantSizeUnit']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
-export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
+export type QueryResolvers<ContextType = ApolloContext, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
   plant?: Resolver<Maybe<ResolversTypes['PlantData']>, ParentType, ContextType, RequireFields<QueryPlantArgs, 'id'>>;
   plantOccurrences?: Resolver<Maybe<ResolversTypes['PlantOccurrencesResults']>, ParentType, ContextType, RequireFields<QueryPlantOccurrencesArgs, 'id'>>;
   plantSearch?: Resolver<ResolversTypes['PlantSearchResults'], ParentType, ContextType, Partial<QueryPlantSearchArgs>>;
 }>;
 
-export type Resolvers<ContextType = any> = ResolversObject<{
+export type Resolvers<ContextType = ApolloContext> = ResolversObject<{
   Mutation?: MutationResolvers<ContextType>;
   ObjectId?: GraphQLScalarType;
   PlantData?: PlantDataResolvers<ContextType>;
