@@ -10,19 +10,11 @@ const DB_NAME = process.env.NODE_ENV === "dev" ? "dev-auth" : "auth";
 const authDb = client.db(DB_NAME);
 
 export const auth = betterAuth({
-  experimental: { joins: true },
   database: mongodbAdapter(authDb),
   trustedOrigins,
   //  requireEmailVerification: true,
 
   emailAndPassword: {
     enabled: true,
-  },
-
-  advanced: {
-    defaultCookieAttributes: {
-      sameSite: "none",
-      secure: true,
-    },
   },
 });
