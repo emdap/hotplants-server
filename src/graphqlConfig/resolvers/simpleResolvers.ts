@@ -1,7 +1,7 @@
 import { ObjectId } from "mongodb";
 import {
   gbifSearchesCollection,
-  plantCollection,
+  plantsCollection,
 } from "../../config/mongodbClient";
 import { QueryResolvers } from "../graphql";
 import { createFilteredCursor } from "./plantSearchResolver";
@@ -16,7 +16,7 @@ export const plantResolver: QueryResolvers["plant"] = async (
   { id, boundingPolyCoords }
 ) => {
   if (!boundingPolyCoords) {
-    return plantCollection.findOne(new ObjectId(id));
+    return plantsCollection.findOne(new ObjectId(id));
   }
 
   const { cursor } = createFilteredCursor({ _id: id, boundingPolyCoords });
@@ -26,7 +26,7 @@ export const plantResolver: QueryResolvers["plant"] = async (
 
 export const plantOccurrencesResolver: QueryResolvers["plantOccurrences"] =
   async (_, { id, offset, limit }) => {
-    const plant = await plantCollection.findOne(new ObjectId(id));
+    const plant = await plantsCollection.findOne(new ObjectId(id));
     const useOffset = offset ?? 0;
 
     return (

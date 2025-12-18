@@ -2,7 +2,7 @@ import { Feature, Polygon } from "geojson";
 import { ObjectId, OptionalId } from "mongodb";
 import {
   gbifSearchesCollection,
-  plantCollection,
+  plantsCollection,
 } from "../../config/mongodbClient";
 import {
   OccurrenceScrapeResponse,
@@ -22,7 +22,7 @@ import { convertPolygon } from "./scrapingUtil";
  */
 export const getPlantByName = (scientificName: string) => {
   const lowercaseName = scientificName.toLowerCase();
-  return plantCollection.findOne({
+  return plantsCollection.findOne({
     scientificName: lowercaseName,
   });
 };
@@ -40,14 +40,14 @@ export const storePlantData = async ({
   };
 
   return _id
-    ? plantCollection.updateOne({ _id }, { $set: fullData })
-    : plantCollection.insertOne(fullData);
+    ? plantsCollection.updateOne({ _id }, { $set: fullData })
+    : plantsCollection.insertOne(fullData);
 };
 
 export const lookupPlantByCoordinates = async ({
   geometry,
 }: Feature<Polygon>) =>
-  plantCollection
+  plantsCollection
     .find({
       occurrenceCoords: { $geoIntersects: { $geometry: geometry } },
     })

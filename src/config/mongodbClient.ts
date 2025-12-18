@@ -6,7 +6,7 @@ export type PlantSizeData = { amount: number; unit: "m" | "cm" | string };
 export const client = new MongoClient(process.env.MONGODB_CONNECTION_STRING!);
 
 const plantsDb = client.db("plants");
-export const plantCollection =
+export const plantsCollection =
   plantsDb.collection<OptionalId<PlantDataDocument>>("plantData");
 
 export const gbifSearchesCollection =

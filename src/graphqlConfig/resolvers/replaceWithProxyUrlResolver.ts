@@ -1,11 +1,11 @@
 import { createHash } from "crypto";
 import { ObjectId } from "mongodb";
-import { plantCollection } from "../../config/mongodbClient";
+import { plantsCollection } from "../../config/mongodbClient";
 import { MutationResolvers, PlantData } from "../graphql";
 
 export const replaceWithProxyUrlResolver: MutationResolvers["replaceWithProxyUrl"] =
   async (_, { plantId, occurrenceId, replaceUrl }) => {
-    const plantData = await plantCollection.findOne(
+    const plantData = await plantsCollection.findOne(
       new ObjectId(plantId as string)
     );
 
@@ -23,7 +23,7 @@ export const replaceWithProxyUrlResolver: MutationResolvers["replaceWithProxyUrl
       const proxyUrl = `https://api.gbif.org/v1/image/cache/occurrence/${occurrenceId}/media/${md5Url}`;
       const updateKey = `occurrences.${occurrenceIndex}.media.${mediaIndex}`;
 
-      const { modifiedCount } = await plantCollection.updateOne(
+      const { modifiedCount } = await plantsCollection.updateOne(
         { _id: new ObjectId(plantId as string) },
         {
           $set: {

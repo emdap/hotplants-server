@@ -7,7 +7,7 @@ import {
   Sort,
   SortDirection,
 } from "mongodb";
-import { plantCollection } from "../../config/mongodbClient";
+import { plantsCollection } from "../../config/mongodbClient";
 import { PlantDataDocument } from "../../config/types";
 import {
   InputMaybe,
@@ -36,7 +36,7 @@ export const plantSearchResolver: QueryResolvers["plantSearch"] = async (
   limit && cursor.limit(limit);
 
   const [count, results] = await Promise.all([
-    plantCollection.countDocuments(filter),
+    plantsCollection.countDocuments(filter),
     cursor.toArray(),
   ]);
 
@@ -54,11 +54,11 @@ export const createFilteredCursor = (where?: InputMaybe<PlantDataInput>) => {
   const filter = where ? extractPlantFilter(where) : {};
 
   if (!where?.boundingPolyCoords) {
-    cursor = plantCollection.find(filter);
+    cursor = plantsCollection.find(filter);
   } else {
     const occurrenceFilter = constructBboxFilter(where.boundingPolyCoords);
 
-    cursor = plantCollection.aggregate([
+    cursor = plantsCollection.aggregate([
       { $match: filter },
 
       {
