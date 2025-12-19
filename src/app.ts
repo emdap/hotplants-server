@@ -55,7 +55,6 @@ const startGraphQlServer = async () => {
   await apolloServer.start();
   app.use(
     "/graphql",
-    express.json(),
     cookieParser(),
     expressMiddleware(apolloServer, {
       context: async ({ req, res }) => {
