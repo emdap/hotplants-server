@@ -8,7 +8,14 @@ import { replaceWithProxyUrlResolver } from "./resolvers/replaceWithProxyUrlReso
 import {
   plantOccurrencesResolver,
   plantResolver,
+  searchRecordResolver,
 } from "./resolvers/simpleResolvers";
+import {
+  addToGardenResolver,
+  allUserGardensResolver,
+  newGardenResolver,
+  userGardenResolver,
+} from "./resolvers/userGardenResolvers";
 import { plantDataSchema } from "./schemas/plantData.schema";
 import { ApolloContext } from "./types";
 
@@ -34,14 +41,20 @@ const resolvers: Resolvers = {
     plant: plantResolver,
     plantOccurrences: plantOccurrencesResolver,
     plantSearch: plantSearchResolver,
+
+    searchRecord: searchRecordResolver,
+
+    userGarden: userGardenResolver,
+    allUserGardens: allUserGardensResolver,
   },
   Mutation: {
     replaceWithProxyUrl: replaceWithProxyUrlResolver,
+
+    newGarden: newGardenResolver,
+    addToGarden: addToGardenResolver,
   },
 };
 
-// The ApolloServer constructor requires two parameters: your schema
-// definition and your set of resolvers.
 export const apolloServer = new ApolloServer<ApolloContext>({
   typeDefs: [gql(readFileSync(schemaPath, "utf-8")), plantDataSchema],
   resolvers,

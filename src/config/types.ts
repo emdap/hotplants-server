@@ -1,8 +1,10 @@
 import { ObjectId } from "mongodb";
 import {
+  GardenPlantData,
   PlantData,
   PlantDataInput,
   SearchRecord,
+  UserGarden,
 } from "../graphqlConfig/graphql";
 import { GbifOccurrenceSearchParams } from "./gbifClient";
 
@@ -25,6 +27,15 @@ export type PlantSearchParams = Omit<
   // TODO: Strange error, if given PlantDataInput as-is, TSOA has error
   // "GenerateMetadataError: Cannot read properties of undefined (reading 'kind')""
   Omit<PlantDataInput, "">;
+
+export type GardenPlantDocument = Pick<
+  GardenPlantData,
+  "addedToGardenTimestamp" | "customThumbnailUrl"
+> & { _id: ObjectId };
+
+export type UserGardenDocument = Omit<UserGarden, "plants"> & {
+  plantRefs: GardenPlantDocument[];
+};
 
 export type SearchRecordDocument = Omit<SearchRecord, "_id"> & {
   _id: ObjectId;

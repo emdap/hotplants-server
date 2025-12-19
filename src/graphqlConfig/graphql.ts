@@ -18,9 +18,49 @@ export type Scalars = {
   ObjectId: { input: any; output: any; }
 };
 
+export type GardenPlantData = PlantDataInterface & {
+  __typename?: 'GardenPlantData';
+  _id: Scalars['ObjectId']['output'];
+  addedTimestamp: Scalars['Float']['output'];
+  addedToGardenTimestamp: Scalars['Float']['output'];
+  bloomColors?: Maybe<Array<Scalars['String']['output']>>;
+  bloomTimes?: Maybe<Array<Scalars['String']['output']>>;
+  commonNames?: Maybe<Array<Scalars['String']['output']>>;
+  customThumbnailUrl?: Maybe<Scalars['String']['output']>;
+  fullOccurrencesCount?: Maybe<Scalars['Int']['output']>;
+  habitat?: Maybe<Scalars['String']['output']>;
+  hardiness?: Maybe<Array<Scalars['Int']['output']>>;
+  height?: Maybe<PlantSize>;
+  isPerennial?: Maybe<Scalars['Boolean']['output']>;
+  lightLevels?: Maybe<Array<Scalars['String']['output']>>;
+  maturityTime?: Maybe<Scalars['String']['output']>;
+  occurrences: Array<PlantOccurrence>;
+  physicalCharactersticsDump?: Maybe<Scalars['String']['output']>;
+  scientificName: Scalars['String']['output'];
+  scrapeSources: Array<Scalars['String']['output']>;
+  soilTypes?: Maybe<Array<Scalars['String']['output']>>;
+  spread?: Maybe<PlantSize>;
+  thumbnailUrl?: Maybe<Scalars['String']['output']>;
+  updatedTimestamp: Scalars['Float']['output'];
+  uses?: Maybe<Array<Scalars['String']['output']>>;
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
+  addToGarden: Scalars['ObjectId']['output'];
+  newGarden: Scalars['ObjectId']['output'];
   replaceWithProxyUrl?: Maybe<Scalars['String']['output']>;
+};
+
+
+export type MutationAddToGardenArgs = {
+  gardenName?: InputMaybe<Scalars['String']['input']>;
+  plantId: Scalars['String']['input'];
+};
+
+
+export type MutationNewGardenArgs = {
+  gardenName?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -30,7 +70,7 @@ export type MutationReplaceWithProxyUrlArgs = {
   replaceUrl: Scalars['String']['input'];
 };
 
-export type PlantData = {
+export type PlantData = PlantDataInterface & {
   __typename?: 'PlantData';
   _id: Scalars['ObjectId']['output'];
   addedTimestamp: Scalars['Float']['output'];
@@ -77,6 +117,30 @@ export type PlantDataInput = {
   uses?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
+export type PlantDataInterface = {
+  _id: Scalars['ObjectId']['output'];
+  addedTimestamp: Scalars['Float']['output'];
+  bloomColors?: Maybe<Array<Scalars['String']['output']>>;
+  bloomTimes?: Maybe<Array<Scalars['String']['output']>>;
+  commonNames?: Maybe<Array<Scalars['String']['output']>>;
+  fullOccurrencesCount?: Maybe<Scalars['Int']['output']>;
+  habitat?: Maybe<Scalars['String']['output']>;
+  hardiness?: Maybe<Array<Scalars['Int']['output']>>;
+  height?: Maybe<PlantSize>;
+  isPerennial?: Maybe<Scalars['Boolean']['output']>;
+  lightLevels?: Maybe<Array<Scalars['String']['output']>>;
+  maturityTime?: Maybe<Scalars['String']['output']>;
+  occurrences: Array<PlantOccurrence>;
+  physicalCharactersticsDump?: Maybe<Scalars['String']['output']>;
+  scientificName: Scalars['String']['output'];
+  scrapeSources: Array<Scalars['String']['output']>;
+  soilTypes?: Maybe<Array<Scalars['String']['output']>>;
+  spread?: Maybe<PlantSize>;
+  thumbnailUrl?: Maybe<Scalars['String']['output']>;
+  updatedTimestamp: Scalars['Float']['output'];
+  uses?: Maybe<Array<Scalars['String']['output']>>;
+};
+
 export type PlantMedia = {
   __typename?: 'PlantMedia';
   isProxyUrl?: Maybe<Scalars['Boolean']['output']>;
@@ -121,10 +185,12 @@ export type PlantSizeUnit =
 
 export type Query = {
   __typename?: 'Query';
+  allUserGardens: Array<UserGarden>;
   plant?: Maybe<PlantData>;
   plantOccurrences?: Maybe<PlantOccurrencesResults>;
   plantSearch: PlantSearchResults;
   searchRecord?: Maybe<SearchRecord>;
+  userGarden?: Maybe<UserGarden>;
 };
 
 
@@ -153,6 +219,11 @@ export type QuerySearchRecordArgs = {
   id: Scalars['String']['input'];
 };
 
+
+export type QueryUserGardenArgs = {
+  gardenName: Scalars['String']['input'];
+};
+
 export type SearchRecord = {
   __typename?: 'SearchRecord';
   _id: Scalars['ObjectId']['output'];
@@ -175,6 +246,13 @@ export type SortField =
 export type SortInput = {
   direction: Scalars['Int']['input'];
   field: SortField;
+};
+
+export type UserGarden = {
+  __typename?: 'UserGarden';
+  gardenName: Scalars['String']['output'];
+  plants: Array<GardenPlantData>;
+  userId: Scalars['String']['output'];
 };
 
 export type WithIndex<TObject> = TObject & Record<string, any>;
@@ -246,16 +324,22 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 ) => TResult | Promise<TResult>;
 
 
+/** Mapping of interface types */
+export type ResolversInterfaceTypes<_RefType extends Record<string, unknown>> = ResolversObject<{
+  PlantDataInterface: ( GardenPlantData ) | ( PlantData );
+}>;
 
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = ResolversObject<{
   Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
   Float: ResolverTypeWrapper<Scalars['Float']['output']>;
+  GardenPlantData: ResolverTypeWrapper<GardenPlantData>;
   Int: ResolverTypeWrapper<Scalars['Int']['output']>;
   Mutation: ResolverTypeWrapper<{}>;
   ObjectId: ResolverTypeWrapper<Scalars['ObjectId']['output']>;
   PlantData: ResolverTypeWrapper<PlantData>;
   PlantDataInput: PlantDataInput;
+  PlantDataInterface: ResolverTypeWrapper<ResolversInterfaceTypes<ResolversTypes>['PlantDataInterface']>;
   PlantMedia: ResolverTypeWrapper<PlantMedia>;
   PlantOccurrence: ResolverTypeWrapper<PlantOccurrence>;
   PlantOccurrencesResults: ResolverTypeWrapper<PlantOccurrencesResults>;
@@ -269,17 +353,20 @@ export type ResolversTypes = ResolversObject<{
   SortField: SortField;
   SortInput: SortInput;
   String: ResolverTypeWrapper<Scalars['String']['output']>;
+  UserGarden: ResolverTypeWrapper<UserGarden>;
 }>;
 
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = ResolversObject<{
   Boolean: Scalars['Boolean']['output'];
   Float: Scalars['Float']['output'];
+  GardenPlantData: GardenPlantData;
   Int: Scalars['Int']['output'];
   Mutation: {};
   ObjectId: Scalars['ObjectId']['output'];
   PlantData: PlantData;
   PlantDataInput: PlantDataInput;
+  PlantDataInterface: ResolversInterfaceTypes<ResolversParentTypes>['PlantDataInterface'];
   PlantMedia: PlantMedia;
   PlantOccurrence: PlantOccurrence;
   PlantOccurrencesResults: PlantOccurrencesResults;
@@ -290,9 +377,39 @@ export type ResolversParentTypes = ResolversObject<{
   SearchRecord: SearchRecord;
   SortInput: SortInput;
   String: Scalars['String']['output'];
+  UserGarden: UserGarden;
+}>;
+
+export type GardenPlantDataResolvers<ContextType = ApolloContext, ParentType extends ResolversParentTypes['GardenPlantData'] = ResolversParentTypes['GardenPlantData']> = ResolversObject<{
+  _id?: Resolver<ResolversTypes['ObjectId'], ParentType, ContextType>;
+  addedTimestamp?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  addedToGardenTimestamp?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  bloomColors?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, ContextType>;
+  bloomTimes?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, ContextType>;
+  commonNames?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, ContextType>;
+  customThumbnailUrl?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  fullOccurrencesCount?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  habitat?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  hardiness?: Resolver<Maybe<Array<ResolversTypes['Int']>>, ParentType, ContextType>;
+  height?: Resolver<Maybe<ResolversTypes['PlantSize']>, ParentType, ContextType>;
+  isPerennial?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
+  lightLevels?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, ContextType>;
+  maturityTime?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  occurrences?: Resolver<Array<ResolversTypes['PlantOccurrence']>, ParentType, ContextType>;
+  physicalCharactersticsDump?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  scientificName?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  scrapeSources?: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType>;
+  soilTypes?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, ContextType>;
+  spread?: Resolver<Maybe<ResolversTypes['PlantSize']>, ParentType, ContextType>;
+  thumbnailUrl?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  updatedTimestamp?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  uses?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
 export type MutationResolvers<ContextType = ApolloContext, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = ResolversObject<{
+  addToGarden?: Resolver<ResolversTypes['ObjectId'], ParentType, ContextType, RequireFields<MutationAddToGardenArgs, 'plantId'>>;
+  newGarden?: Resolver<ResolversTypes['ObjectId'], ParentType, ContextType, Partial<MutationNewGardenArgs>>;
   replaceWithProxyUrl?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType, RequireFields<MutationReplaceWithProxyUrlArgs, 'occurrenceId' | 'plantId' | 'replaceUrl'>>;
 }>;
 
@@ -323,6 +440,31 @@ export type PlantDataResolvers<ContextType = ApolloContext, ParentType extends R
   updatedTimestamp?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
   uses?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
+export type PlantDataInterfaceResolvers<ContextType = ApolloContext, ParentType extends ResolversParentTypes['PlantDataInterface'] = ResolversParentTypes['PlantDataInterface']> = ResolversObject<{
+  __resolveType: TypeResolveFn<'GardenPlantData' | 'PlantData', ParentType, ContextType>;
+  _id?: Resolver<ResolversTypes['ObjectId'], ParentType, ContextType>;
+  addedTimestamp?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  bloomColors?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, ContextType>;
+  bloomTimes?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, ContextType>;
+  commonNames?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, ContextType>;
+  fullOccurrencesCount?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  habitat?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  hardiness?: Resolver<Maybe<Array<ResolversTypes['Int']>>, ParentType, ContextType>;
+  height?: Resolver<Maybe<ResolversTypes['PlantSize']>, ParentType, ContextType>;
+  isPerennial?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
+  lightLevels?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, ContextType>;
+  maturityTime?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  occurrences?: Resolver<Array<ResolversTypes['PlantOccurrence']>, ParentType, ContextType>;
+  physicalCharactersticsDump?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  scientificName?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  scrapeSources?: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType>;
+  soilTypes?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, ContextType>;
+  spread?: Resolver<Maybe<ResolversTypes['PlantSize']>, ParentType, ContextType>;
+  thumbnailUrl?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  updatedTimestamp?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  uses?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, ContextType>;
 }>;
 
 export type PlantMediaResolvers<ContextType = ApolloContext, ParentType extends ResolversParentTypes['PlantMedia'] = ResolversParentTypes['PlantMedia']> = ResolversObject<{
@@ -357,10 +499,12 @@ export type PlantSizeResolvers<ContextType = ApolloContext, ParentType extends R
 }>;
 
 export type QueryResolvers<ContextType = ApolloContext, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
+  allUserGardens?: Resolver<Array<ResolversTypes['UserGarden']>, ParentType, ContextType>;
   plant?: Resolver<Maybe<ResolversTypes['PlantData']>, ParentType, ContextType, RequireFields<QueryPlantArgs, 'id'>>;
   plantOccurrences?: Resolver<Maybe<ResolversTypes['PlantOccurrencesResults']>, ParentType, ContextType, RequireFields<QueryPlantOccurrencesArgs, 'id'>>;
   plantSearch?: Resolver<ResolversTypes['PlantSearchResults'], ParentType, ContextType, Partial<QueryPlantSearchArgs>>;
   searchRecord?: Resolver<Maybe<ResolversTypes['SearchRecord']>, ParentType, ContextType, RequireFields<QuerySearchRecordArgs, 'id'>>;
+  userGarden?: Resolver<Maybe<ResolversTypes['UserGarden']>, ParentType, ContextType, RequireFields<QueryUserGardenArgs, 'gardenName'>>;
 }>;
 
 export type SearchRecordResolvers<ContextType = ApolloContext, ParentType extends ResolversParentTypes['SearchRecord'] = ResolversParentTypes['SearchRecord']> = ResolversObject<{
@@ -372,10 +516,19 @@ export type SearchRecordResolvers<ContextType = ApolloContext, ParentType extend
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
+export type UserGardenResolvers<ContextType = ApolloContext, ParentType extends ResolversParentTypes['UserGarden'] = ResolversParentTypes['UserGarden']> = ResolversObject<{
+  gardenName?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  plants?: Resolver<Array<ResolversTypes['GardenPlantData']>, ParentType, ContextType>;
+  userId?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
 export type Resolvers<ContextType = ApolloContext> = ResolversObject<{
+  GardenPlantData?: GardenPlantDataResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
   ObjectId?: GraphQLScalarType;
   PlantData?: PlantDataResolvers<ContextType>;
+  PlantDataInterface?: PlantDataInterfaceResolvers<ContextType>;
   PlantMedia?: PlantMediaResolvers<ContextType>;
   PlantOccurrence?: PlantOccurrenceResolvers<ContextType>;
   PlantOccurrencesResults?: PlantOccurrencesResultsResolvers<ContextType>;
@@ -383,5 +536,6 @@ export type Resolvers<ContextType = ApolloContext> = ResolversObject<{
   PlantSize?: PlantSizeResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
   SearchRecord?: SearchRecordResolvers<ContextType>;
+  UserGarden?: UserGardenResolvers<ContextType>;
 }>;
 

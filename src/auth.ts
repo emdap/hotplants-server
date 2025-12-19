@@ -12,6 +12,9 @@ const authDb = client.db(DB_NAME);
 export const auth = betterAuth({
   database: mongodbAdapter(authDb),
   trustedOrigins,
+  advanced: {
+    cookiePrefix: "hotplants",
+  },
   //  requireEmailVerification: true,
 
   emailAndPassword: {
