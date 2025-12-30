@@ -33,7 +33,7 @@ export const userGardenResolver: QueryResolvers["userGarden"] = async (
   return gardens[0];
 };
 
-export const allUserGardensResolver: QueryResolvers["allUserGardens"] = (
+export const allUserGardensResolver: QueryResolvers["allUserGardens"] = async (
   _,
   _params,
   context
@@ -152,6 +152,11 @@ const joinGardensWithPlants = (userId: string, gardenName?: string) =>
               },
             },
           },
+        },
+      },
+      {
+        $set: {
+          totalPlants: { $size: "$plants" },
         },
       },
       {

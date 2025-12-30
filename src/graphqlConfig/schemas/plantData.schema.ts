@@ -117,6 +117,8 @@ export const plantDataSchema = buildSchema(`
   type UserGarden {
     userId: String!
     gardenName: String!
+    totalPlants: Int!
+    gardenThumbnailUrl: String
     plants: [GardenPlantData!]!
   }
 
