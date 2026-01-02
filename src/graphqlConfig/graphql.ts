@@ -251,7 +251,9 @@ export type SortInput = {
 export type UserGarden = {
   __typename?: 'UserGarden';
   gardenName: Scalars['String']['output'];
+  gardenThumbnailUrl?: Maybe<Scalars['String']['output']>;
   plants: Array<GardenPlantData>;
+  totalPlants: Scalars['Int']['output'];
   userId: Scalars['String']['output'];
 };
 
@@ -518,7 +520,9 @@ export type SearchRecordResolvers<ContextType = ApolloContext, ParentType extend
 
 export type UserGardenResolvers<ContextType = ApolloContext, ParentType extends ResolversParentTypes['UserGarden'] = ResolversParentTypes['UserGarden']> = ResolversObject<{
   gardenName?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  gardenThumbnailUrl?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   plants?: Resolver<Array<ResolversTypes['GardenPlantData']>, ParentType, ContextType>;
+  totalPlants?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   userId?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
