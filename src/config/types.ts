@@ -8,6 +8,11 @@ import {
 } from "../graphqlConfig/graphql";
 import { GbifOccurrenceSearchParams } from "./gbifClient";
 
+export type SortInput<T = Record<string, unknown>> = {
+  field: keyof T;
+  direction: number;
+};
+
 export type PlantDataDocument = Omit<
   PlantData,
   "_id" | "fullOccurrencesCount"

@@ -61,6 +61,7 @@ export const newGardenResolver: MutationResolvers["newGarden"] = async (
   const newGarden = await userGardensCollection.insertOne({
     userId: user.id,
     gardenName: gardenName?.trim() ?? DEFAULT_GARDEN_NAME(user),
+    totalPlants: 0,
     plantRefs: [],
   });
 

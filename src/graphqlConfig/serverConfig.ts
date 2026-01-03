@@ -3,13 +3,16 @@ import { readFileSync } from "fs";
 import gql from "graphql-tag";
 import path from "path";
 import { Resolvers } from "./graphql";
-import { plantSearchResolver } from "./resolvers/plantSearchResolver";
-import { replaceWithProxyUrlResolver } from "./resolvers/replaceWithProxyUrlResolver";
 import {
   plantOccurrencesResolver,
   plantResolver,
+  plantSearchResolver,
+} from "./resolvers/plantResolvers";
+import { replaceWithProxyUrlResolver } from "./resolvers/replaceWithProxyUrlResolver";
+import {
+  allSearchRecordsResolver,
   searchRecordResolver,
-} from "./resolvers/simpleResolvers";
+} from "./resolvers/searchRecordResolver";
 import {
   addToGardenResolver,
   allUserGardensResolver,
@@ -43,6 +46,7 @@ const resolvers: Resolvers = {
     plantSearch: plantSearchResolver,
 
     searchRecord: searchRecordResolver,
+    allSearchRecords: allSearchRecordsResolver,
 
     userGarden: userGardenResolver,
     allUserGardens: allUserGardensResolver,

@@ -9,7 +9,7 @@ import {
   PlantSearchParams,
   SearchRecordDocument,
 } from "../../config/types";
-import { parseBboxInput } from "../../graphqlConfig/resolvers/plantSearchResolver";
+import { parseBboxInput } from "../../graphqlConfig/resolvers/plantResolvers";
 import { scrapePermaPeople } from "../permaPeopleScraper";
 import { scrapePFAF } from "../pfafScraper";
 import { processGbifResults, searchGbifSpecies } from "./gbifUtil";
@@ -69,14 +69,14 @@ export const extractSearchRecordResponse = ({
 
 export const shouldStartScraping = ({
   status,
-  statusUpdated,
+  statusUpdatedTimestamp,
 }: SearchRecordDocument) => {
   switch (status) {
     case "READY":
       return true;
     case "SCRAPING":
       const now = Date.now();
-      const timeDifference = now - statusUpdated;
+      const timeDifference = now - statusUpdatedTimestamp;
       return timeDifference >= MAX_STALE_SEARCH_MILLISECONDS;
     default:
       return false;

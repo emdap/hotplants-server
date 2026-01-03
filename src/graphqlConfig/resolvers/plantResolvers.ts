@@ -1,12 +1,6 @@
 import { polygon } from "@turf/turf";
 import { Position } from "geojson";
-import {
-  AggregationCursor,
-  Filter,
-  FindCursor,
-  Sort,
-  SortDirection,
-} from "mongodb";
+import { AggregationCursor, Filter, FindCursor, ObjectId } from "mongodb";
 import { plantsCollection } from "../../config/mongodbClient";
 import { PlantDataDocument } from "../../config/types";
 import {
@@ -14,40 +8,46 @@ import {
   PlantData,
   PlantDataInput,
   QueryResolvers,
-  SortInput,
 } from "../graphql";
+import { applySortSkipLimit, countAndResults } from "./resolverUtils";
+
+export const plantResolver: QueryResolvers["plant"] = async (
+  _,
+  { id, boundingPolyCoords }
+) => {
+  if (!boundingPolyCoords) {
+    return plantsCollection.findOne(new ObjectId(id));
+  }
+
+  const { cursor } = createFilteredCursor({ _id: id, boundingPolyCoords });
+  const array = await cursor.toArray();
+  return array[0];
+};
+
+export const plantOccurrencesResolver: QueryResolvers["plantOccurrences"] =
+  async (_, { id, offset, limit }) => {
+    const plant = await plantsCollection.findOne(new ObjectId(id));
+    const useOffset = offset ?? 0;
+
+    return (
+      plant && {
+        count: plant.occurrences.length,
+        results: plant.occurrences.slice(
+          useOffset,
+          limit ? limit + useOffset : undefined
+        ),
+      }
+    );
+  };
 
 export const plantSearchResolver: QueryResolvers["plantSearch"] = async (
   _,
-  { sort, limit, offset, where }
+  { where, ...args }
 ) => {
   const { cursor, filter } = createFilteredCursor(where);
-  const sortObject = getSortObject(sort);
-
-  // TODO: Return distinct options per geographic area for fields like bloom color, bloom time
-  // plantData.distinct("bloomColors", {
-  //   "occurrences.occurrenceCoords": {
-  //     $geoWithin: { $geometry: boundingPolyCoords },
-  //   },
-  // });
-
-  sortObject && cursor.sort(sortObject);
-  offset && cursor.skip(offset);
-  limit && cursor.limit(limit);
-
-  const [count, results] = await Promise.all([
-    plantsCollection.countDocuments(filter),
-    cursor.toArray(),
-  ]);
-
-  return { count, results };
+  applySortSkipLimit(cursor, args);
+  return countAndResults(plantsCollection, cursor, filter);
 };
-
-const getSortObject = (sort?: InputMaybe<SortInput[]>): Sort | undefined =>
-  sort?.reduce<Record<string, SortDirection>>((prev, { field, direction }) => {
-    prev[field] = direction as SortDirection;
-    return prev;
-  }, {});
 
 export const createFilteredCursor = (where?: InputMaybe<PlantDataInput>) => {
   let cursor: FindCursor<PlantData> | AggregationCursor<PlantData>;

@@ -8,10 +8,32 @@ type SearchRecord {
   _id: ObjectId!
   jsonStringSearch: String!
   status: SearchRecordStatus!
-  statusUpdated: Float!
+  statusUpdatedTimestamp: Float!
+  createdTimestamp: Float!
   occurrencesOffset: Int!
+}
+
+enum SearchRecordSortField {
+  createdTimestamp
+  statusUpdatedTimestamp
+  status
+}
+
+input SearchRecordSortInput {
+  field: SearchRecordSortField!
+  direction: Int!
+}
+
+type SearchRecordQueryResults {
+  count: Float!
+  results: [SearchRecord!]!
 }
 
 type Query {
   searchRecord(id: String!): SearchRecord
+  allSearchRecords(
+    sort: [SearchRecordSortInput!]
+    limit: Int
+    offset: Int
+  ): SearchRecordQueryResults!
 }

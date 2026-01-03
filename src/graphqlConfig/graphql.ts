@@ -160,8 +160,8 @@ export type PlantOccurrencesResults = {
   results: Array<PlantOccurrence>;
 };
 
-export type PlantSearchResults = {
-  __typename?: 'PlantSearchResults';
+export type PlantSearchQueryResults = {
+  __typename?: 'PlantSearchQueryResults';
   count: Scalars['Float']['output'];
   results: Array<PlantData>;
 };
@@ -183,14 +183,32 @@ export type PlantSizeUnit =
   | 'in'
   | 'm';
 
+export type PlantSortField =
+  | 'addedTimestamp'
+  | 'scientificName'
+  | 'updatedTimestamp';
+
+export type PlantSortInput = {
+  direction: Scalars['Int']['input'];
+  field: PlantSortField;
+};
+
 export type Query = {
   __typename?: 'Query';
+  allSearchRecords: SearchRecordQueryResults;
   allUserGardens: Array<UserGarden>;
   plant?: Maybe<PlantData>;
   plantOccurrences?: Maybe<PlantOccurrencesResults>;
-  plantSearch: PlantSearchResults;
+  plantSearch: PlantSearchQueryResults;
   searchRecord?: Maybe<SearchRecord>;
   userGarden?: Maybe<UserGarden>;
+};
+
+
+export type QueryAllSearchRecordsArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<SearchRecordSortInput>>;
 };
 
 
@@ -210,7 +228,7 @@ export type QueryPlantOccurrencesArgs = {
 export type QueryPlantSearchArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<SortInput>>;
+  sort?: InputMaybe<Array<PlantSortInput>>;
   where?: InputMaybe<PlantDataInput>;
 };
 
@@ -227,26 +245,33 @@ export type QueryUserGardenArgs = {
 export type SearchRecord = {
   __typename?: 'SearchRecord';
   _id: Scalars['ObjectId']['output'];
+  createdTimestamp: Scalars['Float']['output'];
   jsonStringSearch: Scalars['String']['output'];
   occurrencesOffset: Scalars['Int']['output'];
   status: SearchRecordStatus;
-  statusUpdated: Scalars['Float']['output'];
+  statusUpdatedTimestamp: Scalars['Float']['output'];
+};
+
+export type SearchRecordQueryResults = {
+  __typename?: 'SearchRecordQueryResults';
+  count: Scalars['Float']['output'];
+  results: Array<SearchRecord>;
+};
+
+export type SearchRecordSortField =
+  | 'createdTimestamp'
+  | 'status'
+  | 'statusUpdatedTimestamp';
+
+export type SearchRecordSortInput = {
+  direction: Scalars['Int']['input'];
+  field: SearchRecordSortField;
 };
 
 export type SearchRecordStatus =
   | 'COMPLETE'
   | 'READY'
   | 'SCRAPING';
-
-export type SortField =
-  | 'addedTimestamp'
-  | 'scientificName'
-  | 'updatedTimestamp';
-
-export type SortInput = {
-  direction: Scalars['Int']['input'];
-  field: SortField;
-};
 
 export type UserGarden = {
   __typename?: 'UserGarden';
@@ -345,15 +370,18 @@ export type ResolversTypes = ResolversObject<{
   PlantMedia: ResolverTypeWrapper<PlantMedia>;
   PlantOccurrence: ResolverTypeWrapper<PlantOccurrence>;
   PlantOccurrencesResults: ResolverTypeWrapper<PlantOccurrencesResults>;
-  PlantSearchResults: ResolverTypeWrapper<PlantSearchResults>;
+  PlantSearchQueryResults: ResolverTypeWrapper<PlantSearchQueryResults>;
   PlantSize: ResolverTypeWrapper<PlantSize>;
   PlantSizeInput: PlantSizeInput;
   PlantSizeUnit: PlantSizeUnit;
+  PlantSortField: PlantSortField;
+  PlantSortInput: PlantSortInput;
   Query: ResolverTypeWrapper<{}>;
   SearchRecord: ResolverTypeWrapper<SearchRecord>;
+  SearchRecordQueryResults: ResolverTypeWrapper<SearchRecordQueryResults>;
+  SearchRecordSortField: SearchRecordSortField;
+  SearchRecordSortInput: SearchRecordSortInput;
   SearchRecordStatus: SearchRecordStatus;
-  SortField: SortField;
-  SortInput: SortInput;
   String: ResolverTypeWrapper<Scalars['String']['output']>;
   UserGarden: ResolverTypeWrapper<UserGarden>;
 }>;
@@ -372,12 +400,14 @@ export type ResolversParentTypes = ResolversObject<{
   PlantMedia: PlantMedia;
   PlantOccurrence: PlantOccurrence;
   PlantOccurrencesResults: PlantOccurrencesResults;
-  PlantSearchResults: PlantSearchResults;
+  PlantSearchQueryResults: PlantSearchQueryResults;
   PlantSize: PlantSize;
   PlantSizeInput: PlantSizeInput;
+  PlantSortInput: PlantSortInput;
   Query: {};
   SearchRecord: SearchRecord;
-  SortInput: SortInput;
+  SearchRecordQueryResults: SearchRecordQueryResults;
+  SearchRecordSortInput: SearchRecordSortInput;
   String: Scalars['String']['output'];
   UserGarden: UserGarden;
 }>;
@@ -488,7 +518,7 @@ export type PlantOccurrencesResultsResolvers<ContextType = ApolloContext, Parent
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
-export type PlantSearchResultsResolvers<ContextType = ApolloContext, ParentType extends ResolversParentTypes['PlantSearchResults'] = ResolversParentTypes['PlantSearchResults']> = ResolversObject<{
+export type PlantSearchQueryResultsResolvers<ContextType = ApolloContext, ParentType extends ResolversParentTypes['PlantSearchQueryResults'] = ResolversParentTypes['PlantSearchQueryResults']> = ResolversObject<{
   count?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
   results?: Resolver<Array<ResolversTypes['PlantData']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
@@ -501,20 +531,28 @@ export type PlantSizeResolvers<ContextType = ApolloContext, ParentType extends R
 }>;
 
 export type QueryResolvers<ContextType = ApolloContext, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
+  allSearchRecords?: Resolver<ResolversTypes['SearchRecordQueryResults'], ParentType, ContextType, Partial<QueryAllSearchRecordsArgs>>;
   allUserGardens?: Resolver<Array<ResolversTypes['UserGarden']>, ParentType, ContextType>;
   plant?: Resolver<Maybe<ResolversTypes['PlantData']>, ParentType, ContextType, RequireFields<QueryPlantArgs, 'id'>>;
   plantOccurrences?: Resolver<Maybe<ResolversTypes['PlantOccurrencesResults']>, ParentType, ContextType, RequireFields<QueryPlantOccurrencesArgs, 'id'>>;
-  plantSearch?: Resolver<ResolversTypes['PlantSearchResults'], ParentType, ContextType, Partial<QueryPlantSearchArgs>>;
+  plantSearch?: Resolver<ResolversTypes['PlantSearchQueryResults'], ParentType, ContextType, Partial<QueryPlantSearchArgs>>;
   searchRecord?: Resolver<Maybe<ResolversTypes['SearchRecord']>, ParentType, ContextType, RequireFields<QuerySearchRecordArgs, 'id'>>;
   userGarden?: Resolver<Maybe<ResolversTypes['UserGarden']>, ParentType, ContextType, RequireFields<QueryUserGardenArgs, 'gardenName'>>;
 }>;
 
 export type SearchRecordResolvers<ContextType = ApolloContext, ParentType extends ResolversParentTypes['SearchRecord'] = ResolversParentTypes['SearchRecord']> = ResolversObject<{
   _id?: Resolver<ResolversTypes['ObjectId'], ParentType, ContextType>;
+  createdTimestamp?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
   jsonStringSearch?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   occurrencesOffset?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   status?: Resolver<ResolversTypes['SearchRecordStatus'], ParentType, ContextType>;
-  statusUpdated?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  statusUpdatedTimestamp?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
+export type SearchRecordQueryResultsResolvers<ContextType = ApolloContext, ParentType extends ResolversParentTypes['SearchRecordQueryResults'] = ResolversParentTypes['SearchRecordQueryResults']> = ResolversObject<{
+  count?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  results?: Resolver<Array<ResolversTypes['SearchRecord']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
@@ -536,10 +574,11 @@ export type Resolvers<ContextType = ApolloContext> = ResolversObject<{
   PlantMedia?: PlantMediaResolvers<ContextType>;
   PlantOccurrence?: PlantOccurrenceResolvers<ContextType>;
   PlantOccurrencesResults?: PlantOccurrencesResultsResolvers<ContextType>;
-  PlantSearchResults?: PlantSearchResultsResolvers<ContextType>;
+  PlantSearchQueryResults?: PlantSearchQueryResultsResolvers<ContextType>;
   PlantSize?: PlantSizeResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
   SearchRecord?: SearchRecordResolvers<ContextType>;
+  SearchRecordQueryResults?: SearchRecordQueryResultsResolvers<ContextType>;
   UserGarden?: UserGardenResolvers<ContextType>;
 }>;
 

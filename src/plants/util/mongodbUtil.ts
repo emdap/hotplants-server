@@ -68,11 +68,13 @@ export const createSearchRecord = async (searchParams: PlantSearchParams) => {
   convertPolygon(searchParams.boundingPolyCoords);
 
   const jsonStringSearch = stringifySearch(searchParams);
+  const timestamp = Date.now();
 
   const insertedRecord = await gbifSearchesCollection.insertOne({
     jsonStringSearch,
+    createdTimestamp: timestamp,
     status: "READY",
-    statusUpdated: Date.now(),
+    statusUpdatedTimestamp: timestamp,
     occurrencesOffset: 0,
     originalSearch: searchParams,
   });
@@ -101,9 +103,9 @@ export const updateSearchRecordResults = (
   // Enforce strict typechecking on the updated record
   const updatedSearchRecord: Omit<
     OptionalId<SearchRecordDocument>,
-    "jsonStringSearch" | "originalSearch"
+    "jsonStringSearch" | "originalSearch" | "createdTimestamp"
   > = {
-    statusUpdated: Date.now(),
+    statusUpdatedTimestamp: Date.now(),
     status: scrapeResults?.endOfRecords ? "COMPLETE" : "READY",
     occurrencesOffset:
       searchRecord.occurrencesOffset +

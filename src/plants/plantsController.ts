@@ -48,7 +48,7 @@ export class PlantController {
     if (shouldStartScraping(searchRecord)) {
       const updatedSearch = await gbifSearchesCollection.findOneAndUpdate(
         { _id: searchRecord._id },
-        { $set: { status: "SCRAPING", statusUpdated: Date.now() } },
+        { $set: { status: "SCRAPING", statusUpdatedTimestamp: Date.now() } },
         { returnDocument: "after" }
       );
 
