@@ -1,16 +1,16 @@
 import { Feature, Polygon } from "geojson";
-import { ObjectId, OptionalId } from "mongodb";
+import { ObjectId } from "mongodb";
 import {
   gbifSearchesCollection,
   plantsCollection,
 } from "../../config/mongodbClient";
 import {
-  OccurrenceScrapeResponse,
   PartialPlantData,
   PlantDataDocument,
   PlantSearchParams,
   SearchRecordDocument,
 } from "../../config/types";
+import { searchGbifSpecies } from "./gbifUtil";
 import { convertPolygon } from "./scrapingUtil";
 
 /**
@@ -53,30 +53,36 @@ export const lookupPlantByCoordinates = async ({
     })
     .toArray();
 
-const stringifySearch = (searchParams: PlantSearchParams | null) =>
-  JSON.stringify(searchParams ?? undefined);
-
-export const findGbifSearchRecord = (
-  searchParams: PlantSearchParams | null
-) => {
-  const jsonStringSearch = stringifySearch(searchParams);
-  return gbifSearchesCollection.findOne({ jsonStringSearch });
-};
-
-export const createSearchRecord = async (searchParams: PlantSearchParams) => {
+export const createSearchRecord = async ({
+  commonName,
+  scientificName,
+  locationName,
+  boundingPolyCoords,
+}: PlantSearchParams) => {
   // Converting polygon will error out with invalid input, test conversion before creating
-  convertPolygon(searchParams.boundingPolyCoords);
+  convertPolygon(boundingPolyCoords);
+  // Don't want to store the converted-polygon, easier to parse raw. Converted style is for GBIF API
 
-  const jsonStringSearch = stringifySearch(searchParams);
+  let taxonKeys: number[] | undefined;
+  if (commonName) {
+    taxonKeys = await searchGbifSpecies(commonName.trim());
+  }
+
   const timestamp = Date.now();
 
   const insertedRecord = await gbifSearchesCollection.insertOne({
-    jsonStringSearch,
-    createdTimestamp: timestamp,
     status: "READY",
+    createdTimestamp: timestamp,
     statusUpdatedTimestamp: timestamp,
+
+    commonName: commonName?.trim(),
+    scientificName: scientificName?.trim(),
+    locationName: locationName.trim(),
+    boundingPolyCoords,
+    taxonKeys,
+
+    totalOccurrences: -1,
     occurrencesOffset: 0,
-    originalSearch: searchParams,
   });
 
   return (
@@ -85,37 +91,43 @@ export const createSearchRecord = async (searchParams: PlantSearchParams) => {
   );
 };
 
-export const updateSearchRecordResults = (
+export const finishRunningSearch = (
   searchRecord: SearchRecordDocument,
-  scrapeResults?: OccurrenceScrapeResponse
+  searchResults: {
+    occurrencesProcessed: number;
+    endOfRecords: boolean;
+  } | null,
+  debug?: boolean
 ) => {
-  console.info(
-    "close search record",
-    searchRecord._id,
-    "; current total occurrences searched:",
-    searchRecord.occurrencesOffset,
-    "; new occurrences found:",
-    scrapeResults?.totalOccurrencesScraped,
-    "; end of records?",
-    scrapeResults?.endOfRecords
-  );
+  debug &&
+    console.info(
+      `close search record ${searchRecord._id}
+        current total occurrences searched: ${searchRecord.occurrencesOffset}
+      \nsearch ran: ${Boolean(searchResults)}
+        total occurrences found: ${searchResults?.occurrencesProcessed}
+        end of records: ${searchResults?.endOfRecords}`
+    );
 
-  // Enforce strict typechecking on the updated record
-  const updatedSearchRecord: Omit<
-    OptionalId<SearchRecordDocument>,
-    "jsonStringSearch" | "originalSearch" | "createdTimestamp"
-  > = {
+  const updatedSearchRecord: Partial<SearchRecordDocument> = {
     statusUpdatedTimestamp: Date.now(),
-    status: scrapeResults?.endOfRecords ? "COMPLETE" : "READY",
+    status: searchResults?.endOfRecords ? "COMPLETE" : "READY",
+
     occurrencesOffset:
       searchRecord.occurrencesOffset +
-      (scrapeResults ? scrapeResults?.totalOccurrencesScraped : 0),
+      (searchResults?.occurrencesProcessed ?? 0),
   };
 
-  return gbifSearchesCollection.updateOne(
-    { _id: searchRecord._id },
-    {
-      $set: updatedSearchRecord,
-    }
-  );
+  return updateSearchRecord(searchRecord._id, updatedSearchRecord);
 };
+
+export const updateSearchRecord = (
+  searchRecordId: ObjectId,
+  newData: Partial<SearchRecordDocument>
+) =>
+  gbifSearchesCollection.findOneAndUpdate(
+    { _id: searchRecordId },
+    {
+      $set: newData,
+    },
+    { returnDocument: "after" }
+  );

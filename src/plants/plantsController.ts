@@ -2,12 +2,11 @@ import { ObjectId } from "mongodb";
 import { Body, Get, Path, Post, Res, Route, TsoaResponse } from "tsoa";
 import { gbifSearchesCollection } from "../config/mongodbClient";
 import { PlantSearchParams } from "../config/types";
-import { createSearchRecord, findGbifSearchRecord } from "./util/mongodbUtil";
+import { createSearchRecord } from "./util/mongodbUtil";
 import {
-  createGbifQuery,
-  extractSearchRecordResponse,
+  extractSearchRecordSummary,
   searchGbifOccurrences,
-  SearchRecordResponse,
+  SearchRecordSummary,
   shouldStartScraping,
 } from "./util/scrapingUtil";
 
@@ -15,28 +14,31 @@ import {
 export class PlantController {
   @Post("getSearchRecord")
   public async getSearchRecord(
-    @Body() plantSearch: PlantSearchParams = {},
+    @Body() plantSearch: PlantSearchParams,
     @Res() errorResponse: TsoaResponse<500, string>
-  ): Promise<SearchRecordResponse> {
-    const existingSearchRecord = await findGbifSearchRecord(plantSearch);
+  ): Promise<SearchRecordSummary> {
+    const existingSearchRecord = await gbifSearchesCollection.findOne(
+      plantSearch
+    );
+
     if (existingSearchRecord) {
-      return extractSearchRecordResponse(existingSearchRecord);
+      return extractSearchRecordSummary(existingSearchRecord);
     }
 
     const newSearchRecord = await createSearchRecord(plantSearch);
     return newSearchRecord
-      ? extractSearchRecordResponse(newSearchRecord)
+      ? extractSearchRecordSummary(newSearchRecord)
       : errorResponse(500, "Unable to create search record");
   }
 
   /**
-   * Initiate a new scrape of occurrences from GBIF and combine with PFAF data.
+   * Initiate a new search of occurrences from GBIF and combine with PFAF data.
    */
-  @Get("scrapeOccurrences/{searchRecordId}")
-  public async scrapeOccurrences(
+  @Get("runSearch/{searchRecordId}")
+  public async runSearch(
     @Path() searchRecordId: string,
     @Res() errorResponse: TsoaResponse<500, string>
-  ): Promise<SearchRecordResponse> {
+  ): Promise<SearchRecordSummary> {
     const searchRecord = await gbifSearchesCollection.findOne({
       _id: new ObjectId(searchRecordId),
     });
@@ -59,13 +61,11 @@ export class PlantController {
         );
       }
 
-      const gbifQuery = await createGbifQuery(searchRecord.originalSearch);
-      searchGbifOccurrences(gbifQuery, searchRecord);
-
-      return extractSearchRecordResponse(updatedSearch);
+      searchGbifOccurrences(updatedSearch);
+      return extractSearchRecordSummary(updatedSearch);
     } else {
       console.info("Will not start scraping");
-      return extractSearchRecordResponse(searchRecord);
+      return extractSearchRecordSummary(searchRecord);
     }
   }
 }

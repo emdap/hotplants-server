@@ -4,7 +4,6 @@ import {
   GbifOccurrenceSearchParams,
 } from "../../config/gbifClient";
 import {
-  OccurrenceScrapeResponse,
   PartialPlantData,
   PlantSearchParams,
   SearchRecordDocument,
@@ -12,15 +11,13 @@ import {
 import { parseBboxInput } from "../../graphqlConfig/resolvers/plantResolvers";
 import { scrapePermaPeople } from "../permaPeopleScraper";
 import { scrapePFAF } from "../pfafScraper";
-import { processGbifResults, searchGbifSpecies } from "./gbifUtil";
-import { updateSearchRecordResults } from "./mongodbUtil";
+import { processGbifResults } from "./gbifUtil";
+import { finishRunningSearch, updateSearchRecord } from "./mongodbUtil";
 
-const EMPTY_OCCURRENCE_SCRAPE_RESPONSE: OccurrenceScrapeResponse = {
-  totalOccurrencesScraped: 0,
-  endOfRecords: false,
-};
-
-const DEFAULT_GBIF_SEARCH_PARAMS: PlantSearchParams = {
+const DEFAULT_GBIF_SEARCH_PARAMS: Omit<
+  GbifOccurrenceSearchParams,
+  keyof PlantSearchParams
+> = {
   kingdomKey: [6],
   basisOfRecord: ["HUMAN_OBSERVATION", "OBSERVATION", "MACHINE_OBSERVATION"],
   limit: 300,
@@ -52,19 +49,19 @@ export const SCRAPE_SOURCE_INFO: Record<
   perma: { url: "https://permapeople.org/plants/", spaceReplacement: "-" },
 };
 
-export type SearchRecordResponse = { id: string } & Pick<
+export type SearchRecordSummary = { id: string } & Pick<
   SearchRecordDocument,
   "status" | "occurrencesOffset"
 >;
 
-export const extractSearchRecordResponse = ({
+export const extractSearchRecordSummary = ({
   _id,
   status,
   occurrencesOffset,
-}: SearchRecordDocument): SearchRecordResponse => ({
+}: SearchRecordDocument): SearchRecordSummary => ({
   id: _id.toString(),
   status: status,
-  occurrencesOffset: occurrencesOffset,
+  occurrencesOffset,
 });
 
 export const shouldStartScraping = ({
@@ -84,34 +81,48 @@ export const shouldStartScraping = ({
 };
 
 export const searchGbifOccurrences = async (
-  gbifQuery: GbifOccurrenceSearchParams,
   searchRecord: SearchRecordDocument
 ) => {
-  let scrapeResult = EMPTY_OCCURRENCE_SCRAPE_RESPONSE;
+  const geometry = convertPolygon(searchRecord.boundingPolyCoords);
+
   try {
     const { data } = await gbifClient.GET("/occurrence/search", {
       params: {
         query: {
-          ...gbifQuery,
+          geometry,
+          taxonKey: searchRecord.taxonKeys,
+          scientificName: searchRecord.scientificName
+            ? [searchRecord.scientificName]
+            : undefined,
           offset: searchRecord.occurrencesOffset,
+          ...DEFAULT_GBIF_SEARCH_PARAMS,
         },
       },
     });
 
     if (data?.results) {
-      await processGbifResults(data.results);
-      scrapeResult = {
-        totalOccurrencesScraped: data.results.length,
-        endOfRecords: Boolean(data.endOfRecords),
-      };
-    } else {
-      scrapeResult = { totalOccurrencesScraped: 0, endOfRecords: true };
+      await Promise.all([
+        updateSearchRecord(searchRecord._id, { totalOccurrences: data?.count }),
+        processGbifResults(data.results),
+      ]);
+
+      finishRunningSearch(
+        searchRecord,
+        {
+          occurrencesProcessed: data.results?.length ?? 0,
+          endOfRecords:
+            data.endOfRecords === undefined ? true : data.endOfRecords,
+        },
+        true
+      );
+
+      return;
     }
   } catch (error) {
     console.error(error);
   }
 
-  updateSearchRecordResults(searchRecord, scrapeResult);
+  finishRunningSearch(searchRecord, null, true);
 };
 
 /** Convert the coordinates to a polygon. Will error out if format is incorrect. */
@@ -120,23 +131,18 @@ export const convertPolygon = (boundingPolyCoords?: number[][][] | null) => {
   return validPoly ? ([stringify(validPoly)] as string[]) : undefined;
 };
 
-export const createGbifQuery = async (
-  body: PlantSearchParams
-): Promise<GbifOccurrenceSearchParams> => {
-  const { boundingPolyCoords, commonName, scientificName, ...searchParams } = {
-    ...body,
-    ...DEFAULT_GBIF_SEARCH_PARAMS,
-  };
-
+export const createGbifQuery = async ({
+  scientificName,
+  taxonKeys,
+  boundingPolyCoords,
+}: SearchRecordDocument): Promise<GbifOccurrenceSearchParams> => {
   const geometry = convertPolygon(boundingPolyCoords);
-
-  const taxonKey = commonName ? await searchGbifSpecies(commonName) : undefined;
 
   return {
     geometry,
-    taxonKey,
+    taxonKey: taxonKeys,
     scientificName: scientificName ? [scientificName] : undefined,
-    ...searchParams,
+    ...DEFAULT_GBIF_SEARCH_PARAMS,
   };
 };
 

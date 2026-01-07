@@ -45,6 +45,10 @@ export type GardenPlantData = PlantDataInterface & {
   uses?: Maybe<Array<Scalars['String']['output']>>;
 };
 
+export type LocationType =
+  | 'CUSTOM'
+  | 'MAP';
+
 export type Mutation = {
   __typename?: 'Mutation';
   addToGarden: Scalars['ObjectId']['output'];
@@ -245,11 +249,16 @@ export type QueryUserGardenArgs = {
 export type SearchRecord = {
   __typename?: 'SearchRecord';
   _id: Scalars['ObjectId']['output'];
+  boundingPolyCoords: Array<Array<Array<Scalars['Float']['output']>>>;
+  commonName?: Maybe<Scalars['String']['output']>;
   createdTimestamp: Scalars['Float']['output'];
-  jsonStringSearch: Scalars['String']['output'];
+  locationName: Scalars['String']['output'];
   occurrencesOffset: Scalars['Int']['output'];
+  scientificName?: Maybe<Scalars['String']['output']>;
   status: SearchRecordStatus;
   statusUpdatedTimestamp: Scalars['Float']['output'];
+  taxonKeys?: Maybe<Array<Scalars['Int']['output']>>;
+  totalOccurrences: Scalars['Int']['output'];
 };
 
 export type SearchRecordQueryResults = {
@@ -362,6 +371,7 @@ export type ResolversTypes = ResolversObject<{
   Float: ResolverTypeWrapper<Scalars['Float']['output']>;
   GardenPlantData: ResolverTypeWrapper<GardenPlantData>;
   Int: ResolverTypeWrapper<Scalars['Int']['output']>;
+  LocationType: LocationType;
   Mutation: ResolverTypeWrapper<{}>;
   ObjectId: ResolverTypeWrapper<Scalars['ObjectId']['output']>;
   PlantData: ResolverTypeWrapper<PlantData>;
@@ -542,11 +552,16 @@ export type QueryResolvers<ContextType = ApolloContext, ParentType extends Resol
 
 export type SearchRecordResolvers<ContextType = ApolloContext, ParentType extends ResolversParentTypes['SearchRecord'] = ResolversParentTypes['SearchRecord']> = ResolversObject<{
   _id?: Resolver<ResolversTypes['ObjectId'], ParentType, ContextType>;
+  boundingPolyCoords?: Resolver<Array<Array<Array<ResolversTypes['Float']>>>, ParentType, ContextType>;
+  commonName?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   createdTimestamp?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
-  jsonStringSearch?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  locationName?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   occurrencesOffset?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  scientificName?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   status?: Resolver<ResolversTypes['SearchRecordStatus'], ParentType, ContextType>;
   statusUpdatedTimestamp?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  taxonKeys?: Resolver<Maybe<Array<ResolversTypes['Int']>>, ParentType, ContextType>;
+  totalOccurrences?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 

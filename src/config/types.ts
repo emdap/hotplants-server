@@ -2,11 +2,9 @@ import { ObjectId } from "mongodb";
 import {
   GardenPlantData,
   PlantData,
-  PlantDataInput,
   SearchRecord,
   UserGarden,
 } from "../graphqlConfig/graphql";
-import { GbifOccurrenceSearchParams } from "./gbifClient";
 
 export type SortInput<T = Record<string, unknown>> = {
   field: keyof T;
@@ -25,13 +23,15 @@ export type PartialPlantData = Omit<
   "_id" | "addedTimestamp" | "updatedTimestamp"
 >;
 
-export type PlantSearchParams = Omit<
-  GbifOccurrenceSearchParams,
-  "geometry" | "scientificName"
-> &
-  // TODO: Strange error, if given PlantDataInput as-is, TSOA has error
-  // "GenerateMetadataError: Cannot read properties of undefined (reading 'kind')""
-  Omit<PlantDataInput, "">;
+export type SearchRecordDocument = Omit<SearchRecord, "_id" | "taxonKeys"> & {
+  _id: ObjectId;
+  taxonKeys?: number[];
+};
+
+export type PlantSearchParams = Pick<
+  SearchRecordDocument,
+  "locationName" | "commonName" | "scientificName" | "boundingPolyCoords"
+>;
 
 export type GardenPlantDocument = Pick<
   GardenPlantData,
@@ -40,19 +40,4 @@ export type GardenPlantDocument = Pick<
 
 export type UserGardenDocument = Omit<UserGarden, "plants"> & {
   plantRefs: GardenPlantDocument[];
-};
-
-export type SearchRecordDocument = Omit<SearchRecord, "_id"> & {
-  _id: ObjectId;
-  originalSearch: PlantSearchParams;
-};
-
-/**
- * @property totalOccurrencesScraped: The total (non-unique) occurrences found
- * @property endOfRecords: Direct property from GBIF response, whether there are more occurrences
- *   via this search
- */
-export type OccurrenceScrapeResponse = {
-  totalOccurrencesScraped: number;
-  endOfRecords: boolean;
 };

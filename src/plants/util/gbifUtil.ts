@@ -135,8 +135,12 @@ const combineOccurrences = <
  * or scraped data for the plant from PFAF.
  *
  * @param gbifResults GBIF occurrence results directly from GBIF occurrence API
+ *
+ * @returns number of new unique occurences found
  */
-export const processGbifResults = (gbifResults: GbifOccurenceResult[]) => {
+export const processGbifResults = async (
+  gbifResults: GbifOccurenceResult[]
+) => {
   const processGbifPlant = async (
     scientificName: string,
     occurrenceData: NormalizedGbifResult
