@@ -54,10 +54,11 @@ export const lookupPlantByCoordinates = async ({
     .toArray();
 
 export const createSearchRecord = async ({
+  locationName,
+  locationSource,
+  boundingPolyCoords,
   commonName,
   scientificName,
-  locationName,
-  boundingPolyCoords,
 }: PlantSearchParams) => {
   // Converting polygon will error out with invalid input, test conversion before creating
   convertPolygon(boundingPolyCoords);
@@ -75,10 +76,11 @@ export const createSearchRecord = async ({
     createdTimestamp: timestamp,
     statusUpdatedTimestamp: timestamp,
 
+    locationName: locationName.trim(),
+    locationSource,
+    boundingPolyCoords,
     commonName: commonName?.trim(),
     scientificName: scientificName?.trim(),
-    locationName: locationName.trim(),
-    boundingPolyCoords,
     taxonKeys,
 
     totalOccurrences: -1,

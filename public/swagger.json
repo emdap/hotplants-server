@@ -54,7 +54,14 @@
 				"type": "string",
 				"nullable": true
 			},
-			"Pick_SearchRecordDocument.locationName-or-commonName-or-scientificName-or-boundingPolyCoords_": {
+			"LocationSource": {
+				"type": "string",
+				"enum": [
+					"custom",
+					"search"
+				]
+			},
+			"Pick_SearchRecordDocument.locationName-or-locationSource-or-boundingPolyCoords-or-commonName-or-scientificName_": {
 				"properties": {
 					"boundingPolyCoords": {
 						"items": {
@@ -75,19 +82,23 @@
 					"locationName": {
 						"type": "string"
 					},
+					"locationSource": {
+						"$ref": "#/components/schemas/LocationSource"
+					},
 					"scientificName": {
 						"$ref": "#/components/schemas/Maybe_string_"
 					}
 				},
 				"required": [
 					"boundingPolyCoords",
-					"locationName"
+					"locationName",
+					"locationSource"
 				],
 				"type": "object",
 				"description": "From T, pick a set of properties whose keys are in the union K"
 			},
 			"PlantSearchParams": {
-				"$ref": "#/components/schemas/Pick_SearchRecordDocument.locationName-or-commonName-or-scientificName-or-boundingPolyCoords_"
+				"$ref": "#/components/schemas/Pick_SearchRecordDocument.locationName-or-locationSource-or-boundingPolyCoords-or-commonName-or-scientificName_"
 			}
 		},
 		"securitySchemes": {}

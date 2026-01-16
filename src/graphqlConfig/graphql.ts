@@ -45,9 +45,9 @@ export type GardenPlantData = PlantDataInterface & {
   uses?: Maybe<Array<Scalars['String']['output']>>;
 };
 
-export type LocationType =
-  | 'CUSTOM'
-  | 'MAP';
+export type LocationSource =
+  | 'custom'
+  | 'search';
 
 export type Mutation = {
   __typename?: 'Mutation';
@@ -253,6 +253,7 @@ export type SearchRecord = {
   commonName?: Maybe<Scalars['String']['output']>;
   createdTimestamp: Scalars['Float']['output'];
   locationName: Scalars['String']['output'];
+  locationSource: LocationSource;
   occurrencesOffset: Scalars['Int']['output'];
   scientificName?: Maybe<Scalars['String']['output']>;
   status: SearchRecordStatus;
@@ -371,7 +372,7 @@ export type ResolversTypes = ResolversObject<{
   Float: ResolverTypeWrapper<Scalars['Float']['output']>;
   GardenPlantData: ResolverTypeWrapper<GardenPlantData>;
   Int: ResolverTypeWrapper<Scalars['Int']['output']>;
-  LocationType: LocationType;
+  LocationSource: LocationSource;
   Mutation: ResolverTypeWrapper<{}>;
   ObjectId: ResolverTypeWrapper<Scalars['ObjectId']['output']>;
   PlantData: ResolverTypeWrapper<PlantData>;
@@ -556,6 +557,7 @@ export type SearchRecordResolvers<ContextType = ApolloContext, ParentType extend
   commonName?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   createdTimestamp?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
   locationName?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  locationSource?: Resolver<ResolversTypes['LocationSource'], ParentType, ContextType>;
   occurrencesOffset?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   scientificName?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   status?: Resolver<ResolversTypes['SearchRecordStatus'], ParentType, ContextType>;

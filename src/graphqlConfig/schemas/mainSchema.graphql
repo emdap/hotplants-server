@@ -4,9 +4,9 @@ enum SearchRecordStatus {
   COMPLETE
 }
 
-enum LocationType {
-  MAP
-  CUSTOM
+enum LocationSource {
+  custom
+  search
 }
 
 type SearchRecord {
@@ -15,11 +15,12 @@ type SearchRecord {
   status: SearchRecordStatus!
   statusUpdatedTimestamp: Float!
 
+  locationName: String!
+  locationSource: LocationSource!
   boundingPolyCoords: [[[Float!]!]!]!
   scientificName: String
   commonName: String
 
-  locationName: String!
   taxonKeys: [Int!]
 
   totalOccurrences: Int!

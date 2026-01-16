@@ -30,7 +30,11 @@ export type SearchRecordDocument = Omit<SearchRecord, "_id" | "taxonKeys"> & {
 
 export type PlantSearchParams = Pick<
   SearchRecordDocument,
-  "locationName" | "commonName" | "scientificName" | "boundingPolyCoords"
+  | "locationName"
+  | "locationSource"
+  | "boundingPolyCoords"
+  | "commonName"
+  | "scientificName"
 >;
 
 export type GardenPlantDocument = Pick<
