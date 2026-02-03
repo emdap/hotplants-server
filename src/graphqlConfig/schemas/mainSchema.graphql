@@ -13,7 +13,7 @@ type SearchRecord {
   _id: ObjectId!
   createdTimestamp: Float!
   status: SearchRecordStatus!
-  statusUpdatedTimestamp: Float!
+  statusUpdatedTimestamp: Float
 
   locationName: String!
   locationSource: LocationSource!
@@ -45,6 +45,7 @@ type SearchRecordQueryResults {
 
 type Query {
   searchRecord(id: String!): SearchRecord
+  searchRecordPlantCount(id: String!): Int!
   allSearchRecords(
     sort: [SearchRecordSortInput!]
     limit: Int

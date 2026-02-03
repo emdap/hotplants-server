@@ -205,6 +205,7 @@ export type Query = {
   plantOccurrences?: Maybe<PlantOccurrencesResults>;
   plantSearch: PlantSearchQueryResults;
   searchRecord?: Maybe<SearchRecord>;
+  searchRecordPlantCount: Scalars['Int']['output'];
   userGarden?: Maybe<UserGarden>;
 };
 
@@ -242,6 +243,11 @@ export type QuerySearchRecordArgs = {
 };
 
 
+export type QuerySearchRecordPlantCountArgs = {
+  id: Scalars['String']['input'];
+};
+
+
 export type QueryUserGardenArgs = {
   gardenName: Scalars['String']['input'];
 };
@@ -257,7 +263,7 @@ export type SearchRecord = {
   occurrencesOffset: Scalars['Int']['output'];
   scientificName?: Maybe<Scalars['String']['output']>;
   status: SearchRecordStatus;
-  statusUpdatedTimestamp: Scalars['Float']['output'];
+  statusUpdatedTimestamp?: Maybe<Scalars['Float']['output']>;
   taxonKeys?: Maybe<Array<Scalars['Int']['output']>>;
   totalOccurrences: Scalars['Int']['output'];
 };
@@ -548,6 +554,7 @@ export type QueryResolvers<ContextType = ApolloContext, ParentType extends Resol
   plantOccurrences?: Resolver<Maybe<ResolversTypes['PlantOccurrencesResults']>, ParentType, ContextType, RequireFields<QueryPlantOccurrencesArgs, 'id'>>;
   plantSearch?: Resolver<ResolversTypes['PlantSearchQueryResults'], ParentType, ContextType, Partial<QueryPlantSearchArgs>>;
   searchRecord?: Resolver<Maybe<ResolversTypes['SearchRecord']>, ParentType, ContextType, RequireFields<QuerySearchRecordArgs, 'id'>>;
+  searchRecordPlantCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType, RequireFields<QuerySearchRecordPlantCountArgs, 'id'>>;
   userGarden?: Resolver<Maybe<ResolversTypes['UserGarden']>, ParentType, ContextType, RequireFields<QueryUserGardenArgs, 'gardenName'>>;
 }>;
 
@@ -561,7 +568,7 @@ export type SearchRecordResolvers<ContextType = ApolloContext, ParentType extend
   occurrencesOffset?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   scientificName?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   status?: Resolver<ResolversTypes['SearchRecordStatus'], ParentType, ContextType>;
-  statusUpdatedTimestamp?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  statusUpdatedTimestamp?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   taxonKeys?: Resolver<Maybe<Array<ResolversTypes['Int']>>, ParentType, ContextType>;
   totalOccurrences?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;

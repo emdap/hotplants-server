@@ -11,6 +11,7 @@ import {
 import { replaceWithProxyUrlResolver } from "./resolvers/replaceWithProxyUrlResolver";
 import {
   allSearchRecordsResolver,
+  searchRecordPlantCountResolver,
   searchRecordResolver,
 } from "./resolvers/searchRecordResolver";
 import {
@@ -29,7 +30,7 @@ const resolvers: Resolvers = {
       { occurrences, fullOccurrencesCount },
       _args,
       _context,
-      { operation }
+      { operation },
     ) =>
       operation.name?.value === "plant" || fullOccurrencesCount === undefined
         ? occurrences.length
@@ -47,6 +48,7 @@ const resolvers: Resolvers = {
 
     searchRecord: searchRecordResolver,
     allSearchRecords: allSearchRecordsResolver,
+    searchRecordPlantCount: searchRecordPlantCountResolver,
 
     userGarden: userGardenResolver,
     allUserGardens: allUserGardensResolver,

@@ -13,7 +13,7 @@ import { applySortSkipLimit, countAndResults } from "./resolverUtils";
 
 export const plantResolver: QueryResolvers["plant"] = async (
   _,
-  { id, boundingPolyCoords }
+  { id, boundingPolyCoords },
 ) => {
   if (!boundingPolyCoords) {
     return plantsCollection.findOne(new ObjectId(id));
@@ -34,7 +34,7 @@ export const plantOccurrencesResolver: QueryResolvers["plantOccurrences"] =
         count: plant.occurrences.length,
         results: plant.occurrences.slice(
           useOffset,
-          limit ? limit + useOffset : undefined
+          limit ? limit + useOffset : undefined,
         ),
       }
     );
@@ -42,7 +42,7 @@ export const plantOccurrencesResolver: QueryResolvers["plantOccurrences"] =
 
 export const plantSearchResolver: QueryResolvers["plantSearch"] = async (
   _,
-  { where, ...args }
+  { where, ...args },
 ) => {
   const { cursor, filter } = createFilteredCursor(where);
   applySortSkipLimit(cursor, args);
@@ -99,7 +99,7 @@ export const createFilteredCursor = (where?: InputMaybe<PlantDataInput>) => {
   return { cursor, filter };
 };
 
-const extractPlantFilter = (filter: PlantDataInput) =>
+export const extractPlantFilter = (filter: PlantDataInput) =>
   Object.entries(filter).reduce<Filter<PlantDataDocument>>(
     (prev, [property, value]) => {
       const valueIsArray = Array.isArray(value);
@@ -125,7 +125,7 @@ const extractPlantFilter = (filter: PlantDataInput) =>
 
       return prev;
     },
-    {}
+    {},
   );
 
 export const parseBboxInput = (bbox: Position[][]) => {
@@ -136,7 +136,7 @@ export const parseBboxInput = (bbox: Position[][]) => {
       "Error converting input to polygon:",
       bbox,
       "\nError:",
-      error
+      error,
     );
 
     throw error;

@@ -69,12 +69,9 @@ export const createSearchRecord = async ({
     taxonKeys = await searchGbifSpecies(commonName.trim());
   }
 
-  const timestamp = Date.now();
-
   const insertedRecord = await gbifSearchesCollection.insertOne({
     status: "READY",
-    createdTimestamp: timestamp,
-    statusUpdatedTimestamp: timestamp,
+    createdTimestamp: Date.now(),
 
     locationName: locationName.trim(),
     locationSource,
@@ -99,7 +96,7 @@ export const finishRunningSearch = (
     occurrencesProcessed: number;
     endOfRecords: boolean;
   } | null,
-  debug?: boolean
+  debug?: boolean,
 ) => {
   debug &&
     console.info(
@@ -107,7 +104,7 @@ export const finishRunningSearch = (
         current total occurrences searched: ${searchRecord.occurrencesOffset}
       \nsearch ran: ${Boolean(searchResults)}
         total occurrences found: ${searchResults?.occurrencesProcessed}
-        end of records: ${searchResults?.endOfRecords}`
+        end of records: ${searchResults?.endOfRecords}`,
     );
 
   const updatedSearchRecord: Partial<SearchRecordDocument> = {
@@ -124,12 +121,12 @@ export const finishRunningSearch = (
 
 export const updateSearchRecord = (
   searchRecordId: ObjectId,
-  newData: Partial<SearchRecordDocument>
+  newData: Partial<SearchRecordDocument>,
 ) =>
   gbifSearchesCollection.findOneAndUpdate(
     { _id: searchRecordId },
     {
       $set: newData,
     },
-    { returnDocument: "after" }
+    { returnDocument: "after" },
   );

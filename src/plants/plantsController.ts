@@ -2,7 +2,7 @@ import { ObjectId } from "mongodb";
 import { Body, Get, Path, Post, Res, Route, TsoaResponse } from "tsoa";
 import { gbifSearchesCollection } from "../config/mongodbClient";
 import { PlantSearchParams } from "../config/types";
-import { createSearchRecord } from "./util/mongodbUtil";
+import { createSearchRecord, updateSearchRecord } from "./util/mongodbUtil";
 import {
   extractSearchRecordSummary,
   searchGbifOccurrences,
@@ -15,11 +15,10 @@ export class PlantController {
   @Post("getSearchRecord")
   public async getSearchRecord(
     @Body() plantSearch: PlantSearchParams,
-    @Res() errorResponse: TsoaResponse<500, string>
+    @Res() errorResponse: TsoaResponse<500, string>,
   ): Promise<SearchRecordSummary> {
-    const existingSearchRecord = await gbifSearchesCollection.findOne(
-      plantSearch
-    );
+    const existingSearchRecord =
+      await gbifSearchesCollection.findOne(plantSearch);
 
     if (existingSearchRecord) {
       return extractSearchRecordSummary(existingSearchRecord);
@@ -37,7 +36,7 @@ export class PlantController {
   @Get("runSearch/{searchRecordId}")
   public async runSearch(
     @Path() searchRecordId: string,
-    @Res() errorResponse: TsoaResponse<500, string>
+    @Res() errorResponse: TsoaResponse<500, string>,
   ): Promise<SearchRecordSummary> {
     const searchRecord = await gbifSearchesCollection.findOne({
       _id: new ObjectId(searchRecordId),
@@ -48,16 +47,15 @@ export class PlantController {
     }
 
     if (shouldStartScraping(searchRecord)) {
-      const updatedSearch = await gbifSearchesCollection.findOneAndUpdate(
-        { _id: searchRecord._id },
-        { $set: { status: "SCRAPING", statusUpdatedTimestamp: Date.now() } },
-        { returnDocument: "after" }
-      );
+      const updatedSearch = await updateSearchRecord(searchRecord._id, {
+        status: "SCRAPING",
+        statusUpdatedTimestamp: Date.now(),
+      });
 
       if (!updatedSearch) {
         return errorResponse(
           500,
-          "Error updating search record, please try again"
+          "Error updating search record, please try again",
         );
       }
 

@@ -72,6 +72,10 @@ export const shouldStartScraping = ({
     case "READY":
       return true;
     case "SCRAPING":
+      if (!statusUpdatedTimestamp) {
+        return false;
+      }
+
       const now = Date.now();
       const timeDifference = now - statusUpdatedTimestamp;
       return timeDifference >= MAX_STALE_SEARCH_MILLISECONDS;
@@ -81,7 +85,7 @@ export const shouldStartScraping = ({
 };
 
 export const searchGbifOccurrences = async (
-  searchRecord: SearchRecordDocument
+  searchRecord: SearchRecordDocument,
 ) => {
   const geometry = convertPolygon(searchRecord.boundingPolyCoords);
 
@@ -113,7 +117,7 @@ export const searchGbifOccurrences = async (
           endOfRecords:
             data.endOfRecords === undefined ? true : data.endOfRecords,
         },
-        true
+        true,
       );
 
       return;
@@ -148,7 +152,7 @@ export const createGbifQuery = async ({
 
 export const iteratePlantScrapers = (
   scientificName: string,
-  previousScrapeSources?: string[]
+  previousScrapeSources?: string[],
 ) =>
   Object.keys(SCRAPE_SOURCE_INFO).map((source) => {
     const scrapeSource = source as ScrapeSource;
@@ -163,7 +167,7 @@ export const iteratePlantScrapers = (
 
 export const scrapePlantByName = async (
   scientificName: string,
-  scrapeFrom: ScrapeSource
+  scrapeFrom: ScrapeSource,
 ) => {
   switch (scrapeFrom) {
     case "perma":
@@ -181,7 +185,7 @@ export const getScrapeUrl = (scientificName: string, source: ScrapeSource) => {
 const PREFERRED_SOURCE: ScrapeSource = "perma";
 
 export const combineScrapedData = (
-  scrapedData: (WebsiteScrapedDataWithSource | null)[]
+  scrapedData: (WebsiteScrapedDataWithSource | null)[],
 ) =>
   scrapedData.reduce<WebsiteScrapedData | null>((prev, cur) => {
     if (cur) {
