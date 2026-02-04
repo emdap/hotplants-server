@@ -19,7 +19,7 @@ export const allSearchRecordsResolver: QueryResolvers["allSearchRecords"] =
     return countAndResults(gbifSearchesCollection, cursor);
   };
 
-export const searchRecordPlantCountResolver: QueryResolvers["searchRecordPlantCount"] =
+export const searchRecordDataCountsResolver: QueryResolvers["searchRecordDataCounts"] =
   async (...args) => {
     const searchRecord = await searchRecordResolver(...args);
     if (searchRecord) {
@@ -31,7 +31,17 @@ export const searchRecordPlantCountResolver: QueryResolvers["searchRecordPlantCo
         scientificName,
       });
 
-      return plantsCollection.countDocuments(plantFilter);
+      const plantCountPromise = plantsCollection.countDocuments(plantFilter);
+      const occurrenceCountPromise = plantsCollection
+        .aggregate([{ $match: plantFilter }, { $unwind: "$occurrences" }])
+        .toArray();
+
+      const [plantCount, occurrences] = await Promise.all([
+        plantCountPromise,
+        occurrenceCountPromise,
+      ]);
+
+      return { plantCount, occurrenceCount: occurrences.length };
     }
-    return 0;
+    return { plantCount: 0, occurrenceCount: 0 };
   };

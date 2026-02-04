@@ -11,7 +11,7 @@ import {
 import { replaceWithProxyUrlResolver } from "./resolvers/replaceWithProxyUrlResolver";
 import {
   allSearchRecordsResolver,
-  searchRecordPlantCountResolver,
+  searchRecordDataCountsResolver,
   searchRecordResolver,
 } from "./resolvers/searchRecordResolver";
 import {
@@ -48,7 +48,7 @@ const resolvers: Resolvers = {
 
     searchRecord: searchRecordResolver,
     allSearchRecords: allSearchRecordsResolver,
-    searchRecordPlantCount: searchRecordPlantCountResolver,
+    searchRecordDataCounts: searchRecordDataCountsResolver,
 
     userGarden: userGardenResolver,
     allUserGardens: allUserGardensResolver,

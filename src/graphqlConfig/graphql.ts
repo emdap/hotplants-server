@@ -205,7 +205,7 @@ export type Query = {
   plantOccurrences?: Maybe<PlantOccurrencesResults>;
   plantSearch: PlantSearchQueryResults;
   searchRecord?: Maybe<SearchRecord>;
-  searchRecordPlantCount: Scalars['Int']['output'];
+  searchRecordDataCounts: SearchRecordPlantCountResults;
   userGarden?: Maybe<UserGarden>;
 };
 
@@ -243,7 +243,7 @@ export type QuerySearchRecordArgs = {
 };
 
 
-export type QuerySearchRecordPlantCountArgs = {
+export type QuerySearchRecordDataCountsArgs = {
   id: Scalars['String']['input'];
 };
 
@@ -266,6 +266,12 @@ export type SearchRecord = {
   statusUpdatedTimestamp?: Maybe<Scalars['Float']['output']>;
   taxonKeys?: Maybe<Array<Scalars['Int']['output']>>;
   totalOccurrences: Scalars['Int']['output'];
+};
+
+export type SearchRecordPlantCountResults = {
+  __typename?: 'SearchRecordPlantCountResults';
+  occurrenceCount: Scalars['Float']['output'];
+  plantCount: Scalars['Float']['output'];
 };
 
 export type SearchRecordQueryResults = {
@@ -395,6 +401,7 @@ export type ResolversTypes = ResolversObject<{
   PlantSortInput: PlantSortInput;
   Query: ResolverTypeWrapper<{}>;
   SearchRecord: ResolverTypeWrapper<SearchRecord>;
+  SearchRecordPlantCountResults: ResolverTypeWrapper<SearchRecordPlantCountResults>;
   SearchRecordQueryResults: ResolverTypeWrapper<SearchRecordQueryResults>;
   SearchRecordSortField: SearchRecordSortField;
   SearchRecordSortInput: SearchRecordSortInput;
@@ -423,6 +430,7 @@ export type ResolversParentTypes = ResolversObject<{
   PlantSortInput: PlantSortInput;
   Query: {};
   SearchRecord: SearchRecord;
+  SearchRecordPlantCountResults: SearchRecordPlantCountResults;
   SearchRecordQueryResults: SearchRecordQueryResults;
   SearchRecordSortInput: SearchRecordSortInput;
   String: Scalars['String']['output'];
@@ -554,7 +562,7 @@ export type QueryResolvers<ContextType = ApolloContext, ParentType extends Resol
   plantOccurrences?: Resolver<Maybe<ResolversTypes['PlantOccurrencesResults']>, ParentType, ContextType, RequireFields<QueryPlantOccurrencesArgs, 'id'>>;
   plantSearch?: Resolver<ResolversTypes['PlantSearchQueryResults'], ParentType, ContextType, Partial<QueryPlantSearchArgs>>;
   searchRecord?: Resolver<Maybe<ResolversTypes['SearchRecord']>, ParentType, ContextType, RequireFields<QuerySearchRecordArgs, 'id'>>;
-  searchRecordPlantCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType, RequireFields<QuerySearchRecordPlantCountArgs, 'id'>>;
+  searchRecordDataCounts?: Resolver<ResolversTypes['SearchRecordPlantCountResults'], ParentType, ContextType, RequireFields<QuerySearchRecordDataCountsArgs, 'id'>>;
   userGarden?: Resolver<Maybe<ResolversTypes['UserGarden']>, ParentType, ContextType, RequireFields<QueryUserGardenArgs, 'gardenName'>>;
 }>;
 
@@ -571,6 +579,12 @@ export type SearchRecordResolvers<ContextType = ApolloContext, ParentType extend
   statusUpdatedTimestamp?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   taxonKeys?: Resolver<Maybe<Array<ResolversTypes['Int']>>, ParentType, ContextType>;
   totalOccurrences?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
+export type SearchRecordPlantCountResultsResolvers<ContextType = ApolloContext, ParentType extends ResolversParentTypes['SearchRecordPlantCountResults'] = ResolversParentTypes['SearchRecordPlantCountResults']> = ResolversObject<{
+  occurrenceCount?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  plantCount?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
@@ -602,6 +616,7 @@ export type Resolvers<ContextType = ApolloContext> = ResolversObject<{
   PlantSize?: PlantSizeResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
   SearchRecord?: SearchRecordResolvers<ContextType>;
+  SearchRecordPlantCountResults?: SearchRecordPlantCountResultsResolvers<ContextType>;
   SearchRecordQueryResults?: SearchRecordQueryResultsResolvers<ContextType>;
   UserGarden?: UserGardenResolvers<ContextType>;
 }>;

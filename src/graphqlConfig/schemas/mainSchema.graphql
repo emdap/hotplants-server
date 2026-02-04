@@ -43,9 +43,14 @@ type SearchRecordQueryResults {
   results: [SearchRecord!]!
 }
 
+type SearchRecordPlantCountResults {
+  plantCount: Float!
+  occurrenceCount: Float!
+}
+
 type Query {
   searchRecord(id: String!): SearchRecord
-  searchRecordPlantCount(id: String!): Int!
+  searchRecordDataCounts(id: String!): SearchRecordPlantCountResults!
   allSearchRecords(
     sort: [SearchRecordSortInput!]
     limit: Int
