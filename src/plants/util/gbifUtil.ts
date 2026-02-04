@@ -28,11 +28,11 @@ const extractScientificName = ({
     : scientificName;
 
 export const searchGbifSpecies = async (commonName: string) => {
-  // TODO: Create way to get all species instead of capping out at 100 limit
+  // TODO: Create way to get all species instead of capping out at 20 limit
   const { data } = await gbifClient.GET("/species/search", {
     params: {
       query: {
-        limit: 5,
+        limit: 20,
         higherTaxonKey: "6",
         q: commonName,
       },
@@ -83,7 +83,7 @@ const reduceGbifResults = (gbifResults: GbifOccurenceResult[]) =>
     }
 
     const existingOccurrenceIds = extractOccurrenceIds(
-      prev[scientificName]?.occurrences
+      prev[scientificName]?.occurrences,
     );
 
     if (!existingOccurrenceIds.includes(result.key)) {
@@ -91,7 +91,7 @@ const reduceGbifResults = (gbifResults: GbifOccurenceResult[]) =>
       if (prev[scientificName]) {
         prev[scientificName] = combineOccurrences(
           prev[scientificName],
-          normalizedGbifPlant
+          normalizedGbifPlant,
         );
       } else {
         prev[scientificName] = normalizedGbifPlant;
@@ -102,16 +102,16 @@ const reduceGbifResults = (gbifResults: GbifOccurenceResult[]) =>
   }, {});
 
 const combineOccurrences = <
-  T extends Pick<PlantData, "scrapeSources" | "occurrences">
+  T extends Pick<PlantData, "scrapeSources" | "occurrences">,
 >(
   normalizedData: T,
-  newGbifData: NormalizedGbifResult
+  newGbifData: NormalizedGbifResult,
 ): T & { hasNewData: boolean } => {
   const existingOccurrences = normalizedData.occurrences.map(
-    ({ occurrenceId }) => occurrenceId
+    ({ occurrenceId }) => occurrenceId,
   );
   const newOccurrences = newGbifData.occurrences.filter(
-    ({ occurrenceId }) => !existingOccurrences.includes(occurrenceId)
+    ({ occurrenceId }) => !existingOccurrences.includes(occurrenceId),
   );
 
   const combinedData = {
@@ -139,16 +139,16 @@ const combineOccurrences = <
  * @returns number of new unique occurences found
  */
 export const processGbifResults = async (
-  gbifResults: GbifOccurenceResult[]
+  gbifResults: GbifOccurenceResult[],
 ) => {
   const processGbifPlant = async (
     scientificName: string,
-    occurrenceData: NormalizedGbifResult
+    occurrenceData: NormalizedGbifResult,
   ) => {
     const existingPlantData = await getPlantByName(scientificName);
 
     const scrapedData = await Promise.all(
-      iteratePlantScrapers(scientificName, existingPlantData?.scrapeSources)
+      iteratePlantScrapers(scientificName, existingPlantData?.scrapeSources),
     );
     const combinedScrapedData = combineScrapedData(scrapedData);
 
@@ -162,7 +162,7 @@ export const processGbifResults = async (
 
     const { hasNewData, ...combinedData } = combineOccurrences(
       normalizedData,
-      occurrenceData
+      occurrenceData,
     );
 
     if (hasNewData) {
@@ -176,7 +176,7 @@ export const processGbifResults = async (
 
   return Promise.all(
     Object.entries(resultDict).map((plantEntry) =>
-      processGbifPlant(...plantEntry)
-    )
+      processGbifPlant(...plantEntry),
+    ),
   );
 };
