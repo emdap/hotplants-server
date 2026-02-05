@@ -88,19 +88,22 @@ export const searchGbifOccurrences = async (
   searchRecord: SearchRecordDocument,
 ) => {
   const geometry = convertPolygon(searchRecord.boundingPolyCoords);
+  const gbifQueryParams = {
+    geometry,
+    taxonKey: searchRecord.taxonKeys,
+    scientificName: searchRecord.scientificName
+      ? [searchRecord.scientificName]
+      : undefined,
+    offset: searchRecord.occurrencesOffset,
+    ...DEFAULT_GBIF_SEARCH_PARAMS,
+  };
+
+  console.info("running search with query params:\n", gbifQueryParams);
 
   try {
     const { data } = await gbifClient.GET("/occurrence/search", {
       params: {
-        query: {
-          geometry,
-          taxonKey: searchRecord.taxonKeys,
-          scientificName: searchRecord.scientificName
-            ? [searchRecord.scientificName]
-            : undefined,
-          offset: searchRecord.occurrencesOffset,
-          ...DEFAULT_GBIF_SEARCH_PARAMS,
-        },
+        query: gbifQueryParams,
       },
     });
 

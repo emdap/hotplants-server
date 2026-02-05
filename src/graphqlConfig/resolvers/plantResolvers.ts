@@ -1,5 +1,6 @@
 import { polygon } from "@turf/turf";
-import { Position } from "geojson";
+import { Feature, Polygon, Position } from "geojson";
+import { GraphQLError } from "graphql";
 import { AggregationCursor, Filter, FindCursor, ObjectId } from "mongodb";
 import { plantsCollection } from "../../config/mongodbClient";
 import { PlantDataDocument } from "../../config/types";
@@ -57,7 +58,6 @@ export const createFilteredCursor = (where?: InputMaybe<PlantDataInput>) => {
     cursor = plantsCollection.find(filter);
   } else {
     const occurrenceFilter = constructBboxFilter(where.boundingPolyCoords);
-
     cursor = plantsCollection.aggregate([
       { $match: filter },
 
@@ -145,11 +145,42 @@ export const parseBboxInput = (bbox: Position[][]) => {
 
 const constructBboxFilter = (value: Position[][]) => {
   const inputPolygon = parseBboxInput(value);
-  return (
-    inputPolygon && {
-      "occurrences.occurrenceCoords": {
-        $geoWithin: { $geometry: inputPolygon.geometry },
-      },
-    }
-  );
+  if (!inputPolygon) {
+    throw new GraphQLError("Unable to parse input", {
+      extensions: { code: 400 },
+    });
+  } else if (isPolygonTooBig(inputPolygon)) {
+    throw new GraphQLError("Area is too large", { extensions: { code: 400 } });
+  }
+
+  return {
+    "occurrences.occurrenceCoords": {
+      $geoWithin: { $geometry: inputPolygon.geometry },
+    },
+  };
 };
+
+// TODO: ChatGPT slop
+/**
+ * Prepare any single-ring polygon for Mongo $geoWithin queries.
+ * Automatically handles large polygons and near-global bounding boxes.
+ */
+/**
+ * Returns true if the polygon spans >= 180° in longitude or latitude
+ * @param polygon Feature<Polygon> or Polygon
+ */
+
+function isPolygonTooBig(polygon: Feature<Polygon> | Polygon): boolean {
+  const coords: Position[] =
+    "type" in polygon && polygon.type === "Feature"
+      ? polygon.geometry.coordinates[0]
+      : polygon.coordinates[0];
+
+  const lons = coords.map(([lng]) => lng);
+  const lats = coords.map(([, lat]) => lat);
+
+  const lonSpan = Math.max(...lons) - Math.min(...lons);
+  const latSpan = Math.max(...lats) - Math.min(...lats);
+
+  return lonSpan >= 180 || latSpan >= 180;
+}
