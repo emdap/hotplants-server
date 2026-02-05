@@ -38,6 +38,12 @@ const PlantDataInterface = `
   occurrences: [PlantOccurrence!]!
 `;
 
+const UserGardenData = `
+  userId: String!
+  gardenName: String!
+  totalPlants: Int!
+`;
+
 const makeFieldsOptional = (str: String) => str.replaceAll(/!$/gm, "");
 
 export const plantDataSchema = buildSchema(`
@@ -115,11 +121,14 @@ export const plantDataSchema = buildSchema(`
   }
 
   type UserGarden {
-    userId: String!
-    gardenName: String!
-    totalPlants: Int!
+    ${UserGardenData}
     gardenThumbnailUrl: String
     plants: [GardenPlantData!]!
+  }
+
+  type AddToGardenResult {
+    ${UserGardenData}
+    _id: ObjectId!
   }
 
   type Query {
@@ -135,6 +144,6 @@ export const plantDataSchema = buildSchema(`
     replaceWithProxyUrl(plantId: String!, occurrenceId: Float!, replaceUrl: String!): String
   
     newGarden(gardenName: String): ObjectId!
-    addToGarden(gardenName: String, plantId: String!): ObjectId!
+    addToGarden(gardenName: String, plantId: String!): AddToGardenResult
   }
 `);

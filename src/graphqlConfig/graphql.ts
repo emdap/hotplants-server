@@ -18,6 +18,14 @@ export type Scalars = {
   ObjectId: { input: any; output: any; }
 };
 
+export type AddToGardenResult = {
+  __typename?: 'AddToGardenResult';
+  _id: Scalars['ObjectId']['output'];
+  gardenName: Scalars['String']['output'];
+  totalPlants: Scalars['Int']['output'];
+  userId: Scalars['String']['output'];
+};
+
 export type GardenPlantData = PlantDataInterface & {
   __typename?: 'GardenPlantData';
   _id: Scalars['ObjectId']['output'];
@@ -51,7 +59,7 @@ export type LocationSource =
 
 export type Mutation = {
   __typename?: 'Mutation';
-  addToGarden: Scalars['ObjectId']['output'];
+  addToGarden?: Maybe<AddToGardenResult>;
   newGarden: Scalars['ObjectId']['output'];
   replaceWithProxyUrl?: Maybe<Scalars['String']['output']>;
 };
@@ -380,6 +388,7 @@ export type ResolversInterfaceTypes<_RefType extends Record<string, unknown>> = 
 
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = ResolversObject<{
+  AddToGardenResult: ResolverTypeWrapper<AddToGardenResult>;
   Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
   Float: ResolverTypeWrapper<Scalars['Float']['output']>;
   GardenPlantData: ResolverTypeWrapper<GardenPlantData>;
@@ -412,6 +421,7 @@ export type ResolversTypes = ResolversObject<{
 
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = ResolversObject<{
+  AddToGardenResult: AddToGardenResult;
   Boolean: Scalars['Boolean']['output'];
   Float: Scalars['Float']['output'];
   GardenPlantData: GardenPlantData;
@@ -435,6 +445,14 @@ export type ResolversParentTypes = ResolversObject<{
   SearchRecordSortInput: SearchRecordSortInput;
   String: Scalars['String']['output'];
   UserGarden: UserGarden;
+}>;
+
+export type AddToGardenResultResolvers<ContextType = ApolloContext, ParentType extends ResolversParentTypes['AddToGardenResult'] = ResolversParentTypes['AddToGardenResult']> = ResolversObject<{
+  _id?: Resolver<ResolversTypes['ObjectId'], ParentType, ContextType>;
+  gardenName?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  totalPlants?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  userId?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
 export type GardenPlantDataResolvers<ContextType = ApolloContext, ParentType extends ResolversParentTypes['GardenPlantData'] = ResolversParentTypes['GardenPlantData']> = ResolversObject<{
@@ -465,7 +483,7 @@ export type GardenPlantDataResolvers<ContextType = ApolloContext, ParentType ext
 }>;
 
 export type MutationResolvers<ContextType = ApolloContext, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = ResolversObject<{
-  addToGarden?: Resolver<ResolversTypes['ObjectId'], ParentType, ContextType, RequireFields<MutationAddToGardenArgs, 'plantId'>>;
+  addToGarden?: Resolver<Maybe<ResolversTypes['AddToGardenResult']>, ParentType, ContextType, RequireFields<MutationAddToGardenArgs, 'plantId'>>;
   newGarden?: Resolver<ResolversTypes['ObjectId'], ParentType, ContextType, Partial<MutationNewGardenArgs>>;
   replaceWithProxyUrl?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType, RequireFields<MutationReplaceWithProxyUrlArgs, 'occurrenceId' | 'plantId' | 'replaceUrl'>>;
 }>;
@@ -604,6 +622,7 @@ export type UserGardenResolvers<ContextType = ApolloContext, ParentType extends 
 }>;
 
 export type Resolvers<ContextType = ApolloContext> = ResolversObject<{
+  AddToGardenResult?: AddToGardenResultResolvers<ContextType>;
   GardenPlantData?: GardenPlantDataResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
   ObjectId?: GraphQLScalarType;

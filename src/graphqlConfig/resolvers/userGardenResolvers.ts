@@ -3,8 +3,15 @@ import { GardenPlantDocument } from "@/config/types";
 import { User } from "better-auth";
 import { GraphQLError } from "graphql";
 import { ObjectId } from "mongodb";
-import { MutationResolvers, QueryResolvers, UserGarden } from "../graphql";
+import {
+  AddToGardenResult,
+  MutationResolvers,
+  QueryResolvers,
+  UserGarden,
+} from "../graphql";
 import { ApolloContext } from "../types";
+
+// TODO: Standard codes for FE to interpret error message from
 
 const DEFAULT_GARDEN_NAME = (user: User) =>
   `${user.name.slice(0, 10)}'s Garden`;
@@ -25,7 +32,7 @@ const extractUser = (context: ApolloContext) => {
 export const userGardenResolver: QueryResolvers["userGarden"] = async (
   _,
   { gardenName },
-  context
+  context,
 ) => {
   const user = extractUser(context);
 
@@ -36,7 +43,7 @@ export const userGardenResolver: QueryResolvers["userGarden"] = async (
 export const allUserGardensResolver: QueryResolvers["allUserGardens"] = async (
   _,
   _params,
-  context
+  context,
 ) => {
   const user = extractUser(context);
   return joinGardensWithPlants(user.id);
@@ -45,7 +52,7 @@ export const allUserGardensResolver: QueryResolvers["allUserGardens"] = async (
 export const newGardenResolver: MutationResolvers["newGarden"] = async (
   _,
   { gardenName },
-  context
+  context,
 ) => {
   const user = extractUser(context);
   const newGardenName = gardenName?.trim() ?? DEFAULT_GARDEN_NAME(user);
@@ -71,7 +78,7 @@ export const newGardenResolver: MutationResolvers["newGarden"] = async (
 export const addToGardenResolver: MutationResolvers["addToGarden"] = async (
   _,
   { gardenName, plantId },
-  context
+  context,
 ) => {
   const user = extractUser(context);
   const newGardenName = gardenName?.trim() ?? DEFAULT_GARDEN_NAME(user);
@@ -83,7 +90,7 @@ export const addToGardenResolver: MutationResolvers["addToGarden"] = async (
     existingGarden &&
     existingGarden.plantRefs.find(({ _id }) => _id.toString() === plantId)
   ) {
-    throw new GraphQLError(`Plant already in garden ${newGardenName}`, {
+    throw new GraphQLError(`Plant already added to "${newGardenName}".`, {
       extensions: { code: 400 },
     });
   }
@@ -95,8 +102,8 @@ export const addToGardenResolver: MutationResolvers["addToGarden"] = async (
     addedToGardenTimestamp: Date.now(),
   });
 
-  const updatedGarden = await userGardensCollection.findOneAndUpdate(
-    { _id: existingGarden?._id },
+  return userGardensCollection.findOneAndUpdate(
+    existingGarden?._id ? { _id: existingGarden._id } : {},
     {
       $set: {
         gardenName: newGardenName,
@@ -104,10 +111,8 @@ export const addToGardenResolver: MutationResolvers["addToGarden"] = async (
         plantRefs: newPlants,
       },
     },
-    { returnDocument: "after" }
-  );
-
-  return updatedGarden?._id;
+    { returnDocument: "after", upsert: true },
+  ) as Promise<AddToGardenResult> | null;
 };
 
 const joinGardensWithPlants = (userId: string, gardenName?: string) =>
