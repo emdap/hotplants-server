@@ -1,5 +1,5 @@
 import { polygon } from "@turf/turf";
-import { Feature, Polygon, Position } from "geojson";
+import { Polygon, Position } from "geojson";
 import { GraphQLError } from "graphql";
 import { AggregationCursor, Filter, FindCursor, ObjectId } from "mongodb";
 import { plantsCollection } from "../../config/mongodbClient";
@@ -149,38 +149,72 @@ const constructBboxFilter = (value: Position[][]) => {
     throw new GraphQLError("Unable to parse input", {
       extensions: { code: 400 },
     });
-  } else if (isPolygonTooBig(inputPolygon)) {
-    throw new GraphQLError("Area is too large", { extensions: { code: 400 } });
   }
 
+  const allPolygons = splitPolygonByLongitude(
+    inputPolygon.geometry.coordinates,
+  );
+
   return {
-    "occurrences.occurrenceCoords": {
-      $geoWithin: { $geometry: inputPolygon.geometry },
-    },
+    $or: allPolygons.map((poly) => ({
+      "occurrences.occurrenceCoords": {
+        $geoWithin: { $geometry: poly },
+      },
+    })),
   };
 };
 
-// TODO: ChatGPT slop
+// TODO: AI slop
 /**
- * Prepare any single-ring polygon for Mongo $geoWithin queries.
- * Automatically handles large polygons and near-global bounding boxes.
+ * Splits a polygon into multiple polygons if it spans more than 180 degrees longitude.
+ * Returns an array of polygons, each with max 180 degree longitude span.
  */
-/**
- * Returns true if the polygon spans >= 180° in longitude or latitude
- * @param polygon Feature<Polygon> or Polygon
- */
+const MAX_SPAN = 90;
 
-function isPolygonTooBig(polygon: Feature<Polygon> | Polygon): boolean {
-  const coords: Position[] =
-    "type" in polygon && polygon.type === "Feature"
-      ? polygon.geometry.coordinates[0]
-      : polygon.coordinates[0];
+function splitPolygonByLongitude(coordinates: number[][][]): Polygon[] {
+  const coords = coordinates[0];
+  const lons = coords.map((coord) => coord[0]);
+  const lats = coords.map((coord) => coord[1]);
 
-  const lons = coords.map(([lng]) => lng);
-  const lats = coords.map(([, lat]) => lat);
+  const west = Math.min(...lons);
+  const east = Math.max(...lons);
+  const south = Math.min(...lats);
+  const north = Math.max(...lats);
 
-  const lonSpan = Math.max(...lons) - Math.min(...lons);
-  const latSpan = Math.max(...lats) - Math.min(...lats);
+  const lonSpan = east - west;
 
-  return lonSpan >= 180 || latSpan >= 180;
+  // If small enough, return as-is
+  if (lonSpan <= MAX_SPAN) {
+    return [
+      {
+        type: "Polygon",
+        coordinates: coordinates,
+      },
+    ];
+  }
+
+  // Split into multiple polygons
+  const numSplits = Math.ceil(lonSpan / MAX_SPAN);
+  const splitSize = lonSpan / numSplits;
+  const polygons: Polygon[] = [];
+
+  for (let i = 0; i < numSplits; i++) {
+    const splitWest = west + i * splitSize;
+    const splitEast = Math.min(west + (i + 1) * splitSize, east);
+
+    polygons.push({
+      type: "Polygon",
+      coordinates: [
+        [
+          [splitWest, south],
+          [splitEast, south],
+          [splitEast, north],
+          [splitWest, north],
+          [splitWest, south],
+        ],
+      ],
+    });
+  }
+
+  return polygons;
 }
