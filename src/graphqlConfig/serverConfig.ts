@@ -13,7 +13,7 @@ import {
   allSearchRecordsResolver,
   searchRecordDataCountsResolver,
   searchRecordResolver,
-} from "./resolvers/searchRecordResolver";
+} from "./resolvers/searchRecordResolvers";
 import {
   addToGardenResolver,
   allUserGardensResolver,
