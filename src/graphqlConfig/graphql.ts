@@ -219,9 +219,11 @@ export type Query = {
 
 
 export type QueryAllSearchRecordsArgs = {
+  booleanFilter?: InputMaybe<Array<SearchRecordBooleanFilterInput>>;
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<SearchRecordSortInput>>;
+  stringFilter?: InputMaybe<Array<SearchRecordStringFilterInput>>;
 };
 
 
@@ -276,6 +278,15 @@ export type SearchRecord = {
   totalOccurrences: Scalars['Int']['output'];
 };
 
+export type SearchRecordBooleanFilterField =
+  | 'commonName'
+  | 'scientificName';
+
+export type SearchRecordBooleanFilterInput = {
+  field: SearchRecordBooleanFilterField;
+  value: Scalars['Boolean']['input'];
+};
+
 export type SearchRecordPlantCountResults = {
   __typename?: 'SearchRecordPlantCountResults';
   occurrenceCount: Scalars['Float']['output'];
@@ -290,8 +301,9 @@ export type SearchRecordQueryResults = {
 
 export type SearchRecordSortField =
   | 'createdTimestamp'
-  | 'status'
-  | 'statusUpdatedTimestamp';
+  | 'locationName'
+  | 'statusUpdatedTimestamp'
+  | 'totalOccurrences';
 
 export type SearchRecordSortInput = {
   direction: Scalars['Int']['input'];
@@ -302,6 +314,15 @@ export type SearchRecordStatus =
   | 'COMPLETE'
   | 'READY'
   | 'SCRAPING';
+
+export type SearchRecordStringFilterField =
+  | 'locationSource'
+  | 'status';
+
+export type SearchRecordStringFilterInput = {
+  field: SearchRecordStringFilterField;
+  value: Scalars['String']['input'];
+};
 
 export type UserGarden = {
   __typename?: 'UserGarden';
@@ -410,11 +431,15 @@ export type ResolversTypes = ResolversObject<{
   PlantSortInput: PlantSortInput;
   Query: ResolverTypeWrapper<{}>;
   SearchRecord: ResolverTypeWrapper<SearchRecord>;
+  SearchRecordBooleanFilterField: SearchRecordBooleanFilterField;
+  SearchRecordBooleanFilterInput: SearchRecordBooleanFilterInput;
   SearchRecordPlantCountResults: ResolverTypeWrapper<SearchRecordPlantCountResults>;
   SearchRecordQueryResults: ResolverTypeWrapper<SearchRecordQueryResults>;
   SearchRecordSortField: SearchRecordSortField;
   SearchRecordSortInput: SearchRecordSortInput;
   SearchRecordStatus: SearchRecordStatus;
+  SearchRecordStringFilterField: SearchRecordStringFilterField;
+  SearchRecordStringFilterInput: SearchRecordStringFilterInput;
   String: ResolverTypeWrapper<Scalars['String']['output']>;
   UserGarden: ResolverTypeWrapper<UserGarden>;
 }>;
@@ -440,9 +465,11 @@ export type ResolversParentTypes = ResolversObject<{
   PlantSortInput: PlantSortInput;
   Query: {};
   SearchRecord: SearchRecord;
+  SearchRecordBooleanFilterInput: SearchRecordBooleanFilterInput;
   SearchRecordPlantCountResults: SearchRecordPlantCountResults;
   SearchRecordQueryResults: SearchRecordQueryResults;
   SearchRecordSortInput: SearchRecordSortInput;
+  SearchRecordStringFilterInput: SearchRecordStringFilterInput;
   String: Scalars['String']['output'];
   UserGarden: UserGarden;
 }>;

@@ -30,12 +30,33 @@ type SearchRecord {
 enum SearchRecordSortField {
   createdTimestamp
   statusUpdatedTimestamp
-  status
+  totalOccurrences
+  locationName
 }
 
 input SearchRecordSortInput {
   field: SearchRecordSortField!
   direction: Int!
+}
+
+enum SearchRecordBooleanFilterField {
+  commonName
+  scientificName
+}
+
+input SearchRecordBooleanFilterInput {
+  field: SearchRecordBooleanFilterField!
+  value: Boolean!
+}
+
+enum SearchRecordStringFilterField {
+  locationSource
+  status
+}
+
+input SearchRecordStringFilterInput {
+  field: SearchRecordStringFilterField!
+  value: String!
 }
 
 type SearchRecordQueryResults {
@@ -53,6 +74,8 @@ type Query {
   searchRecordDataCounts(id: String!): SearchRecordPlantCountResults!
   allSearchRecords(
     sort: [SearchRecordSortInput!]
+    booleanFilter: [SearchRecordBooleanFilterInput!]
+    stringFilter: [SearchRecordStringFilterInput!]
     limit: Int
     offset: Int
   ): SearchRecordQueryResults!
