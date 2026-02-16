@@ -101,7 +101,7 @@ export const plantDataSchema = buildSchema(`
 
   input PlantSortInput {
     field: PlantSortField!
-    direction: Int!
+    value: Int!
   }
 
   type PlantSearchQueryResults {

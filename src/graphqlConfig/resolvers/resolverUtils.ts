@@ -21,7 +21,7 @@ export const applySortSkipLimit = <T extends object>(
     sort?: InputMaybe<SortInput[]>;
     offset?: InputMaybe<number>;
     limit?: InputMaybe<number>;
-  }
+  },
 ) => {
   const sortObject = getSortObject(sort);
 
@@ -33,17 +33,17 @@ export const applySortSkipLimit = <T extends object>(
 };
 
 export const getSortObject = <T extends SortInput>(
-  sort?: InputMaybe<T[]>
+  sort?: InputMaybe<T[]>,
 ): Sort | undefined =>
-  sort?.reduce<Record<string, SortDirection>>((prev, { field, direction }) => {
-    prev[field] = direction as SortDirection;
+  sort?.reduce<Record<string, SortDirection>>((prev, { field, value }) => {
+    prev[field] = value as SortDirection;
     return prev;
   }, {});
 
 export const countAndResults = async <T extends object, S extends object>(
   collection: Collection<S>,
   cursor: Cursor<T>,
-  filter?: Filter<S>
+  filter?: Filter<S>,
 ) => {
   const [count, results] = await Promise.all([
     collection.countDocuments(filter),

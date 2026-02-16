@@ -8,7 +8,7 @@ import {
 
 export type SortInput<T = Record<string, unknown>> = {
   field: keyof T;
-  direction: number;
+  value: number;
 };
 
 export type PlantDataDocument = Omit<

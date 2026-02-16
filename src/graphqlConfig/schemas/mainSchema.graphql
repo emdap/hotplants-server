@@ -36,7 +36,7 @@ enum SearchRecordSortField {
 
 input SearchRecordSortInput {
   field: SearchRecordSortField!
-  direction: Int!
+  value: Int!
 }
 
 enum SearchRecordBooleanFilterField {
