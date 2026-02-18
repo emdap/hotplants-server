@@ -30,7 +30,7 @@ const extractSearchRecordFilter = ({
     filter[field] = { $all: value };
   });
   booleanFilter?.forEach(({ field, value }) => {
-    filter[field] = { $exists: value };
+    filter[field] = { [value ? "$ne" : "$eq"]: null };
   });
 
   return filter;
