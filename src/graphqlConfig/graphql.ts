@@ -321,7 +321,7 @@ export type SearchRecordStringFilterField =
 
 export type SearchRecordStringFilterInput = {
   field: SearchRecordStringFilterField;
-  value: Scalars['String']['input'];
+  value: Array<Scalars['String']['input']>;
 };
 
 export type UserGarden = {

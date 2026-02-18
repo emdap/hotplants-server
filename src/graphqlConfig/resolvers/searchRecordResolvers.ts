@@ -1,9 +1,14 @@
-import { ObjectId } from "mongodb";
+import { SearchRecordDocument } from "@/config/types";
+import { Filter, ObjectId } from "mongodb";
 import {
   gbifSearchesCollection,
   plantsCollection,
 } from "../../config/mongodbClient";
-import { QueryResolvers } from "../graphql";
+import {
+  QueryResolvers,
+  SearchRecordBooleanFilterInput,
+  SearchRecordStringFilterInput,
+} from "../graphql";
 import { extractPlantFilter } from "./plantResolvers";
 import { applySortSkipLimit, countAndResults } from "./resolverUtils";
 
@@ -12,9 +17,33 @@ export const searchRecordResolver: QueryResolvers["searchRecord"] = (
   { id },
 ) => gbifSearchesCollection.findOne(new ObjectId(id));
 
+const extractSearchRecordFilter = ({
+  stringFilter,
+  booleanFilter,
+}: {
+  stringFilter?: SearchRecordStringFilterInput[] | null;
+  booleanFilter?: SearchRecordBooleanFilterInput[] | null;
+}) => {
+  const filter = {} as Filter<SearchRecordDocument>;
+
+  stringFilter?.forEach(({ field, value }) => {
+    filter[field] = { $all: value };
+  });
+  booleanFilter?.forEach(({ field, value }) => {
+    filter[field] = { $exists: value };
+  });
+
+  return filter;
+};
+
 export const allSearchRecordsResolver: QueryResolvers["allSearchRecords"] =
-  async (_, args) => {
-    const cursor = applySortSkipLimit(gbifSearchesCollection.find(), args);
+  async (_, { stringFilter, booleanFilter, ...args }) => {
+    const cursor = applySortSkipLimit(
+      gbifSearchesCollection.find(
+        extractSearchRecordFilter({ stringFilter, booleanFilter }),
+      ),
+      args,
+    );
 
     return countAndResults(gbifSearchesCollection, cursor);
   };

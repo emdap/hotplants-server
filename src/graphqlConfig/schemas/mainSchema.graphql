@@ -56,7 +56,7 @@ enum SearchRecordStringFilterField {
 
 input SearchRecordStringFilterInput {
   field: SearchRecordStringFilterField!
-  value: String!
+  value: [String!]!
 }
 
 type SearchRecordQueryResults {
