@@ -1,35 +1,11 @@
 import { SortInput } from "@/config/types";
-import {
-  AggregationCursor,
-  Collection,
-  Filter,
-  FindCursor,
-  Sort,
-  SortDirection,
-} from "mongodb";
+import { Collection, Document, Sort, SortDirection } from "mongodb";
 import { InputMaybe } from "../graphql";
 
-type Cursor<T> = FindCursor<T> | AggregationCursor<T>;
-
-export const applySortSkipLimit = <T extends object>(
-  cursor: Cursor<T>,
-  {
-    sort,
-    limit,
-    offset,
-  }: {
-    sort?: InputMaybe<SortInput[]>;
-    offset?: InputMaybe<number>;
-    limit?: InputMaybe<number>;
-  },
-) => {
-  const sortObject = getSortObject(sort);
-
-  sortObject && cursor.sort(sortObject);
-  offset && cursor.skip(offset);
-  limit && cursor.limit(limit);
-
-  return cursor;
+type SortSkipLimitArgs = {
+  sort?: InputMaybe<SortInput[]>;
+  offset?: InputMaybe<number>;
+  limit?: InputMaybe<number>;
 };
 
 export const getSortObject = <T extends SortInput>(
@@ -40,15 +16,38 @@ export const getSortObject = <T extends SortInput>(
     return prev;
   }, {});
 
-export const countAndResults = async <T extends object, S extends object>(
-  collection: Collection<S>,
-  cursor: Cursor<T>,
-  filter?: Filter<S>,
-) => {
-  const [count, results] = await Promise.all([
-    collection.countDocuments(filter),
-    cursor.toArray(),
-  ]);
+export const paginateWithCount = ({
+  sort,
+  limit,
+  offset,
+}: SortSkipLimitArgs) => {
+  const sortObject = getSortObject(sort);
+  const facetSteps = [];
+  sortObject && facetSteps.push({ $sort: sortObject });
+  offset && facetSteps.push({ $skip: offset });
+  limit && facetSteps.push({ $limit: limit });
 
-  return { count, results };
+  return {
+    $facet: {
+      results: facetSteps,
+      count: [{ $count: "count" }],
+    },
+  };
 };
+
+export const aggregateAndProject = async <T extends Document>(
+  collection: Collection<T>,
+  pipeline: Document,
+) =>
+  (
+    await collection
+      .aggregate<{ count: number; results: T[] }>(
+        pipeline.concat({
+          $project: {
+            results: 1,
+            count: { $ifNull: [{ $arrayElemAt: ["$count.count", 0] }, 0] },
+          },
+        }),
+      )
+      .toArray()
+  )[0];

@@ -41,7 +41,7 @@ export const storePlantData = async ({
 
   return _id
     ? plantsCollection.updateOne({ _id }, { $set: fullData })
-    : plantsCollection.insertOne(fullData);
+    : plantsCollection.insertOne({ _id: new ObjectId(), ...fullData });
 };
 
 export const lookupPlantByCoordinates = async ({
@@ -70,6 +70,8 @@ export const createSearchRecord = async ({
   }
 
   const insertedRecord = await gbifSearchesCollection.insertOne({
+    _id: new ObjectId(),
+
     status: "READY",
     createdTimestamp: Date.now(),
 

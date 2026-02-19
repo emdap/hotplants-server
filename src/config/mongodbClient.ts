@@ -1,4 +1,4 @@
-import { MongoClient, OptionalId } from "mongodb";
+import { MongoClient } from "mongodb";
 import {
   PlantDataDocument,
   SearchRecordDocument,
@@ -11,10 +11,10 @@ export const client = new MongoClient(process.env.MONGODB_CONNECTION_STRING!);
 
 const plantsDb = client.db("plants");
 export const plantsCollection =
-  plantsDb.collection<OptionalId<PlantDataDocument>>("plantData");
+  plantsDb.collection<PlantDataDocument>("plantData");
 
 export const userGardensCollection =
   plantsDb.collection<UserGardenDocument>("userGardens");
 
 export const gbifSearchesCollection =
-  plantsDb.collection<OptionalId<SearchRecordDocument>>("gbifSearches");
+  plantsDb.collection<SearchRecordDocument>("gbifSearches");

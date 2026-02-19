@@ -10,7 +10,7 @@ import {
   SearchRecordStringFilterInput,
 } from "../graphql";
 import { extractPlantFilter } from "./plantResolvers";
-import { applySortSkipLimit, countAndResults } from "./resolverUtils";
+import { aggregateAndProject, paginateWithCount } from "./resolverUtils";
 
 export const searchRecordResolver: QueryResolvers["searchRecord"] = (
   _,
@@ -38,14 +38,12 @@ const extractSearchRecordFilter = ({
 
 export const allSearchRecordsResolver: QueryResolvers["allSearchRecords"] =
   async (_, { stringFilter, booleanFilter, ...args }) => {
-    const cursor = applySortSkipLimit(
-      gbifSearchesCollection.find(
-        extractSearchRecordFilter({ stringFilter, booleanFilter }),
-      ),
-      args,
-    );
+    const aggregations = [
+      { $match: extractSearchRecordFilter({ stringFilter, booleanFilter }) },
+      paginateWithCount(args),
+    ];
 
-    return countAndResults(gbifSearchesCollection, cursor);
+    return aggregateAndProject(gbifSearchesCollection, aggregations);
   };
 
 export const searchRecordDataCountsResolver: QueryResolvers["searchRecordDataCounts"] =

@@ -1,28 +1,20 @@
 import { polygon } from "@turf/turf";
 import { Polygon, Position } from "geojson";
 import { GraphQLError } from "graphql";
-import { AggregationCursor, Filter, FindCursor, ObjectId } from "mongodb";
+import { Document, Filter, ObjectId } from "mongodb";
 import { plantsCollection } from "../../config/mongodbClient";
 import { PlantDataDocument } from "../../config/types";
-import {
-  InputMaybe,
-  PlantData,
-  PlantDataInput,
-  QueryResolvers,
-} from "../graphql";
-import { applySortSkipLimit, countAndResults } from "./resolverUtils";
+import { PlantDataInput, QueryResolvers } from "../graphql";
+import { aggregateAndProject, paginateWithCount } from "./resolverUtils";
 
 export const plantResolver: QueryResolvers["plant"] = async (
   _,
   { id, boundingPolyCoords },
 ) => {
-  if (!boundingPolyCoords) {
-    return plantsCollection.findOne(new ObjectId(id));
-  }
-
-  const { cursor } = createFilteredCursor({ _id: id, boundingPolyCoords });
-  const array = await cursor.toArray();
-  return array[0];
+  const filter = boundingPolyCoords
+    ? extractPlantFilter({ _id: id, boundingPolyCoords })
+    : new ObjectId(id);
+  return plantsCollection.findOne(filter);
 };
 
 export const plantOccurrencesResolver: QueryResolvers["plantOccurrences"] =
@@ -45,58 +37,56 @@ export const plantSearchResolver: QueryResolvers["plantSearch"] = async (
   _,
   { where, ...args },
 ) => {
-  const { cursor, filter } = createFilteredCursor(where);
-  applySortSkipLimit(cursor, args);
-  return countAndResults(plantsCollection, cursor, filter);
-};
-
-export const createFilteredCursor = (where?: InputMaybe<PlantDataInput>) => {
-  let cursor: FindCursor<PlantData> | AggregationCursor<PlantData>;
-  const filter = where ? extractPlantFilter(where) : {};
+  const aggregation: Document = where
+    ? [{ $match: extractPlantFilter(where) }]
+    : [];
+  const paginate = paginateWithCount(args);
 
   if (!where?.boundingPolyCoords) {
-    cursor = plantsCollection.find(filter);
+    aggregation.push(paginate);
   } else {
     const occurrenceFilter = constructBboxFilter(where.boundingPolyCoords);
-    cursor = plantsCollection.aggregate([
-      { $match: filter },
-
-      {
-        $addFields: {
-          fullOccurrencesCount: { $size: "$occurrences" },
-        },
-      },
-
-      { $unwind: "$occurrences" },
-      { $match: occurrenceFilter },
-
-      {
-        $group: {
-          _id: "$_id",
-          plant: { $first: "$$ROOT" },
-
-          occurrences: { $push: "$occurrences" },
-          fullOccurrencesCount: { $first: "$fullOccurrencesCount" },
-        },
-      },
-
-      {
-        $replaceRoot: {
-          newRoot: {
-            $mergeObjects: [
-              "$plant",
-              {
-                occurrences: "$occurrences",
-                fullOccurrencesCount: "$fullOccurrencesCount",
-              },
-            ],
+    aggregation.push(
+      ...[
+        {
+          $addFields: {
+            fullOccurrencesCount: { $size: "$occurrences" },
           },
         },
-      },
-    ]);
+
+        { $unwind: "$occurrences" },
+        { $match: occurrenceFilter },
+
+        {
+          $group: {
+            _id: "$_id",
+            plant: { $first: "$$ROOT" },
+
+            occurrences: { $push: "$occurrences" },
+            fullOccurrencesCount: { $first: "$fullOccurrencesCount" },
+          },
+        },
+
+        {
+          $replaceRoot: {
+            newRoot: {
+              $mergeObjects: [
+                "$plant",
+                {
+                  occurrences: "$occurrences",
+                  fullOccurrencesCount: "$fullOccurrencesCount",
+                },
+              ],
+            },
+          },
+        },
+
+        paginate,
+      ],
+    );
   }
 
-  return { cursor, filter };
+  return aggregateAndProject(plantsCollection, aggregation);
 };
 
 export const extractPlantFilter = (filter: PlantDataInput) =>
