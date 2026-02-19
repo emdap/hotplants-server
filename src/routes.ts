@@ -12,21 +12,6 @@ import type { Request as ExRequest, Response as ExResponse, RequestHandler, Rout
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 
 const models: TsoaRoute.Models = {
-    "SearchRecordStatus": {
-        "dataType": "refAlias",
-        "type": {"dataType":"union","subSchemas":[{"dataType":"enum","enums":["COMPLETE"]},{"dataType":"enum","enums":["READY"]},{"dataType":"enum","enums":["SCRAPING"]}],"validators":{}},
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "Pick_SearchRecordDocument.status-or-occurrencesOffset_": {
-        "dataType": "refAlias",
-        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"occurrencesOffset":{"dataType":"double","required":true},"status":{"ref":"SearchRecordStatus","required":true}},"validators":{}},
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "SearchRecordSummary": {
-        "dataType": "refAlias",
-        "type": {"dataType":"intersection","subSchemas":[{"dataType":"nestedObjectLiteral","nestedProperties":{"id":{"dataType":"string","required":true}}},{"ref":"Pick_SearchRecordDocument.status-or-occurrencesOffset_"}],"validators":{}},
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "Maybe_string_": {
         "dataType": "refAlias",
         "type": {"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}],"validators":{}},
@@ -35,6 +20,31 @@ const models: TsoaRoute.Models = {
     "LocationSource": {
         "dataType": "refAlias",
         "type": {"dataType":"union","subSchemas":[{"dataType":"enum","enums":["custom"]},{"dataType":"enum","enums":["search"]}],"validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "SearchRecordStatus": {
+        "dataType": "refAlias",
+        "type": {"dataType":"union","subSchemas":[{"dataType":"enum","enums":["COMPLETE"]},{"dataType":"enum","enums":["READY"]},{"dataType":"enum","enums":["SCRAPING"]}],"validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "Maybe_number_": {
+        "dataType": "refAlias",
+        "type": {"dataType":"union","subSchemas":[{"dataType":"double"},{"dataType":"enum","enums":[null]}],"validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "Pick_SearchRecordDocument.Exclude_keyofSearchRecordDocument._id__": {
+        "dataType": "refAlias",
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"taxonKeys":{"dataType":"union","subSchemas":[{"dataType":"array","array":{"dataType":"double"}},{"dataType":"undefined"}]},"__typename":{"dataType":"union","subSchemas":[{"dataType":"enum","enums":["SearchRecord"]},{"dataType":"undefined"}]},"boundingPolyCoords":{"dataType":"array","array":{"dataType":"array","array":{"dataType":"array","array":{"dataType":"double"}}},"required":true},"commonName":{"dataType":"union","subSchemas":[{"ref":"Maybe_string_"},{"dataType":"undefined"}]},"createdTimestamp":{"dataType":"double","required":true},"locationName":{"dataType":"string","required":true},"locationSource":{"ref":"LocationSource","required":true},"occurrencesOffset":{"dataType":"double","required":true},"scientificName":{"dataType":"union","subSchemas":[{"ref":"Maybe_string_"},{"dataType":"undefined"}]},"status":{"ref":"SearchRecordStatus","required":true},"statusUpdatedTimestamp":{"dataType":"union","subSchemas":[{"ref":"Maybe_number_"},{"dataType":"undefined"}]},"totalOccurrences":{"dataType":"double","required":true}},"validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "Omit_SearchRecordDocument._id_": {
+        "dataType": "refAlias",
+        "type": {"ref":"Pick_SearchRecordDocument.Exclude_keyofSearchRecordDocument._id__","validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "SearchRecordSummary": {
+        "dataType": "refAlias",
+        "type": {"dataType":"intersection","subSchemas":[{"dataType":"nestedObjectLiteral","nestedProperties":{"id":{"dataType":"string","required":true}}},{"ref":"Omit_SearchRecordDocument._id_"}],"validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "Pick_SearchRecordDocument.locationName-or-locationSource-or-boundingPolyCoords-or-commonName-or-scientificName_": {

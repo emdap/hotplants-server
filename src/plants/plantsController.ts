@@ -4,7 +4,7 @@ import { gbifSearchesCollection } from "../config/mongodbClient";
 import { PlantSearchParams } from "../config/types";
 import { createSearchRecord, updateSearchRecord } from "./util/mongodbUtil";
 import {
-  extractSearchRecordSummary,
+  normalizeSearchRecord,
   searchGbifOccurrences,
   SearchRecordSummary,
   shouldStartScraping,
@@ -21,12 +21,12 @@ export class PlantController {
       await gbifSearchesCollection.findOne(plantSearch);
 
     if (existingSearchRecord) {
-      return extractSearchRecordSummary(existingSearchRecord);
+      return normalizeSearchRecord(existingSearchRecord);
     }
 
     const newSearchRecord = await createSearchRecord(plantSearch);
     return newSearchRecord
-      ? extractSearchRecordSummary(newSearchRecord)
+      ? normalizeSearchRecord(newSearchRecord)
       : errorResponse(500, "Unable to create search record");
   }
 
@@ -60,10 +60,10 @@ export class PlantController {
       }
 
       searchGbifOccurrences(updatedSearch);
-      return extractSearchRecordSummary(updatedSearch);
+      return normalizeSearchRecord(updatedSearch);
     } else {
       console.info("Will not start scraping");
-      return extractSearchRecordSummary(searchRecord);
+      return normalizeSearchRecord(searchRecord);
     }
   }
 }

@@ -49,19 +49,17 @@ export const SCRAPE_SOURCE_INFO: Record<
   perma: { url: "https://permapeople.org/plants/", spaceReplacement: "-" },
 };
 
-export type SearchRecordSummary = { id: string } & Pick<
+export type SearchRecordSummary = { id: string } & Omit<
   SearchRecordDocument,
-  "status" | "occurrencesOffset"
+  "_id"
 >;
 
-export const extractSearchRecordSummary = ({
+export const normalizeSearchRecord = ({
   _id,
-  status,
-  occurrencesOffset,
+  ...searchRecord
 }: SearchRecordDocument): SearchRecordSummary => ({
   id: _id.toString(),
-  status: status,
-  occurrencesOffset,
+  ...searchRecord,
 });
 
 export const shouldStartScraping = ({

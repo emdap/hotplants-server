@@ -7,6 +7,17 @@
 		"requestBodies": {},
 		"responses": {},
 		"schemas": {
+			"Maybe_string_": {
+				"type": "string",
+				"nullable": true
+			},
+			"LocationSource": {
+				"type": "string",
+				"enum": [
+					"custom",
+					"search"
+				]
+			},
 			"SearchRecordStatus": {
 				"type": "string",
 				"enum": [
@@ -15,22 +26,85 @@
 					"SCRAPING"
 				]
 			},
-			"Pick_SearchRecordDocument.status-or-occurrencesOffset_": {
+			"Maybe_number_": {
+				"type": "number",
+				"format": "double",
+				"nullable": true
+			},
+			"Pick_SearchRecordDocument.Exclude_keyofSearchRecordDocument._id__": {
 				"properties": {
+					"taxonKeys": {
+						"items": {
+							"type": "number",
+							"format": "double"
+						},
+						"type": "array"
+					},
+					"__typename": {
+						"type": "string",
+						"enum": [
+							"SearchRecord"
+						]
+					},
+					"boundingPolyCoords": {
+						"items": {
+							"items": {
+								"items": {
+									"type": "number",
+									"format": "double"
+								},
+								"type": "array"
+							},
+							"type": "array"
+						},
+						"type": "array"
+					},
+					"commonName": {
+						"$ref": "#/components/schemas/Maybe_string_"
+					},
+					"createdTimestamp": {
+						"type": "number",
+						"format": "double"
+					},
+					"locationName": {
+						"type": "string"
+					},
+					"locationSource": {
+						"$ref": "#/components/schemas/LocationSource"
+					},
 					"occurrencesOffset": {
 						"type": "number",
 						"format": "double"
 					},
+					"scientificName": {
+						"$ref": "#/components/schemas/Maybe_string_"
+					},
 					"status": {
 						"$ref": "#/components/schemas/SearchRecordStatus"
+					},
+					"statusUpdatedTimestamp": {
+						"$ref": "#/components/schemas/Maybe_number_"
+					},
+					"totalOccurrences": {
+						"type": "number",
+						"format": "double"
 					}
 				},
 				"required": [
+					"boundingPolyCoords",
+					"createdTimestamp",
+					"locationName",
+					"locationSource",
 					"occurrencesOffset",
-					"status"
+					"status",
+					"totalOccurrences"
 				],
 				"type": "object",
 				"description": "From T, pick a set of properties whose keys are in the union K"
+			},
+			"Omit_SearchRecordDocument._id_": {
+				"$ref": "#/components/schemas/Pick_SearchRecordDocument.Exclude_keyofSearchRecordDocument._id__",
+				"description": "Construct a type with the properties of T except for those in type K."
 			},
 			"SearchRecordSummary": {
 				"allOf": [
@@ -46,19 +120,8 @@
 						"type": "object"
 					},
 					{
-						"$ref": "#/components/schemas/Pick_SearchRecordDocument.status-or-occurrencesOffset_"
+						"$ref": "#/components/schemas/Omit_SearchRecordDocument._id_"
 					}
-				]
-			},
-			"Maybe_string_": {
-				"type": "string",
-				"nullable": true
-			},
-			"LocationSource": {
-				"type": "string",
-				"enum": [
-					"custom",
-					"search"
 				]
 			},
 			"Pick_SearchRecordDocument.locationName-or-locationSource-or-boundingPolyCoords-or-commonName-or-scientificName_": {

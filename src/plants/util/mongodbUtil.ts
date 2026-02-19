@@ -82,7 +82,7 @@ export const createSearchRecord = async ({
     scientificName: scientificName?.trim(),
     taxonKeys,
 
-    totalOccurrences: -1,
+    totalOccurrences: 0,
     occurrencesOffset: 0,
   });
 
