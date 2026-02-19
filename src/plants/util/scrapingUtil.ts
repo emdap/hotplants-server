@@ -64,18 +64,18 @@ export const normalizeSearchRecord = ({
 
 export const shouldStartScraping = ({
   status,
-  statusUpdatedTimestamp,
+  lastRanTimestamp,
 }: SearchRecordDocument) => {
   switch (status) {
     case "READY":
       return true;
     case "SCRAPING":
-      if (!statusUpdatedTimestamp) {
+      if (!lastRanTimestamp) {
         return false;
       }
 
       const now = Date.now();
-      const timeDifference = now - statusUpdatedTimestamp;
+      const timeDifference = now - lastRanTimestamp;
       return timeDifference >= MAX_STALE_SEARCH_MILLISECONDS;
     default:
       return false;

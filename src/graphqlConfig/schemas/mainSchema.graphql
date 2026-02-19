@@ -13,7 +13,7 @@ type SearchRecord {
   _id: ObjectId!
   createdTimestamp: Float!
   status: SearchRecordStatus!
-  statusUpdatedTimestamp: Float
+  lastRanTimestamp: Float
 
   locationName: String!
   locationSource: LocationSource!
@@ -29,7 +29,7 @@ type SearchRecord {
 
 enum SearchRecordSortField {
   createdTimestamp
-  statusUpdatedTimestamp
+  lastRanTimestamp
   totalOccurrences
   locationName
 }

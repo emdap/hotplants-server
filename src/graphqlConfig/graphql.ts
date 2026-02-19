@@ -268,12 +268,12 @@ export type SearchRecord = {
   boundingPolyCoords: Array<Array<Array<Scalars['Float']['output']>>>;
   commonName?: Maybe<Scalars['String']['output']>;
   createdTimestamp: Scalars['Float']['output'];
+  lastRanTimestamp?: Maybe<Scalars['Float']['output']>;
   locationName: Scalars['String']['output'];
   locationSource: LocationSource;
   occurrencesOffset: Scalars['Int']['output'];
   scientificName?: Maybe<Scalars['String']['output']>;
   status: SearchRecordStatus;
-  statusUpdatedTimestamp?: Maybe<Scalars['Float']['output']>;
   taxonKeys?: Maybe<Array<Scalars['Int']['output']>>;
   totalOccurrences: Scalars['Int']['output'];
 };
@@ -301,8 +301,8 @@ export type SearchRecordQueryResults = {
 
 export type SearchRecordSortField =
   | 'createdTimestamp'
+  | 'lastRanTimestamp'
   | 'locationName'
-  | 'statusUpdatedTimestamp'
   | 'totalOccurrences';
 
 export type SearchRecordSortInput = {
@@ -616,12 +616,12 @@ export type SearchRecordResolvers<ContextType = ApolloContext, ParentType extend
   boundingPolyCoords?: Resolver<Array<Array<Array<ResolversTypes['Float']>>>, ParentType, ContextType>;
   commonName?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   createdTimestamp?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  lastRanTimestamp?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   locationName?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   locationSource?: Resolver<ResolversTypes['LocationSource'], ParentType, ContextType>;
   occurrencesOffset?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   scientificName?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   status?: Resolver<ResolversTypes['SearchRecordStatus'], ParentType, ContextType>;
-  statusUpdatedTimestamp?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   taxonKeys?: Resolver<Maybe<Array<ResolversTypes['Int']>>, ParentType, ContextType>;
   totalOccurrences?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;

@@ -110,7 +110,7 @@ export const finishRunningSearch = (
     );
 
   const updatedSearchRecord: Partial<SearchRecordDocument> = {
-    statusUpdatedTimestamp: Date.now(),
+    lastRanTimestamp: Date.now(),
     status: searchResults?.endOfRecords ? "COMPLETE" : "READY",
 
     occurrencesOffset:

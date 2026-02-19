@@ -49,7 +49,7 @@ export class PlantController {
     if (shouldStartScraping(searchRecord)) {
       const updatedSearch = await updateSearchRecord(searchRecord._id, {
         status: "SCRAPING",
-        statusUpdatedTimestamp: Date.now(),
+        lastRanTimestamp: Date.now(),
       });
 
       if (!updatedSearch) {

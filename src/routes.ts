@@ -17,6 +17,11 @@ const models: TsoaRoute.Models = {
         "type": {"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}],"validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "Maybe_number_": {
+        "dataType": "refAlias",
+        "type": {"dataType":"union","subSchemas":[{"dataType":"double"},{"dataType":"enum","enums":[null]}],"validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "LocationSource": {
         "dataType": "refAlias",
         "type": {"dataType":"union","subSchemas":[{"dataType":"enum","enums":["custom"]},{"dataType":"enum","enums":["search"]}],"validators":{}},
@@ -27,14 +32,9 @@ const models: TsoaRoute.Models = {
         "type": {"dataType":"union","subSchemas":[{"dataType":"enum","enums":["COMPLETE"]},{"dataType":"enum","enums":["READY"]},{"dataType":"enum","enums":["SCRAPING"]}],"validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "Maybe_number_": {
-        "dataType": "refAlias",
-        "type": {"dataType":"union","subSchemas":[{"dataType":"double"},{"dataType":"enum","enums":[null]}],"validators":{}},
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "Pick_SearchRecordDocument.Exclude_keyofSearchRecordDocument._id__": {
         "dataType": "refAlias",
-        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"taxonKeys":{"dataType":"union","subSchemas":[{"dataType":"array","array":{"dataType":"double"}},{"dataType":"undefined"}]},"__typename":{"dataType":"union","subSchemas":[{"dataType":"enum","enums":["SearchRecord"]},{"dataType":"undefined"}]},"boundingPolyCoords":{"dataType":"array","array":{"dataType":"array","array":{"dataType":"array","array":{"dataType":"double"}}},"required":true},"commonName":{"dataType":"union","subSchemas":[{"ref":"Maybe_string_"},{"dataType":"undefined"}]},"createdTimestamp":{"dataType":"double","required":true},"locationName":{"dataType":"string","required":true},"locationSource":{"ref":"LocationSource","required":true},"occurrencesOffset":{"dataType":"double","required":true},"scientificName":{"dataType":"union","subSchemas":[{"ref":"Maybe_string_"},{"dataType":"undefined"}]},"status":{"ref":"SearchRecordStatus","required":true},"statusUpdatedTimestamp":{"dataType":"union","subSchemas":[{"ref":"Maybe_number_"},{"dataType":"undefined"}]},"totalOccurrences":{"dataType":"double","required":true}},"validators":{}},
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"taxonKeys":{"dataType":"union","subSchemas":[{"dataType":"array","array":{"dataType":"double"}},{"dataType":"undefined"}]},"__typename":{"dataType":"union","subSchemas":[{"dataType":"enum","enums":["SearchRecord"]},{"dataType":"undefined"}]},"boundingPolyCoords":{"dataType":"array","array":{"dataType":"array","array":{"dataType":"array","array":{"dataType":"double"}}},"required":true},"commonName":{"dataType":"union","subSchemas":[{"ref":"Maybe_string_"},{"dataType":"undefined"}]},"createdTimestamp":{"dataType":"double","required":true},"lastRanTimestamp":{"dataType":"union","subSchemas":[{"ref":"Maybe_number_"},{"dataType":"undefined"}]},"locationName":{"dataType":"string","required":true},"locationSource":{"ref":"LocationSource","required":true},"occurrencesOffset":{"dataType":"double","required":true},"scientificName":{"dataType":"union","subSchemas":[{"ref":"Maybe_string_"},{"dataType":"undefined"}]},"status":{"ref":"SearchRecordStatus","required":true},"totalOccurrences":{"dataType":"double","required":true}},"validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "Omit_SearchRecordDocument._id_": {

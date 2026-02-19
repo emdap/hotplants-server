@@ -11,6 +11,11 @@
 				"type": "string",
 				"nullable": true
 			},
+			"Maybe_number_": {
+				"type": "number",
+				"format": "double",
+				"nullable": true
+			},
 			"LocationSource": {
 				"type": "string",
 				"enum": [
@@ -25,11 +30,6 @@
 					"READY",
 					"SCRAPING"
 				]
-			},
-			"Maybe_number_": {
-				"type": "number",
-				"format": "double",
-				"nullable": true
 			},
 			"Pick_SearchRecordDocument.Exclude_keyofSearchRecordDocument._id__": {
 				"properties": {
@@ -66,6 +66,9 @@
 						"type": "number",
 						"format": "double"
 					},
+					"lastRanTimestamp": {
+						"$ref": "#/components/schemas/Maybe_number_"
+					},
 					"locationName": {
 						"type": "string"
 					},
@@ -81,9 +84,6 @@
 					},
 					"status": {
 						"$ref": "#/components/schemas/SearchRecordStatus"
-					},
-					"statusUpdatedTimestamp": {
-						"$ref": "#/components/schemas/Maybe_number_"
 					},
 					"totalOccurrences": {
 						"type": "number",
