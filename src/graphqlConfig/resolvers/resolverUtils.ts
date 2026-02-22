@@ -2,7 +2,7 @@ import { SortInput } from "@/config/types";
 import { Collection, Document, Sort, SortDirection } from "mongodb";
 import { InputMaybe } from "../graphql";
 
-type SortSkipLimitArgs = {
+export type SortSkipLimitArgs = {
   sort?: InputMaybe<SortInput[]>;
   offset?: InputMaybe<number>;
   limit?: InputMaybe<number>;
@@ -20,7 +20,7 @@ export const paginateWithCount = ({
   sort,
   limit,
   offset,
-}: SortSkipLimitArgs) => {
+}: SortSkipLimitArgs = {}) => {
   const sortObject = getSortObject(sort);
   const facetSteps = [];
   sortObject && facetSteps.push({ $sort: sortObject });
@@ -35,13 +35,16 @@ export const paginateWithCount = ({
   };
 };
 
-export const aggregateAndProject = async <T extends Document>(
+export const aggregateAndProject = async <
+  T extends Document,
+  R extends Document = T,
+>(
   collection: Collection<T>,
   pipeline: Document,
 ) =>
   (
     await collection
-      .aggregate<{ count: number; results: T[] }>(
+      .aggregate<{ count: number; results: R[] }>(
         pipeline.concat({
           $project: {
             results: 1,

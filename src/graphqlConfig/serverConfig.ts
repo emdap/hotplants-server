@@ -18,6 +18,7 @@ import {
   addToGardenResolver,
   allUserGardensResolver,
   newGardenResolver,
+  userGardenPlantsResolver,
   userGardenResolver,
 } from "./resolvers/userGardenResolvers";
 import { plantDataSchema } from "./schemas/plantData.schema";
@@ -50,8 +51,9 @@ const resolvers: Resolvers = {
     allSearchRecords: allSearchRecordsResolver,
     searchRecordDataCounts: searchRecordDataCountsResolver,
 
-    userGarden: userGardenResolver,
     allUserGardens: allUserGardensResolver,
+    userGarden: userGardenResolver,
+    userGardenPlants: userGardenPlantsResolver,
   },
   Mutation: {
     replaceWithProxyUrl: replaceWithProxyUrlResolver,

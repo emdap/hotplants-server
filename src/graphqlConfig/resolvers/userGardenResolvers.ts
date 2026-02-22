@@ -1,15 +1,18 @@
 import { userGardensCollection } from "@/config/mongodbClient";
-import { GardenPlantDocument } from "@/config/types";
+import { GardenPlantRefDocument, UserGardenDocument } from "@/config/types";
 import { User } from "better-auth";
 import { GraphQLError } from "graphql";
 import { ObjectId } from "mongodb";
 import {
   AddToGardenResult,
+  GardenPlantData,
+  GardenPlantRef,
   MutationResolvers,
   QueryResolvers,
   UserGarden,
 } from "../graphql";
 import { ApolloContext } from "../types";
+import { aggregateAndProject, paginateWithCount } from "./resolverUtils";
 
 // TODO: Standard codes for FE to interpret error message from
 
@@ -29,25 +32,77 @@ const extractUser = (context: ApolloContext) => {
   return context.user;
 };
 
+const userGardenMatch = (userId: string, gardenName?: string) => ({
+  $match: {
+    userId,
+    ...(gardenName && {
+      gardenName: { $regex: new RegExp(`^${gardenName?.trim()}$`, "i") },
+    }),
+  },
+});
+
+export const allUserGardensResolver: QueryResolvers["allUserGardens"] = async (
+  _,
+  { gardenName }: { gardenName?: string },
+  context,
+) => {
+  const user = extractUser(context);
+  return userGardensCollection
+    .aggregate<UserGarden>([
+      userGardenMatch(user.id, gardenName),
+      {
+        $project: {
+          gardenName: 1,
+          gardenThumbnail: 1,
+          plantRefs: 1,
+          plantCount: { $size: "$plantRefs" },
+        },
+      },
+    ])
+    .toArray();
+};
+
 export const userGardenResolver: QueryResolvers["userGarden"] = async (
   _,
   { gardenName },
   context,
-) => {
-  const user = extractUser(context);
+  ...rest
+) => (await allUserGardensResolver(_, { gardenName }, context, ...rest))[0];
 
-  const gardens = await joinGardensWithPlants(user.id, gardenName);
-  return gardens[0];
-};
+export const userGardenPlantsResolver: QueryResolvers["userGardenPlants"] =
+  async (_, { gardenName, ...args }, context) => {
+    const user = extractUser(context);
 
-export const allUserGardensResolver: QueryResolvers["allUserGardens"] = async (
-  _,
-  _params,
-  context,
-) => {
-  const user = extractUser(context);
-  return joinGardensWithPlants(user.id);
-};
+    return aggregateAndProject<UserGardenDocument, GardenPlantData>(
+      userGardensCollection,
+      [
+        userGardenMatch(user.id, gardenName),
+
+        { $unwind: "$plantRefs" },
+
+        {
+          $lookup: {
+            from: "plantData",
+            localField: "plantRefs._id",
+            foreignField: "_id",
+            as: "plantDataLookup",
+          },
+        },
+
+        { $unwind: "$plantDataLookup" },
+
+        {
+          $replaceRoot: {
+            newRoot: {
+              $mergeObjects: ["$plantDataLookup", "$plantRefs"],
+            },
+          },
+        },
+
+        paginateWithCount(args),
+      ],
+    );
+  };
 
 export const newGardenResolver: MutationResolvers["newGarden"] = async (
   _,
@@ -68,8 +123,8 @@ export const newGardenResolver: MutationResolvers["newGarden"] = async (
   const newGarden = await userGardensCollection.insertOne({
     userId: user.id,
     gardenName: gardenName?.trim() ?? DEFAULT_GARDEN_NAME(user),
-    totalPlants: 0,
-    plantRefs: [],
+    plantRefs: [] as GardenPlantRefDocument[],
+    plantCount: 0,
   });
 
   return newGarden.insertedId;
@@ -95,9 +150,7 @@ export const addToGardenResolver: MutationResolvers["addToGarden"] = async (
     });
   }
 
-  const newPlants: GardenPlantDocument[] = (
-    existingGarden?.plantRefs ?? []
-  ).concat({
+  const newPlants: GardenPlantRef[] = (existingGarden?.plantRefs ?? []).concat({
     _id: new ObjectId(plantId),
     addedToGardenTimestamp: Date.now(),
   });
@@ -114,59 +167,3 @@ export const addToGardenResolver: MutationResolvers["addToGarden"] = async (
     { returnDocument: "after", upsert: true },
   ) as Promise<AddToGardenResult> | null;
 };
-
-const joinGardensWithPlants = (userId: string, gardenName?: string) =>
-  userGardensCollection
-    .aggregate([
-      {
-        $match: {
-          userId,
-          ...(gardenName && {
-            gardenName: { $regex: new RegExp(`^${gardenName?.trim()}$`, "i") },
-          }),
-        },
-      },
-      {
-        $lookup: {
-          from: "plantData",
-          localField: "plantRefs._id",
-          foreignField: "_id",
-          as: "plantDataLookup",
-        },
-      },
-      {
-        $set: {
-          plants: {
-            $map: {
-              input: "$plantRefs",
-              as: "plantRef",
-              in: {
-                $mergeObjects: [
-                  {
-                    $first: {
-                      $filter: {
-                        input: "$plantDataLookup",
-                        cond: { $eq: ["$$this._id", "$$plantRef._id"] },
-                      },
-                    },
-                  },
-                  {
-                    addedToGardenTimestamp: "$$plantRef.addedToGardenTimestamp",
-                    customThumbnailUrl: "$$plantRef.customThumbnailUrl",
-                  },
-                ],
-              },
-            },
-          },
-        },
-      },
-      {
-        $set: {
-          totalPlants: { $size: "$plants" },
-        },
-      },
-      {
-        $unset: ["plantDataLookup", "plantRefs"],
-      },
-    ])
-    .toArray() as Promise<UserGarden[]>;

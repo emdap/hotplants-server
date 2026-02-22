@@ -1,6 +1,6 @@
 import { ObjectId } from "mongodb";
 import {
-  GardenPlantData,
+  GardenPlantRef,
   PlantData,
   SearchRecord,
   UserGarden,
@@ -37,11 +37,10 @@ export type PlantSearchParams = Pick<
   | "scientificName"
 >;
 
-export type GardenPlantDocument = Pick<
-  GardenPlantData,
-  "addedToGardenTimestamp" | "customThumbnailUrl"
-> & { _id: ObjectId };
+export type GardenPlantRefDocument = Omit<GardenPlantRef, "_id"> & {
+  _id: ObjectId;
+};
 
 export type UserGardenDocument = Omit<UserGarden, "plants"> & {
-  plantRefs: GardenPlantDocument[];
+  plantRefs: GardenPlantRefDocument[];
 };

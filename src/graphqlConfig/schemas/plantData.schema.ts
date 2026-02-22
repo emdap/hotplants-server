@@ -38,10 +38,16 @@ const PlantDataInterface = `
   occurrences: [PlantOccurrence!]!
 `;
 
+const GardenPlantRef = `
+  addedToGardenTimestamp: Float!
+  customThumbnailUrl: String
+`;
+
 const UserGardenData = `
   userId: String!
   gardenName: String!
-  totalPlants: Int!
+  plantRefs: [GardenPlantRef!]!
+  plantCount: Float!
 `;
 
 const makeFieldsOptional = (str: String) => str.replaceAll(/!$/gm, "");
@@ -114,16 +120,24 @@ export const plantDataSchema = buildSchema(`
     results: [PlantOccurrence!]!
   }
 
+  type GardenPlantRef {
+    _id: ObjectId!
+    ${GardenPlantRef}
+  }
+
   type GardenPlantData implements PlantDataInterface {
+    ${GardenPlantRef}
     ${PlantDataInterface}
-    addedToGardenTimestamp: Float!
-    customThumbnailUrl: String
   }
 
   type UserGarden {
     ${UserGardenData}
     gardenThumbnailUrl: String
-    plants: [GardenPlantData!]!
+  }
+
+  type UserGardenPlants {
+    count: Float!
+    results: [GardenPlantData!]!
   }
 
   type AddToGardenResult {
@@ -136,8 +150,9 @@ export const plantDataSchema = buildSchema(`
     plantOccurrences(id: String!, offset: Int, limit: Int): PlantOccurrencesResults
     plantSearch(sort: [PlantSortInput!], limit: Int, offset: Int, where: PlantDataInput): PlantSearchQueryResults!
   
-    userGarden(gardenName: String!): UserGarden
     allUserGardens: [UserGarden!]!
+    userGarden(gardenName: String!): UserGarden
+    userGardenPlants(gardenName: String!, sort: [PlantSortInput!], offset: Int, limit: Int): UserGardenPlants
   }
 
   type Mutation {
