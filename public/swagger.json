@@ -175,6 +175,25 @@
 		"contact": {}
 	},
 	"paths": {
+		"/wakeUp": {
+			"post": {
+				"operationId": "WakeUp",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "string"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": []
+			}
+		},
 		"/plants/getSearchRecord": {
 			"post": {
 				"operationId": "GetSearchRecord",

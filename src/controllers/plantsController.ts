@@ -2,13 +2,16 @@ import { ObjectId } from "mongodb";
 import { Body, Get, Path, Post, Res, Route, TsoaResponse } from "tsoa";
 import { gbifSearchesCollection } from "../config/mongodbClient";
 import { PlantSearchParams } from "../config/types";
-import { createSearchRecord, updateSearchRecord } from "./util/mongodbUtil";
+import {
+  createSearchRecord,
+  updateSearchRecord,
+} from "../plants/util/mongodbUtil";
 import {
   normalizeSearchRecord,
   searchGbifOccurrences,
   SearchRecordSummary,
   shouldStartScraping,
-} from "./util/scrapingUtil";
+} from "../plants/util/scrapingUtil";
 
 @Route("plants")
 export class PlantController {
