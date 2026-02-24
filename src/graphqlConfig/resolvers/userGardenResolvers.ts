@@ -160,9 +160,12 @@ export const addToGardenResolver: MutationResolvers["addToGarden"] = async (
   context,
 ) => {
   const user = extractUser(context);
-  const existingGarden = gardenId
-    ? await userGardensCollection.findOne(new ObjectId(gardenId))
-    : null;
+  // TODO: Want to require gardenId in future -- FE not ready to specify, fallback to default name
+  const existingGarden = await userGardensCollection.findOne(
+    gardenId
+      ? { _id: new ObjectId(gardenId) }
+      : { gardenName: DEFAULT_GARDEN_NAME(user) },
+  );
 
   if (
     existingGarden &&
@@ -188,6 +191,7 @@ export const addToGardenResolver: MutationResolvers["addToGarden"] = async (
         gardenName: existingGarden?.gardenName ?? DEFAULT_GARDEN_NAME(user),
         userId: user.id,
         plantRefs: newPlants,
+        plantCount: existingGarden?.plantCount ?? 0,
       },
     },
     { returnDocument: "after", upsert: true },
