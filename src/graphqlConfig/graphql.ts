@@ -34,6 +34,7 @@ export type GardenPlantData = PlantDataInterface & {
   isPerennial?: Maybe<Scalars['Boolean']['output']>;
   lightLevels?: Maybe<Array<Scalars['String']['output']>>;
   maturityTime?: Maybe<Scalars['String']['output']>;
+  notes?: Maybe<Scalars['String']['output']>;
   occurrences: Array<PlantOccurrence>;
   physicalCharactersticsDump?: Maybe<Scalars['String']['output']>;
   scientificName: Scalars['String']['output'];
@@ -61,11 +62,12 @@ export type Mutation = {
   addToGarden?: Maybe<UserGarden>;
   newGarden: Scalars['ObjectId']['output'];
   replaceWithProxyUrl?: Maybe<Scalars['String']['output']>;
+  updateGardenPlant?: Maybe<GardenPlantData>;
 };
 
 
 export type MutationAddToGardenArgs = {
-  gardenName?: InputMaybe<Scalars['String']['input']>;
+  gardenId?: InputMaybe<Scalars['String']['input']>;
   plantId: Scalars['String']['input'];
 };
 
@@ -79,6 +81,14 @@ export type MutationReplaceWithProxyUrlArgs = {
   occurrenceId: Scalars['Float']['input'];
   plantId: Scalars['String']['input'];
   replaceUrl: Scalars['String']['input'];
+};
+
+
+export type MutationUpdateGardenPlantArgs = {
+  customThumbnailUrl?: InputMaybe<Scalars['String']['input']>;
+  gardenId: Scalars['String']['input'];
+  note?: InputMaybe<Scalars['String']['input']>;
+  plantId: Scalars['String']['input'];
 };
 
 export type PlantData = PlantDataInterface & {
@@ -227,6 +237,12 @@ export type QueryAllSearchRecordsArgs = {
 };
 
 
+export type QueryAllUserGardensArgs = {
+  gardenId?: InputMaybe<Scalars['String']['input']>;
+  gardenName?: InputMaybe<Scalars['String']['input']>;
+};
+
+
 export type QueryPlantArgs = {
   boundingPolyCoords?: InputMaybe<Array<Array<Array<Scalars['Float']['input']>>>>;
   id: Scalars['String']['input'];
@@ -259,12 +275,13 @@ export type QuerySearchRecordDataCountsArgs = {
 
 
 export type QueryUserGardenArgs = {
-  gardenName: Scalars['String']['input'];
+  gardenId?: InputMaybe<Scalars['String']['input']>;
+  gardenName?: InputMaybe<Scalars['String']['input']>;
 };
 
 
 export type QueryUserGardenPlantsArgs = {
-  gardenName: Scalars['String']['input'];
+  gardenId: Scalars['String']['input'];
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<PlantSortInput>>;
@@ -506,6 +523,7 @@ export type GardenPlantDataResolvers<ContextType = ApolloContext, ParentType ext
   isPerennial?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   lightLevels?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, ContextType>;
   maturityTime?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  notes?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   occurrences?: Resolver<Array<ResolversTypes['PlantOccurrence']>, ParentType, ContextType>;
   physicalCharactersticsDump?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   scientificName?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
@@ -529,6 +547,7 @@ export type MutationResolvers<ContextType = ApolloContext, ParentType extends Re
   addToGarden?: Resolver<Maybe<ResolversTypes['UserGarden']>, ParentType, ContextType, RequireFields<MutationAddToGardenArgs, 'plantId'>>;
   newGarden?: Resolver<ResolversTypes['ObjectId'], ParentType, ContextType, Partial<MutationNewGardenArgs>>;
   replaceWithProxyUrl?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType, RequireFields<MutationReplaceWithProxyUrlArgs, 'occurrenceId' | 'plantId' | 'replaceUrl'>>;
+  updateGardenPlant?: Resolver<Maybe<ResolversTypes['GardenPlantData']>, ParentType, ContextType, RequireFields<MutationUpdateGardenPlantArgs, 'gardenId' | 'plantId'>>;
 }>;
 
 export interface ObjectIdScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['ObjectId'], any> {
@@ -618,14 +637,14 @@ export type PlantSizeResolvers<ContextType = ApolloContext, ParentType extends R
 
 export type QueryResolvers<ContextType = ApolloContext, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
   allSearchRecords?: Resolver<ResolversTypes['SearchRecordQueryResults'], ParentType, ContextType, Partial<QueryAllSearchRecordsArgs>>;
-  allUserGardens?: Resolver<Array<ResolversTypes['UserGarden']>, ParentType, ContextType>;
+  allUserGardens?: Resolver<Array<ResolversTypes['UserGarden']>, ParentType, ContextType, Partial<QueryAllUserGardensArgs>>;
   plant?: Resolver<Maybe<ResolversTypes['PlantData']>, ParentType, ContextType, RequireFields<QueryPlantArgs, 'id'>>;
   plantOccurrences?: Resolver<Maybe<ResolversTypes['PlantOccurrencesResults']>, ParentType, ContextType, RequireFields<QueryPlantOccurrencesArgs, 'id'>>;
   plantSearch?: Resolver<ResolversTypes['PlantSearchQueryResults'], ParentType, ContextType, Partial<QueryPlantSearchArgs>>;
   searchRecord?: Resolver<Maybe<ResolversTypes['SearchRecord']>, ParentType, ContextType, RequireFields<QuerySearchRecordArgs, 'id'>>;
   searchRecordDataCounts?: Resolver<ResolversTypes['SearchRecordPlantCountResults'], ParentType, ContextType, RequireFields<QuerySearchRecordDataCountsArgs, 'id'>>;
-  userGarden?: Resolver<Maybe<ResolversTypes['UserGarden']>, ParentType, ContextType, RequireFields<QueryUserGardenArgs, 'gardenName'>>;
-  userGardenPlants?: Resolver<Maybe<ResolversTypes['UserGardenPlants']>, ParentType, ContextType, RequireFields<QueryUserGardenPlantsArgs, 'gardenName'>>;
+  userGarden?: Resolver<Maybe<ResolversTypes['UserGarden']>, ParentType, ContextType, Partial<QueryUserGardenArgs>>;
+  userGardenPlants?: Resolver<Maybe<ResolversTypes['UserGardenPlants']>, ParentType, ContextType, RequireFields<QueryUserGardenPlantsArgs, 'gardenId'>>;
 }>;
 
 export type SearchRecordResolvers<ContextType = ApolloContext, ParentType extends ResolversParentTypes['SearchRecord'] = ResolversParentTypes['SearchRecord']> = ResolversObject<{

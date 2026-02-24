@@ -121,6 +121,8 @@ export const plantDataSchema = buildSchema(`
   type GardenPlantData implements PlantDataInterface {
     ${GardenPlantRef}
     ${PlantDataInterface}
+
+    notes: String
   }
 
   type UserGarden {
@@ -143,15 +145,16 @@ export const plantDataSchema = buildSchema(`
     plantOccurrences(id: String!, offset: Int, limit: Int): PlantOccurrencesResults
     plantSearch(sort: [PlantSortInput!], limit: Int, offset: Int, where: PlantDataInput): PlantSearchQueryResults!
   
-    allUserGardens: [UserGarden!]!
-    userGarden(gardenName: String!): UserGarden
-    userGardenPlants(gardenName: String!, sort: [PlantSortInput!], offset: Int, limit: Int): UserGardenPlants
+    allUserGardens(gardenId: String, gardenName: String): [UserGarden!]!
+    userGarden(gardenId: String, gardenName: String): UserGarden
+    userGardenPlants(gardenId: String!, sort: [PlantSortInput!], offset: Int, limit: Int): UserGardenPlants
   }
 
   type Mutation {
     replaceWithProxyUrl(plantId: String!, occurrenceId: Float!, replaceUrl: String!): String
   
     newGarden(gardenName: String): ObjectId!
-    addToGarden(gardenName: String, plantId: String!): UserGarden
+    addToGarden(gardenId: String, plantId: String!): UserGarden
+    updateGardenPlant(gardenId: String!, plantId: String!, customThumbnailUrl: String, note: String): GardenPlantData
   }
 `);

@@ -35,24 +35,32 @@ const extractUser = (context: ApolloContext) => {
   return context.user;
 };
 
-const userGardenMatch = (userId: string, gardenName?: string) => ({
+const userGardenMatch = (
+  userId: string,
+  {
+    gardenName,
+    gardenId,
+  }: { gardenName?: string | null; gardenId?: string | null } = {},
+) => ({
   $match: {
     userId,
-    ...(gardenName && {
-      gardenName: caseInsensitiveStringRegex(gardenName),
-    }),
+    ...(gardenId
+      ? { _id: new ObjectId(gardenId) }
+      : gardenName && {
+          gardenName: caseInsensitiveStringRegex(gardenName),
+        }),
   },
 });
 
 export const allUserGardensResolver: QueryResolvers["allUserGardens"] = async (
   _,
-  { gardenName }: { gardenName?: string },
+  { gardenId, gardenName },
   context,
 ) => {
   const user = extractUser(context);
   return userGardensCollection
     .aggregate<UserGarden>([
-      userGardenMatch(user.id, gardenName),
+      userGardenMatch(user.id, { gardenId, gardenName }),
       {
         $project: {
           gardenName: 1,
@@ -67,19 +75,29 @@ export const allUserGardensResolver: QueryResolvers["allUserGardens"] = async (
 
 export const userGardenResolver: QueryResolvers["userGarden"] = async (
   _,
-  { gardenName },
+  { gardenId, gardenName },
   context,
   ...rest
-) => (await allUserGardensResolver(_, { gardenName }, context, ...rest))[0];
+) =>
+  !gardenId && !gardenName
+    ? null
+    : (
+        await allUserGardensResolver(
+          _,
+          { gardenId, gardenName },
+          context,
+          ...rest,
+        )
+      )[0];
 
 export const userGardenPlantsResolver: QueryResolvers["userGardenPlants"] =
-  async (_, { gardenName, ...args }, context) => {
+  async (_, { gardenId, ...args }, context) => {
     const user = extractUser(context);
 
     return aggregateAndProject<UserGardenDocument, GardenPlantData>(
       userGardensCollection,
       [
-        userGardenMatch(user.id, gardenName),
+        userGardenMatch(user.id, { gardenId }),
 
         { $unwind: "$plantRefs" },
 
@@ -138,22 +156,24 @@ export const newGardenResolver: MutationResolvers["newGarden"] = async (
 
 export const addToGardenResolver: MutationResolvers["addToGarden"] = async (
   _,
-  { gardenName, plantId },
+  { gardenId, plantId },
   context,
 ) => {
   const user = extractUser(context);
-  const newGardenName = gardenName?.trim() ?? DEFAULT_GARDEN_NAME(user);
-  const existingGarden = await userGardensCollection.findOne({
-    gardenName: newGardenName,
-  });
+  const existingGarden = gardenId
+    ? await userGardensCollection.findOne(new ObjectId(gardenId))
+    : null;
 
   if (
     existingGarden &&
     existingGarden.plantRefs.find(({ _id }) => _id.toString() === plantId)
   ) {
-    throw new GraphQLError(`Plant already added to "${newGardenName}".`, {
-      extensions: { code: 400 },
-    });
+    throw new GraphQLError(
+      `Plant already added to "${existingGarden?.gardenName}".`,
+      {
+        extensions: { code: 400 },
+      },
+    );
   }
 
   const newPlants: GardenPlantRef[] = (existingGarden?.plantRefs ?? []).concat({
@@ -165,7 +185,7 @@ export const addToGardenResolver: MutationResolvers["addToGarden"] = async (
     existingGarden?._id ? { _id: existingGarden._id } : {},
     {
       $set: {
-        gardenName: newGardenName,
+        gardenName: existingGarden?.gardenName ?? DEFAULT_GARDEN_NAME(user),
         userId: user.id,
         plantRefs: newPlants,
       },
