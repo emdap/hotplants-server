@@ -41,6 +41,7 @@ export type GardenPlantRefDocument = Omit<GardenPlantRef, "_id"> & {
   _id: ObjectId;
 };
 
-export type UserGardenDocument = Omit<UserGarden, "plants"> & {
+export type UserGardenDocument = Omit<UserGarden, "plants" | "_id"> & {
+  _id: ObjectId;
   plantRefs: GardenPlantRefDocument[];
 };

@@ -4,7 +4,6 @@ import { User } from "better-auth";
 import { GraphQLError } from "graphql";
 import { ObjectId } from "mongodb";
 import {
-  AddToGardenResult,
   GardenPlantData,
   GardenPlantRef,
   MutationResolvers,
@@ -115,19 +114,22 @@ export const newGardenResolver: MutationResolvers["newGarden"] = async (
     gardenName: newGardenName,
   });
   if (existingGarden) {
-    throw new GraphQLError("Duplicate garden name", {
+    throw new GraphQLError(`Duplicate garden name "${newGardenName}"`, {
       extensions: { code: 400 },
     });
   }
 
-  const newGarden = await userGardensCollection.insertOne({
+  const newGardenData = {
+    _id: new ObjectId(),
     userId: user.id,
-    gardenName: gardenName?.trim() ?? DEFAULT_GARDEN_NAME(user),
+    gardenName: newGardenName,
     plantRefs: [] as GardenPlantRefDocument[],
     plantCount: 0,
-  });
+  };
 
-  return newGarden.insertedId;
+  const result = await userGardensCollection.insertOne(newGardenData);
+
+  return result.acknowledged ? newGardenData : null;
 };
 
 export const addToGardenResolver: MutationResolvers["addToGarden"] = async (
@@ -165,5 +167,5 @@ export const addToGardenResolver: MutationResolvers["addToGarden"] = async (
       },
     },
     { returnDocument: "after", upsert: true },
-  ) as Promise<AddToGardenResult> | null;
+  ) as Promise<UserGarden> | null;
 };

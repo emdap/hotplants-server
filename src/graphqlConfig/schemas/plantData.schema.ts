@@ -43,13 +43,6 @@ const GardenPlantRef = `
   customThumbnailUrl: String
 `;
 
-const UserGardenData = `
-  userId: String!
-  gardenName: String!
-  plantRefs: [GardenPlantRef!]!
-  plantCount: Float!
-`;
-
 const makeFieldsOptional = (str: String) => str.replaceAll(/!$/gm, "");
 
 export const plantDataSchema = buildSchema(`
@@ -131,7 +124,11 @@ export const plantDataSchema = buildSchema(`
   }
 
   type UserGarden {
-    ${UserGardenData}
+    _id: ObjectId!
+    userId: String!
+    gardenName: String!
+    plantRefs: [GardenPlantRef!]!
+    plantCount: Float!
     gardenThumbnailUrl: String
   }
 
@@ -140,10 +137,6 @@ export const plantDataSchema = buildSchema(`
     results: [GardenPlantData!]!
   }
 
-  type AddToGardenResult {
-    ${UserGardenData}
-    _id: ObjectId!
-  }
 
   type Query {
     plant(id: String!, boundingPolyCoords: [[[Float!]!]!]): PlantData
@@ -159,6 +152,6 @@ export const plantDataSchema = buildSchema(`
     replaceWithProxyUrl(plantId: String!, occurrenceId: Float!, replaceUrl: String!): String
   
     newGarden(gardenName: String): ObjectId!
-    addToGarden(gardenName: String, plantId: String!): AddToGardenResult
+    addToGarden(gardenName: String, plantId: String!): UserGarden
   }
 `);
