@@ -5,7 +5,11 @@ import { Document, Filter, ObjectId } from "mongodb";
 import { plantsCollection } from "../../config/mongodbClient";
 import { PlantDataDocument } from "../../config/types";
 import { PlantDataInput, QueryResolvers } from "../graphql";
-import { aggregateAndProject, paginateWithCount } from "./resolverUtils";
+import {
+  aggregateAndProject,
+  caseInsensitiveStringRegex,
+  paginateWithCount,
+} from "./resolverUtils";
 
 export const plantResolver: QueryResolvers["plant"] = async (
   _,
@@ -101,10 +105,8 @@ export const extractPlantFilter = (filter: PlantDataInput) =>
       }
 
       if (typeof value === "string") {
-        const regex = new RegExp(value.trim(), "i");
-        prev[property === "commonName" ? "commonNames" : property] = {
-          $regex: regex,
-        };
+        prev[property === "commonName" ? "commonNames" : property] =
+          caseInsensitiveStringRegex(value);
       } else if (property === "boundingPolyCoords") {
         prev = { ...prev, ...constructBboxFilter(value as Position[][]) };
       } else if (valueIsArray) {

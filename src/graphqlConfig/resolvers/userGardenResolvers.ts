@@ -11,7 +11,11 @@ import {
   UserGarden,
 } from "../graphql";
 import { ApolloContext } from "../types";
-import { aggregateAndProject, paginateWithCount } from "./resolverUtils";
+import {
+  aggregateAndProject,
+  caseInsensitiveStringRegex,
+  paginateWithCount,
+} from "./resolverUtils";
 
 // TODO: Standard codes for FE to interpret error message from
 
@@ -35,7 +39,7 @@ const userGardenMatch = (userId: string, gardenName?: string) => ({
   $match: {
     userId,
     ...(gardenName && {
-      gardenName: { $regex: new RegExp(`^${gardenName?.trim()}$`, "i") },
+      gardenName: caseInsensitiveStringRegex(gardenName),
     }),
   },
 });

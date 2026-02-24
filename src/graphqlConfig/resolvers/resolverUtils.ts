@@ -54,3 +54,7 @@ export const aggregateAndProject = async <
       )
       .toArray()
   )[0];
+
+export const caseInsensitiveStringRegex = (value: string = "") => ({
+  $regex: new RegExp(value.trim(), "i"),
+});
