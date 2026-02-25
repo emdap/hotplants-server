@@ -67,7 +67,7 @@ export type Mutation = {
 
 
 export type MutationAddToGardenArgs = {
-  gardenId: Scalars['String']['input'];
+  gardenId?: InputMaybe<Scalars['String']['input']>;
   plantId: Scalars['String']['input'];
 };
 
@@ -544,7 +544,7 @@ export type GardenPlantRefResolvers<ContextType = ApolloContext, ParentType exte
 }>;
 
 export type MutationResolvers<ContextType = ApolloContext, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = ResolversObject<{
-  addToGarden?: Resolver<Maybe<ResolversTypes['UserGarden']>, ParentType, ContextType, RequireFields<MutationAddToGardenArgs, 'gardenId' | 'plantId'>>;
+  addToGarden?: Resolver<Maybe<ResolversTypes['UserGarden']>, ParentType, ContextType, RequireFields<MutationAddToGardenArgs, 'plantId'>>;
   newGarden?: Resolver<ResolversTypes['ObjectId'], ParentType, ContextType, Partial<MutationNewGardenArgs>>;
   replaceWithProxyUrl?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType, RequireFields<MutationReplaceWithProxyUrlArgs, 'occurrenceId' | 'plantId' | 'replaceUrl'>>;
   updateGardenPlant?: Resolver<Maybe<ResolversTypes['GardenPlantData']>, ParentType, ContextType, RequireFields<MutationUpdateGardenPlantArgs, 'gardenId' | 'plantId'>>;

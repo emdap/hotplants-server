@@ -162,6 +162,41 @@
 			},
 			"PlantSearchParams": {
 				"$ref": "#/components/schemas/Pick_SearchRecordDocument.locationName-or-locationSource-or-boundingPolyCoords-or-commonName-or-scientificName_"
+			},
+			"Maybe_string-Array_": {
+				"items": {
+					"type": "string"
+				},
+				"type": "array",
+				"nullable": true
+			},
+			"Maybe_number-Array_": {
+				"items": {
+					"type": "number",
+					"format": "double"
+				},
+				"type": "array",
+				"nullable": true
+			},
+			"PlantArrayValuesDocument": {
+				"properties": {
+					"bloomColors": {
+						"$ref": "#/components/schemas/Maybe_string-Array_"
+					},
+					"bloomTimes": {
+						"$ref": "#/components/schemas/Maybe_string-Array_"
+					},
+					"hardiness": {
+						"$ref": "#/components/schemas/Maybe_number-Array_"
+					},
+					"lightLevels": {
+						"$ref": "#/components/schemas/Maybe_string-Array_"
+					},
+					"soilTypes": {
+						"$ref": "#/components/schemas/Maybe_string-Array_"
+					}
+				},
+				"type": "object"
 			}
 		},
 		"securitySchemes": {}
@@ -194,7 +229,7 @@
 				"parameters": []
 			}
 		},
-		"/plants/getSearchRecord": {
+		"/plants/searchRecord": {
 			"post": {
 				"operationId": "GetSearchRecord",
 				"responses": {
@@ -270,6 +305,25 @@
 						}
 					}
 				]
+			}
+		},
+		"/plants/filterValues": {
+			"get": {
+				"operationId": "GetFilterValues",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/PlantArrayValuesDocument"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": []
 			}
 		}
 	},

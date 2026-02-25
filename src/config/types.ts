@@ -18,6 +18,21 @@ export type PlantDataDocument = Omit<
   _id: ObjectId;
 };
 
+type ArrayField<T> = {
+  [K in keyof T]: NonNullable<T[K]> extends Array<any> ? K : never;
+}[keyof T];
+export type PlantFilterableArrayField = NonNullable<
+  ArrayField<
+    Omit<
+      PlantDataDocument,
+      "occurrences" | "commonNames" | "uses" | "scrapeSources"
+    >
+  >
+>;
+export type PlantArrayValuesDocument = {
+  [K in PlantFilterableArrayField]?: PlantDataDocument[K];
+};
+
 export type PartialPlantData = Omit<
   PlantDataDocument,
   "_id" | "addedTimestamp" | "updatedTimestamp"

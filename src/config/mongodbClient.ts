@@ -1,5 +1,6 @@
 import { MongoClient } from "mongodb";
 import {
+  PlantArrayValuesDocument,
   PlantDataDocument,
   SearchRecordDocument,
   UserGardenDocument,
@@ -18,3 +19,6 @@ export const userGardensCollection =
 
 export const gbifSearchesCollection =
   plantsDb.collection<SearchRecordDocument>("gbifSearches");
+
+export const plantArrayValuesCollection =
+  plantsDb.collection<PlantArrayValuesDocument>("plantArrayValues");

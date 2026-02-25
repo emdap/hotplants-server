@@ -1,7 +1,10 @@
 import { ObjectId } from "mongodb";
 import { Body, Get, Path, Post, Res, Route, TsoaResponse } from "tsoa";
-import { gbifSearchesCollection } from "../config/mongodbClient";
-import { PlantSearchParams } from "../config/types";
+import {
+  gbifSearchesCollection,
+  plantArrayValuesCollection,
+} from "../config/mongodbClient";
+import { PlantArrayValuesDocument, PlantSearchParams } from "../config/types";
 import {
   createSearchRecord,
   updateSearchRecord,
@@ -15,7 +18,7 @@ import {
 
 @Route("plants")
 export class PlantController {
-  @Post("getSearchRecord")
+  @Post("searchRecord")
   public async getSearchRecord(
     @Body() plantSearch: PlantSearchParams,
     @Res() errorResponse: TsoaResponse<500, string>,
@@ -68,5 +71,10 @@ export class PlantController {
       console.info("Will not start scraping");
       return normalizeSearchRecord(searchRecord);
     }
+  }
+
+  @Get("filterValues")
+  public async getFilterValues(): Promise<PlantArrayValuesDocument> {
+    return (await plantArrayValuesCollection.findOne({})) ?? {};
   }
 }

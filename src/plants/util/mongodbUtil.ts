@@ -1,12 +1,14 @@
 import { Feature, Polygon } from "geojson";
-import { ObjectId } from "mongodb";
+import { Document, ObjectId } from "mongodb";
 import {
   gbifSearchesCollection,
+  plantArrayValuesCollection,
   plantsCollection,
 } from "../../config/mongodbClient";
 import {
   PartialPlantData,
   PlantDataDocument,
+  PlantFilterableArrayField,
   PlantSearchParams,
   SearchRecordDocument,
 } from "../../config/types";
@@ -39,9 +41,12 @@ export const storePlantData = async ({
     updatedTimestamp: unixTimestamp,
   };
 
-  return _id
+  const plantPromise = _id
     ? plantsCollection.updateOne({ _id }, { $set: fullData })
     : plantsCollection.insertOne({ _id: new ObjectId(), ...fullData });
+  const arrayValuesPromise = updatePlantDataArrayValues(fullData);
+
+  return Promise.all([plantPromise, arrayValuesPromise]);
 };
 
 export const lookupPlantByCoordinates = async ({
@@ -132,3 +137,25 @@ export const updateSearchRecord = (
     },
     { returnDocument: "after" },
   );
+
+const updatePlantDataArrayValues = (
+  plantData: Omit<PlantDataDocument, "_id">,
+) => {
+  // TS definition ensures all array fields are present
+  const plantArrayFieldsGrouping: Record<PlantFilterableArrayField, Document> =
+    {
+      bloomColors: { $each: plantData.bloomColors ?? [] },
+      bloomTimes: { $each: plantData.bloomTimes ?? [] },
+      hardiness: { $each: plantData.hardiness ?? [] },
+      lightLevels: { $each: plantData.lightLevels ?? [] },
+      soilTypes: { $each: plantData.soilTypes ?? [] },
+    };
+
+  return plantArrayValuesCollection.updateOne(
+    {},
+    {
+      $addToSet: plantArrayFieldsGrouping,
+    },
+    { upsert: true },
+  );
+};
