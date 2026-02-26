@@ -9,7 +9,8 @@ import {
 const PFAF_PLANT_FIELD_MAPPING: Record<string, keyof PartialPlantData> = {
   "common name": "commonNames",
   "usda hardiness": "hardiness",
-  habitats: "habitat",
+  // TODO: Scrape habitats -- GBIF has info on this as well from `NameUsageSearchResult`
+  habitats: "habitats",
   "bloom color": "bloomColors",
   "bloom time": "bloomTimes",
   "main bloom time": "bloomTimes",
@@ -23,7 +24,7 @@ const cleanText = (text: string) =>
 
 const scrapeCareIcons = (document: Document) => {
   const careIconsTable = document.getElementById(
-    "contentplaceholder1_tblicons"
+    "contentplaceholder1_tblicons",
   );
   if (!careIconsTable) {
     return;
@@ -32,7 +33,7 @@ const scrapeCareIcons = (document: Document) => {
   const soilType: string[] = [];
   const lightLevel: string[] = [];
   const careIconTitles = Array.from(careIconsTable.querySelectorAll("img")).map(
-    (imgElement) => imgElement.title
+    (imgElement) => imgElement.title,
   );
   careIconTitles.forEach((title) => {
     if (title.match(/soil|water/g)) {
@@ -76,7 +77,7 @@ const scrapeStructuredFields = (document: Document) => {
 const scrapePlantSummary = (document: Document) => {
   const plantData: [string, unknown][] = [];
   const plantSummary = document.getElementById(
-    "contentplaceholder1_txtsummary"
+    "contentplaceholder1_txtsummary",
   );
 
   plantSummary?.textContent?.split(".").forEach((item) => {
@@ -113,7 +114,7 @@ const extractPlantSize = (plantCharData: string) => {
 const scrapePlantPhysicalChars = (document: Document) => {
   let plantData: Partial<PartialPlantData> = {};
   const plantCharData = document.getElementById(
-    "contentplaceholder1_lblphystatment"
+    "contentplaceholder1_lblphystatment",
   )?.textContent;
 
   if (plantCharData) {
@@ -126,7 +127,7 @@ const scrapePlantPhysicalChars = (document: Document) => {
 };
 
 const scrapeThumbnailImage = (
-  document: Document
+  document: Document,
 ): Partial<PartialPlantData> | null => {
   const images = document
     .getElementById("ContentPlaceHolder1_tblPlantImges".toLowerCase())
@@ -139,13 +140,13 @@ const scrapeThumbnailImage = (
 
 const PFAFPageFound = (document: Document) => {
   const plantTitle = document.getElementById(
-    "contentplaceholder1_lbldisplatinname"
+    "contentplaceholder1_lbldisplatinname",
   );
   return Boolean(plantTitle?.textContent);
 };
 
 export const scrapePFAF = async (
-  scientificName: string
+  scientificName: string,
 ): Promise<WebsiteScrapedDataWithSource | null> => {
   const scrapeUrl = getScrapeUrl(scientificName, "pfaf");
   const response = await fetch(scrapeUrl);

@@ -71,7 +71,7 @@ const models: TsoaRoute.Models = {
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "PlantArrayValuesDocument": {
         "dataType": "refAlias",
-        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"bloomColors":{"dataType":"union","subSchemas":[{"ref":"Maybe_string-Array_"},{"dataType":"undefined"}]},"bloomTimes":{"dataType":"union","subSchemas":[{"ref":"Maybe_string-Array_"},{"dataType":"undefined"}]},"hardiness":{"dataType":"union","subSchemas":[{"ref":"Maybe_number-Array_"},{"dataType":"undefined"}]},"lightLevels":{"dataType":"union","subSchemas":[{"ref":"Maybe_string-Array_"},{"dataType":"undefined"}]},"soilTypes":{"dataType":"union","subSchemas":[{"ref":"Maybe_string-Array_"},{"dataType":"undefined"}]}},"validators":{}},
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"bloomColors":{"dataType":"union","subSchemas":[{"ref":"Maybe_string-Array_"},{"dataType":"undefined"}]},"bloomTimes":{"dataType":"union","subSchemas":[{"ref":"Maybe_string-Array_"},{"dataType":"undefined"}]},"habitats":{"dataType":"union","subSchemas":[{"ref":"Maybe_string-Array_"},{"dataType":"undefined"}]},"hardiness":{"dataType":"union","subSchemas":[{"ref":"Maybe_number-Array_"},{"dataType":"undefined"}]},"lightLevels":{"dataType":"union","subSchemas":[{"ref":"Maybe_string-Array_"},{"dataType":"undefined"}]},"soilTypes":{"dataType":"union","subSchemas":[{"ref":"Maybe_string-Array_"},{"dataType":"undefined"}]}},"validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 };

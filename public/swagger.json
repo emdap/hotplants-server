@@ -186,6 +186,9 @@
 					"bloomTimes": {
 						"$ref": "#/components/schemas/Maybe_string-Array_"
 					},
+					"habitats": {
+						"$ref": "#/components/schemas/Maybe_string-Array_"
+					},
 					"hardiness": {
 						"$ref": "#/components/schemas/Maybe_number-Array_"
 					},

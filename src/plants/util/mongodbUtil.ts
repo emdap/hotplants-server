@@ -147,6 +147,7 @@ const updatePlantDataArrayValues = (
       bloomColors: { $each: plantData.bloomColors ?? [] },
       bloomTimes: { $each: plantData.bloomTimes ?? [] },
       hardiness: { $each: plantData.hardiness ?? [] },
+      habitats: { $each: plantData.habitats ?? [] },
       lightLevels: { $each: plantData.lightLevels ?? [] },
       soilTypes: { $each: plantData.soilTypes ?? [] },
     };
