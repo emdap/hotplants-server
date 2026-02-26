@@ -72,6 +72,12 @@ export class PlantController {
 
   @Get("filterValues")
   public async getFilterValues(): Promise<PlantArrayValuesDocument> {
-    return (await plantArrayValuesCollection.findOne({})) ?? {};
+    const valuesDocument = await plantArrayValuesCollection.findOne({});
+    if (valuesDocument) {
+      const { _id, ...values } = valuesDocument;
+      return values;
+    }
+
+    return {};
   }
 }
