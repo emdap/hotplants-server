@@ -1,9 +1,9 @@
 import type { CodegenConfig } from "@graphql-codegen/cli";
 import { printSchema } from "graphql";
-import { plantDataSchema } from "./schemas/plantData.schema";
+import { dynamicSchema } from "./schemas/dynamic.schema";
 
 const config: CodegenConfig = {
-  schema: ["src/graphqlConfig/schemas/**", printSchema(plantDataSchema)],
+  schema: ["src/graphqlConfig/schemas/**", printSchema(dynamicSchema)],
 
   generates: {
     "src/graphqlConfig/graphql.ts": {

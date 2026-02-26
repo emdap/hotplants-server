@@ -45,7 +45,7 @@ const GardenPlantRef = `
 
 const makeFieldsOptional = (str: String) => str.replaceAll(/!$/gm, "");
 
-export const plantDataSchema = buildSchema(`
+export const dynamicSchema = buildSchema(`
   scalar ObjectId
 
   type PlantMedia {

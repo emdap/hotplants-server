@@ -21,7 +21,7 @@ import {
   userGardenPlantsResolver,
   userGardenResolver,
 } from "./resolvers/userGardenResolvers";
-import { plantDataSchema } from "./schemas/plantData.schema";
+import { dynamicSchema } from "./schemas/dynamic.schema";
 import { ApolloContext } from "./types";
 
 const schemaPath = path.join(import.meta.dirname, "schemas/mainSchema.graphql");
@@ -64,7 +64,7 @@ const resolvers: Resolvers = {
 };
 
 export const apolloServer = new ApolloServer<ApolloContext>({
-  typeDefs: [gql(readFileSync(schemaPath, "utf-8")), plantDataSchema],
+  typeDefs: [gql(readFileSync(schemaPath, "utf-8")), dynamicSchema],
   resolvers,
   introspection: true,
 });
