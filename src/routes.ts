@@ -4,9 +4,9 @@
 import type { TsoaRoute } from '@tsoa/runtime';
 import {  fetchMiddlewares, ExpressTemplateService } from '@tsoa/runtime';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-import { WakeUpController } from './controllers/wakeUpController';
+import { PlantController } from './plants/plantsController';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-import { PlantController } from './controllers/plantsController';
+import { WakeUpController } from './controllers/wakeUpController';
 import type { Request as ExRequest, Response as ExResponse, RequestHandler, Router } from 'express';
 
 
@@ -91,35 +91,6 @@ export function RegisterRoutes(app: Router) {
 
 
     
-        const argsWakeUpController_wakeUp: Record<string, TsoaRoute.ParameterSchema> = {
-        };
-        app.post('/wakeUp',
-            ...(fetchMiddlewares<RequestHandler>(WakeUpController)),
-            ...(fetchMiddlewares<RequestHandler>(WakeUpController.prototype.wakeUp)),
-
-            async function WakeUpController_wakeUp(request: ExRequest, response: ExResponse, next: any) {
-
-            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-
-            let validatedArgs: any[] = [];
-            try {
-                validatedArgs = templateService.getValidatedArgs({ args: argsWakeUpController_wakeUp, request, response });
-
-                const controller = new WakeUpController();
-
-              await templateService.apiHandler({
-                methodName: 'wakeUp',
-                controller,
-                response,
-                next,
-                validatedArgs,
-                successStatus: undefined,
-              });
-            } catch (err) {
-                return next(err);
-            }
-        });
-        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsPlantController_getSearchRecord: Record<string, TsoaRoute.ParameterSchema> = {
                 plantSearch: {"in":"body","name":"plantSearch","required":true,"ref":"PlantSearchParams"},
                 errorResponse: {"in":"res","name":"500","required":true,"dataType":"string"},
@@ -200,6 +171,35 @@ export function RegisterRoutes(app: Router) {
 
               await templateService.apiHandler({
                 methodName: 'getFilterValues',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsWakeUpController_wakeUp: Record<string, TsoaRoute.ParameterSchema> = {
+        };
+        app.post('/wakeUp',
+            ...(fetchMiddlewares<RequestHandler>(WakeUpController)),
+            ...(fetchMiddlewares<RequestHandler>(WakeUpController.prototype.wakeUp)),
+
+            async function WakeUpController_wakeUp(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsWakeUpController_wakeUp, request, response });
+
+                const controller = new WakeUpController();
+
+              await templateService.apiHandler({
+                methodName: 'wakeUp',
                 controller,
                 response,
                 next,

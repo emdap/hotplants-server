@@ -5,16 +5,13 @@ import {
   plantArrayValuesCollection,
 } from "../config/mongodbClient";
 import { PlantArrayValuesDocument, PlantSearchParams } from "../config/types";
-import {
-  createSearchRecord,
-  updateSearchRecord,
-} from "../plants/util/mongodbUtil";
+import { createSearchRecord, updateSearchRecord } from "./util/mongodbUtil";
 import {
   normalizeSearchRecord,
   searchGbifOccurrences,
   SearchRecordSummary,
   shouldStartScraping,
-} from "../plants/util/scrapingUtil";
+} from "./util/scrapingUtil";
 
 @Route("plants")
 export class PlantController {
