@@ -2,6 +2,7 @@ import { polygon } from "@turf/turf";
 import { Polygon, Position } from "geojson";
 import { GraphQLError } from "graphql";
 import { Document, Filter, ObjectId } from "mongodb";
+import { Entries } from "type-fest";
 import { plantsCollection } from "../../config/mongodbClient";
 import { PlantDataDocument } from "../../config/types";
 import { PlantDataInput, QueryResolvers } from "../graphql";
@@ -41,6 +42,7 @@ export const plantSearchResolver: QueryResolvers["plantSearch"] = async (
   _,
   { where, ...args },
 ) => {
+  console.log("resolver", where);
   const aggregation: Document = where
     ? [{ $match: extractPlantFilter(where) }]
     : [];
@@ -93,32 +95,39 @@ export const plantSearchResolver: QueryResolvers["plantSearch"] = async (
   return aggregateAndProject(plantsCollection, aggregation);
 };
 
-export const extractPlantFilter = (filter: PlantDataInput) =>
-  Object.entries(filter).reduce<Filter<PlantDataDocument>>(
-    (prev, [property, value]) => {
-      const valueIsArray = Array.isArray(value);
-      if (
-        !value ||
-        ((typeof value === "string" || valueIsArray) && !value.length)
-      ) {
-        return prev;
-      }
+export const extractPlantFilter = (filter: PlantDataInput & { _id?: string }) =>
+  (Object.entries(filter) as Entries<typeof filter>).reduce<
+    Filter<PlantDataDocument>
+  >((prev, [property, filter]) => {
+    const simpleArrayFilter = Array.isArray(filter) ? filter : null;
+    const complexArrayFilter =
+      filter && typeof filter === "object" && "value" in filter ? filter : null;
 
-      if (typeof value === "string") {
-        prev[property === "commonName" ? "commonNames" : property] =
-          caseInsensitiveStringRegex(value);
-      } else if (property === "boundingPolyCoords") {
-        prev = { ...prev, ...constructBboxFilter(value as Position[][]) };
-      } else if (valueIsArray) {
-        prev[property] = { $all: value };
-      } else {
-        prev[property] = value;
-      }
-
+    if (
+      (filter !== null && !filter) ||
+      (typeof filter === "string" && !filter.length) ||
+      (simpleArrayFilter && !simpleArrayFilter.length) ||
+      (complexArrayFilter && !complexArrayFilter.value?.length)
+    ) {
       return prev;
-    },
-    {},
-  );
+    }
+
+    const field = property === "commonName" ? "commonNames" : property;
+
+    if (typeof filter === "string") {
+      prev[field] = caseInsensitiveStringRegex(filter);
+    } else if (field === "boundingPolyCoords") {
+      prev = { ...prev, ...constructBboxFilter(filter as Position[][]) };
+    } else if (simpleArrayFilter) {
+      prev[field] = { $in: simpleArrayFilter } as Filter<PlantDataDocument>;
+    } else if (complexArrayFilter?.value) {
+      prev[field] = complexArrayFilter.matchAll
+        ? { $all: complexArrayFilter.value }
+        : ({ $in: complexArrayFilter.value } as Filter<PlantDataDocument>);
+    }
+
+    return prev;
+  }, {});
 
 export const parseBboxInput = (bbox: Position[][]) => {
   try {

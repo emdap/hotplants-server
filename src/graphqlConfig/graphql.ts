@@ -91,6 +91,16 @@ export type MutationUpdateGardenPlantArgs = {
   plantId: Scalars['String']['input'];
 };
 
+export type PlantArrayFilterIntInput = {
+  matchAll?: InputMaybe<Scalars['Boolean']['input']>;
+  value?: InputMaybe<Array<InputMaybe<Scalars['Int']['input']>>>;
+};
+
+export type PlantArrayFilterStringInput = {
+  matchAll?: InputMaybe<Scalars['Boolean']['input']>;
+  value?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
 export type PlantData = PlantDataInterface & {
   __typename?: 'PlantData';
   _id: Scalars['ObjectId']['output'];
@@ -117,29 +127,27 @@ export type PlantData = PlantDataInterface & {
 };
 
 export type PlantDataInput = {
-  _id?: InputMaybe<Scalars['ObjectId']['input']>;
   addedTimestamp?: InputMaybe<Scalars['Float']['input']>;
-  bloomColors?: InputMaybe<Array<Scalars['String']['input']>>;
-  bloomTimes?: InputMaybe<Array<Scalars['String']['input']>>;
+  bloomColors?: InputMaybe<PlantArrayFilterStringInput>;
+  bloomTimes?: InputMaybe<PlantArrayFilterStringInput>;
   boundingPolyCoords?: InputMaybe<Array<Array<Array<Scalars['Float']['input']>>>>;
   commonName?: InputMaybe<Scalars['String']['input']>;
-  habitats?: InputMaybe<Array<Scalars['String']['input']>>;
-  hardiness?: InputMaybe<Array<Scalars['Int']['input']>>;
+  habitats?: InputMaybe<PlantArrayFilterStringInput>;
+  hardiness?: InputMaybe<PlantArrayFilterIntInput>;
   height?: InputMaybe<PlantSizeInput>;
-  isPerennial?: InputMaybe<Scalars['Boolean']['input']>;
-  lightLevels?: InputMaybe<Array<Scalars['String']['input']>>;
+  isPerennial?: InputMaybe<Array<InputMaybe<Scalars['Boolean']['input']>>>;
+  lightLevels?: InputMaybe<PlantArrayFilterStringInput>;
   maturityTime?: InputMaybe<Scalars['String']['input']>;
   physicalCharactersticsDump?: InputMaybe<Scalars['String']['input']>;
   scientificName?: InputMaybe<Scalars['String']['input']>;
-  scrapeSources?: InputMaybe<Array<Scalars['String']['input']>>;
-  soilTypes?: InputMaybe<Array<Scalars['String']['input']>>;
+  scrapeSources?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  soilTypes?: InputMaybe<PlantArrayFilterStringInput>;
   spread?: InputMaybe<PlantSizeInput>;
   updatedTimestamp?: InputMaybe<Scalars['Float']['input']>;
-  uses?: InputMaybe<Array<Scalars['String']['input']>>;
+  uses?: InputMaybe<PlantArrayFilterStringInput>;
 };
 
 export type PlantDataInterface = {
-  _id: Scalars['ObjectId']['output'];
   addedTimestamp: Scalars['Float']['output'];
   bloomColors?: Maybe<Array<Scalars['String']['output']>>;
   bloomTimes?: Maybe<Array<Scalars['String']['output']>>;
@@ -449,6 +457,8 @@ export type ResolversTypes = ResolversObject<{
   LocationSource: LocationSource;
   Mutation: ResolverTypeWrapper<{}>;
   ObjectId: ResolverTypeWrapper<Scalars['ObjectId']['output']>;
+  PlantArrayFilterIntInput: PlantArrayFilterIntInput;
+  PlantArrayFilterStringInput: PlantArrayFilterStringInput;
   PlantData: ResolverTypeWrapper<PlantData>;
   PlantDataInput: PlantDataInput;
   PlantDataInterface: ResolverTypeWrapper<ResolversInterfaceTypes<ResolversTypes>['PlantDataInterface']>;
@@ -486,6 +496,8 @@ export type ResolversParentTypes = ResolversObject<{
   Int: Scalars['Int']['output'];
   Mutation: {};
   ObjectId: Scalars['ObjectId']['output'];
+  PlantArrayFilterIntInput: PlantArrayFilterIntInput;
+  PlantArrayFilterStringInput: PlantArrayFilterStringInput;
   PlantData: PlantData;
   PlantDataInput: PlantDataInput;
   PlantDataInterface: ResolversInterfaceTypes<ResolversParentTypes>['PlantDataInterface'];
@@ -581,7 +593,6 @@ export type PlantDataResolvers<ContextType = ApolloContext, ParentType extends R
 
 export type PlantDataInterfaceResolvers<ContextType = ApolloContext, ParentType extends ResolversParentTypes['PlantDataInterface'] = ResolversParentTypes['PlantDataInterface']> = ResolversObject<{
   __resolveType: TypeResolveFn<'GardenPlantData' | 'PlantData', ParentType, ContextType>;
-  _id?: Resolver<ResolversTypes['ObjectId'], ParentType, ContextType>;
   addedTimestamp?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
   bloomColors?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, ContextType>;
   bloomTimes?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, ContextType>;

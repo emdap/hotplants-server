@@ -6,17 +6,22 @@ const PlantSize = `
 `;
 
 const PlantDataCommonFields = `
-  _id: ObjectId!
-
   scientificName: String!
   addedTimestamp: Float!
   updatedTimestamp: Float!
   scrapeSources: [String!]!
 
-  isPerennial: Boolean
   maturityTime: String
   physicalCharactersticsDump: String
-  
+`;
+
+const PlantDataInterface = `
+  ${PlantDataCommonFields}
+
+  isPerennial: Boolean
+  height: PlantSize
+  spread: PlantSize
+
   habitats: [String!]
   bloomColors: [String!]
   bloomTimes: [String!]
@@ -24,13 +29,6 @@ const PlantDataCommonFields = `
   lightLevels: [String!]
   hardiness: [Int!]
   uses: [String!]
-`;
-
-const PlantDataInterface = `
-  ${PlantDataCommonFields}
-
-  height: PlantSize
-  spread: PlantSize
 
   thumbnailUrl: String
   commonNames: [String!]
@@ -43,7 +41,7 @@ const GardenPlantRef = `
   customThumbnailUrl: String
 `;
 
-const makeFieldsOptional = (str: String) => str.replaceAll(/!$/gm, "");
+const makeFieldsOptional = (str: String) => str.replaceAll("!", "");
 
 export const dynamicSchema = buildSchema(`
   scalar ObjectId
@@ -64,17 +62,8 @@ export const dynamicSchema = buildSchema(`
   }
 
   type PlantData implements PlantDataInterface {
+    _id: ObjectId!
     ${PlantDataInterface}
-  }
-
-  input PlantDataInput {
-    ${makeFieldsOptional(PlantDataCommonFields)}
-
-    height: PlantSizeInput
-    spread: PlantSizeInput
-
-    commonName: String
-    boundingPolyCoords: [[[Float!]!]!]
   }
 
   enum PlantSizeUnit {
@@ -98,6 +87,36 @@ export const dynamicSchema = buildSchema(`
     scientificName
   }
 
+  input PlantArrayFilterStringInput {
+    value: [String]
+    matchAll: Boolean
+  }
+
+  input PlantArrayFilterIntInput {
+    value: [Int]
+    matchAll: Boolean
+  }
+
+  input PlantDataInput {
+    ${makeFieldsOptional(PlantDataCommonFields)}
+
+    isPerennial: [Boolean]
+    height: PlantSizeInput
+    spread: PlantSizeInput
+
+    commonName: String
+    boundingPolyCoords: [[[Float!]!]!]
+
+    habitats: PlantArrayFilterStringInput
+    bloomColors: PlantArrayFilterStringInput
+    bloomTimes: PlantArrayFilterStringInput
+    soilTypes: PlantArrayFilterStringInput
+    lightLevels: PlantArrayFilterStringInput
+    uses: PlantArrayFilterStringInput
+
+    hardiness: PlantArrayFilterIntInput
+  }
+
   input PlantSortInput {
     field: PlantSortField!
     value: Int!
@@ -119,6 +138,7 @@ export const dynamicSchema = buildSchema(`
   }
 
   type GardenPlantData implements PlantDataInterface {
+    _id: ObjectId!
     ${GardenPlantRef}
     ${PlantDataInterface}
 
