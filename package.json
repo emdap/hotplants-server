@@ -12,7 +12,7 @@
     "generate-docs": "pnpm generate-graphql && pnpm generate-tsoa",
     "generate-graphql": "graphql-codegen --config src/graphqlConfig/codegen.ts",
     "generate-tsoa": "tsoa routes && tsoa spec",
-    "generate-gbif-types": "npx openapi-typescript src/config/schemas/gbif-schema.json -o src/config/schemas/gbif.d.ts"
+    "generate-gbif-types": "node scripts/generateOpenApi.js src/config/schemas/gbifSchema.json src/config/schemas/gbif.ts"
   },
   "keywords": [],
   "author": "",
@@ -25,6 +25,7 @@
     "@turf/turf": "^7.2.0",
     "@types/swagger-ui-express": "^4.1.8",
     "better-auth": "^1.4.6",
+    "convert": "^7.0.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^17.2.0",

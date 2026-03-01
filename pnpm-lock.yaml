@@ -26,6 +26,9 @@ importers:
       better-auth:
         specifier: ^1.4.6
         version: 1.4.6
+      convert:
+        specifier: ^7.0.0
+        version: 7.0.0
       cookie-parser:
         specifier: ^1.4.7
         version: 1.4.7
@@ -1738,6 +1741,9 @@ packages:
 
   convert-source-map@2.0.0:
     resolution: {integrity: sha512-Kvp459HrV2FEJ1CAsi1Ku+MY3kasH19TFykTz2xWmMeq6bk2NU3XXvfJ+Q61m0xktWwt+1HSYf3JZsTms3aRJg==}
+
+  convert@7.0.0:
+    resolution: {integrity: sha512-Sc8P9MeZBPtaAG/hiSYO28LvVjEDfP+iecvP1nvhJxvXcS3d9WQJIQma9XMPRwIWPifA2X8epIR9zbLxJPrT8w==}
 
   cookie-parser@1.4.7:
     resolution: {integrity: sha512-nGUvgXnotP3BsjiLX2ypbQnWoGUPIIfHQNZkkC668ntrzGWEZVW70HDEB1qnNGMicPje6EttlIgzo51YSwNQGw==}
@@ -6106,6 +6112,8 @@ snapshots:
   content-type@1.0.5: {}
 
   convert-source-map@2.0.0: {}
+
+  convert@7.0.0: {}
 
   cookie-parser@1.4.7:
     dependencies:
