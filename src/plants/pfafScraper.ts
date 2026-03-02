@@ -1,10 +1,12 @@
+import { convert, Unit } from "convert";
 import { JSDOM } from "jsdom";
 import { PartialPlantData } from "../config/types";
-import { PlantSizeUnit } from "../graphqlConfig/graphql";
 import {
   getScrapeUrl,
   WebsiteScrapedDataWithSource,
 } from "./util/scrapingUtil";
+
+export const STANDARD_UNIT: Unit = "meters";
 
 const PFAF_PLANT_FIELD_MAPPING: Record<string, keyof PartialPlantData> = {
   "common name": "commonNames",
@@ -61,10 +63,17 @@ const scrapeStructuredFields = (document: Document) => {
     const plantKey = rowLabel ? PFAF_PLANT_FIELD_MAPPING[rowLabel] : null;
     if (plantKey && rowValue) {
       if (plantKey === "hardiness") {
-        plantData.push([
-          plantKey,
-          rowValue.split("-").map((item) => parseInt(item)),
-        ]);
+        const hardinessArray = rowValue
+          .split("-")
+          .reduce<number[]>((prev, item) => {
+            const value = parseInt(item);
+            if (!isNaN(value)) {
+              prev.push(value);
+            }
+            return prev;
+          }, []);
+
+        hardinessArray.length && plantData.push([plantKey, hardinessArray]);
       } else {
         plantData.push([plantKey, rowValue.split(", ").map(cleanText)]);
       }
@@ -100,11 +109,17 @@ const extractPlantSize = (plantCharData: string) => {
     // Size data typically listed as "<height> by <spread>", get the first 2 numbers listed
     for (let i = 0; i < 2; i++) {
       const [_, amount, unit] = sizeMatches[i];
-      plantData[i === 0 ? "height" : "spread"] = {
-        amount: Number(amount),
-        // TODO: Handle 'bad' unit
-        unit: unit as PlantSizeUnit,
-      };
+      const numberAmount = Number(amount);
+      const convertedAmount = convert(numberAmount, unit as Unit).to(
+        STANDARD_UNIT,
+      );
+
+      if (convertedAmount && !isNaN(convertedAmount)) {
+        plantData[i === 0 ? "height" : "spread"] = {
+          amount: convertedAmount,
+          unit: STANDARD_UNIT,
+        };
+      }
     }
   }
 

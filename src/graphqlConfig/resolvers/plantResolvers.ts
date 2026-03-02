@@ -1,11 +1,17 @@
+import { STANDARD_UNIT } from "@/plants/pfafScraper";
 import { polygon } from "@turf/turf";
+import convert, { Unit } from "convert";
 import { Polygon, Position } from "geojson";
 import { GraphQLError } from "graphql";
 import { Document, Filter, ObjectId } from "mongodb";
 import { Entries } from "type-fest";
 import { plantsCollection } from "../../config/mongodbClient";
 import { PlantDataDocument } from "../../config/types";
-import { PlantDataInput, QueryResolvers } from "../graphql";
+import {
+  PlantDataInput,
+  PlantSizeRangeInput,
+  QueryResolvers,
+} from "../graphql";
 import {
   aggregateAndProject,
   caseInsensitiveStringRegex,
@@ -42,7 +48,6 @@ export const plantSearchResolver: QueryResolvers["plantSearch"] = async (
   _,
   { where, ...args },
 ) => {
-  console.log("resolver", where);
   const aggregation: Document = where
     ? [{ $match: extractPlantFilter(where) }]
     : [];
@@ -102,6 +107,10 @@ export const extractPlantFilter = (filter: PlantDataInput & { _id?: string }) =>
     const simpleArrayFilter = Array.isArray(filter) ? filter : null;
     const complexArrayFilter =
       filter && typeof filter === "object" && "value" in filter ? filter : null;
+    const rangeFilter =
+      ["height", "spread"].includes(property) && typeof filter === "object"
+        ? (filter as PlantSizeRangeInput)
+        : null;
 
     if (
       (filter !== null && !filter) ||
@@ -124,6 +133,15 @@ export const extractPlantFilter = (filter: PlantDataInput & { _id?: string }) =>
       prev[field] = complexArrayFilter.matchAll
         ? { $all: complexArrayFilter.value }
         : ({ $in: complexArrayFilter.value } as Filter<PlantDataDocument>);
+    } else if (rangeFilter) {
+      const { convertedMin, convertedMax, unit } =
+        constructRangeFilter(rangeFilter);
+
+      prev[`${field}.amount`] = {
+        ...(convertedMin && { $gte: convertedMin }),
+        ...(convertedMax && { $lte: convertedMax }),
+      };
+      prev[`${field}.unit`] = unit;
     }
 
     return prev;
@@ -142,6 +160,21 @@ export const parseBboxInput = (bbox: Position[][]) => {
 
     throw error;
   }
+};
+
+const constructRangeFilter = (rangeFilter: PlantSizeRangeInput) => {
+  const [minAmount, maxAmount] = (["minAmount", "maxAmount"] as const).map(
+    (key) =>
+      rangeFilter[key] !== null && rangeFilter[key] !== undefined
+        ? convert(rangeFilter[key], rangeFilter.unit as Unit).to(STANDARD_UNIT)
+        : undefined,
+  );
+
+  return {
+    convertedMin: minAmount,
+    convertedMax: maxAmount,
+    unit: STANDARD_UNIT,
+  };
 };
 
 const constructBboxFilter = (value: Position[][]) => {

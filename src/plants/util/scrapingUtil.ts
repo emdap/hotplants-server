@@ -76,7 +76,6 @@ export const shouldStartScraping = ({
 
       const now = Date.now();
       const timeDifference = now - lastRanTimestamp;
-      console.log(timeDifference);
       return timeDifference >= MAX_STALE_SEARCH_MILLISECONDS;
     default:
       return false;

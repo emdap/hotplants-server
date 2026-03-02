@@ -134,7 +134,7 @@ export type PlantDataInput = {
   commonName?: InputMaybe<Scalars['String']['input']>;
   habitats?: InputMaybe<PlantArrayFilterStringInput>;
   hardiness?: InputMaybe<PlantArrayFilterIntInput>;
-  height?: InputMaybe<PlantSizeInput>;
+  height?: InputMaybe<PlantSizeRangeInput>;
   isPerennial?: InputMaybe<Array<InputMaybe<Scalars['Boolean']['input']>>>;
   lightLevels?: InputMaybe<PlantArrayFilterStringInput>;
   maturityTime?: InputMaybe<Scalars['String']['input']>;
@@ -142,7 +142,7 @@ export type PlantDataInput = {
   scientificName?: InputMaybe<Scalars['String']['input']>;
   scrapeSources?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   soilTypes?: InputMaybe<PlantArrayFilterStringInput>;
-  spread?: InputMaybe<PlantSizeInput>;
+  spread?: InputMaybe<PlantSizeRangeInput>;
   updatedTimestamp?: InputMaybe<Scalars['Float']['input']>;
   uses?: InputMaybe<PlantArrayFilterStringInput>;
 };
@@ -197,20 +197,21 @@ export type PlantSearchQueryResults = {
 
 export type PlantSize = {
   __typename?: 'PlantSize';
-  amount?: Maybe<Scalars['Int']['output']>;
-  unit?: Maybe<PlantSizeUnit>;
+  amount: Scalars['Float']['output'];
+  unit: PlantSizeUnit;
 };
 
-export type PlantSizeInput = {
-  amount?: InputMaybe<Scalars['Int']['input']>;
-  unit?: InputMaybe<PlantSizeUnit>;
+export type PlantSizeRangeInput = {
+  maxAmount?: InputMaybe<Scalars['Float']['input']>;
+  minAmount?: InputMaybe<Scalars['Float']['input']>;
+  unit: PlantSizeUnit;
 };
 
 export type PlantSizeUnit =
-  | 'cm'
-  | 'ft'
-  | 'in'
-  | 'm';
+  | 'centimeters'
+  | 'feet'
+  | 'inches'
+  | 'meters';
 
 export type PlantSortField =
   | 'addedTimestamp'
@@ -467,7 +468,7 @@ export type ResolversTypes = ResolversObject<{
   PlantOccurrencesResults: ResolverTypeWrapper<PlantOccurrencesResults>;
   PlantSearchQueryResults: ResolverTypeWrapper<PlantSearchQueryResults>;
   PlantSize: ResolverTypeWrapper<PlantSize>;
-  PlantSizeInput: PlantSizeInput;
+  PlantSizeRangeInput: PlantSizeRangeInput;
   PlantSizeUnit: PlantSizeUnit;
   PlantSortField: PlantSortField;
   PlantSortInput: PlantSortInput;
@@ -506,7 +507,7 @@ export type ResolversParentTypes = ResolversObject<{
   PlantOccurrencesResults: PlantOccurrencesResults;
   PlantSearchQueryResults: PlantSearchQueryResults;
   PlantSize: PlantSize;
-  PlantSizeInput: PlantSizeInput;
+  PlantSizeRangeInput: PlantSizeRangeInput;
   PlantSortInput: PlantSortInput;
   Query: {};
   SearchRecord: SearchRecord;
@@ -641,8 +642,8 @@ export type PlantSearchQueryResultsResolvers<ContextType = ApolloContext, Parent
 }>;
 
 export type PlantSizeResolvers<ContextType = ApolloContext, ParentType extends ResolversParentTypes['PlantSize'] = ResolversParentTypes['PlantSize']> = ResolversObject<{
-  amount?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
-  unit?: Resolver<Maybe<ResolversTypes['PlantSizeUnit']>, ParentType, ContextType>;
+  amount?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  unit?: Resolver<ResolversTypes['PlantSizeUnit'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 

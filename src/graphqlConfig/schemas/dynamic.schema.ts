@@ -1,10 +1,5 @@
 import { buildSchema } from "graphql";
 
-const PlantSize = `
-  amount: Int
-  unit: PlantSizeUnit
-`;
-
 const PlantDataCommonFields = `
   scientificName: String!
   addedTimestamp: Float!
@@ -67,18 +62,21 @@ export const dynamicSchema = buildSchema(`
   }
 
   enum PlantSizeUnit {
-    m
-    cm
-    in
-    ft
+    meters
+    centimeters
+    inches
+    feet
   }
 
   type PlantSize {
-    ${PlantSize}
+    amount: Float!
+    unit: PlantSizeUnit!
   }
   
-  input PlantSizeInput {
-    ${PlantSize}
+  input PlantSizeRangeInput {
+    minAmount: Float
+    maxAmount: Float
+    unit: PlantSizeUnit!
   }
 
   enum PlantSortField {
@@ -101,8 +99,8 @@ export const dynamicSchema = buildSchema(`
     ${makeFieldsOptional(PlantDataCommonFields)}
 
     isPerennial: [Boolean]
-    height: PlantSizeInput
-    spread: PlantSizeInput
+    height: PlantSizeRangeInput
+    spread: PlantSizeRangeInput
 
     commonName: String
     boundingPolyCoords: [[[Float!]!]!]
