@@ -24,7 +24,7 @@ if (!inputSchema || !outputFile) {
 }
 
 try {
-  console.log("🔧 Generating OpenAPI types...");
+  console.info("🔧 Generating OpenAPI types...");
   execSync(`npx openapi-typescript ${inputSchema} -o ${outputFile}`, {
     stdio: "inherit",
   });
@@ -39,12 +39,12 @@ try {
 
   if (!content.startsWith("// @ts-nocheck")) {
     fs.writeFileSync(resolvedPath, "// @ts-nocheck\n\n" + content, "utf8");
-    console.log("✅ Added // @ts-nocheck");
+    console.info("✅ Added // @ts-nocheck");
   } else {
-    console.log("ℹ️  // @ts-nocheck already present");
+    console.info("ℹ️  // @ts-nocheck already present");
   }
 
-  console.log("🎉 Done.");
+  console.info("🎉 Done.");
 } catch (err) {
   console.error("❌ Error:", err.message);
   process.exit(1);
