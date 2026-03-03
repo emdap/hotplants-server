@@ -165,7 +165,7 @@ export const dynamicSchema = buildSchema(`
   
     allUserGardens(gardenId: String, gardenName: String): [UserGarden!]!
     userGarden(gardenId: String, gardenName: String): UserGarden
-    userGardenPlants(gardenId: String!, sort: [PlantSortInput!], offset: Int, limit: Int): UserGardenPlants
+    userGardenPlants(gardenId: String!, sort: [PlantSortInput!], offset: Int, limit: Int, where: PlantDataInput): UserGardenPlants
   }
 
   type Mutation {

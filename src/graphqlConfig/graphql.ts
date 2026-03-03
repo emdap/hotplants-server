@@ -294,6 +294,7 @@ export type QueryUserGardenPlantsArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<PlantSortInput>>;
+  where?: InputMaybe<PlantDataInput>;
 };
 
 export type SearchRecord = {

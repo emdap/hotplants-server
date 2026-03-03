@@ -2,7 +2,7 @@ import { userGardensCollection } from "@/config/mongodbClient";
 import { GardenPlantRefDocument, UserGardenDocument } from "@/config/types";
 import { User } from "better-auth";
 import { GraphQLError } from "graphql";
-import { ObjectId } from "mongodb";
+import { Document, ObjectId } from "mongodb";
 import {
   GardenPlantData,
   GardenPlantRef,
@@ -11,6 +11,7 @@ import {
   UserGarden,
 } from "../graphql";
 import { ApolloContext } from "../types";
+import { extractPlantFilter } from "./plantResolvers";
 import {
   aggregateAndProject,
   caseInsensitiveStringRegex,
@@ -91,37 +92,40 @@ export const userGardenResolver: QueryResolvers["userGarden"] = async (
       )[0];
 
 export const userGardenPlantsResolver: QueryResolvers["userGardenPlants"] =
-  async (_, { gardenId, ...args }, context) => {
+  async (_, { gardenId, where, ...args }, context) => {
     const user = extractUser(context);
+    const pipeline: Document[] = [
+      userGardenMatch(user.id, { gardenId }),
+
+      { $unwind: "$plantRefs" },
+
+      {
+        $lookup: {
+          from: "plantData",
+          localField: "plantRefs._id",
+          foreignField: "_id",
+          as: "plantDataLookup",
+        },
+      },
+
+      { $unwind: "$plantDataLookup" },
+
+      {
+        $replaceRoot: {
+          newRoot: {
+            $mergeObjects: ["$plantDataLookup", "$plantRefs"],
+          },
+        },
+      },
+    ];
+
+    where && pipeline.push({ $match: extractPlantFilter(where) });
+    console.log(pipeline);
+    pipeline.push(paginateWithCount(args));
 
     return aggregateAndProject<UserGardenDocument, GardenPlantData>(
       userGardensCollection,
-      [
-        userGardenMatch(user.id, { gardenId }),
-
-        { $unwind: "$plantRefs" },
-
-        {
-          $lookup: {
-            from: "plantData",
-            localField: "plantRefs._id",
-            foreignField: "_id",
-            as: "plantDataLookup",
-          },
-        },
-
-        { $unwind: "$plantDataLookup" },
-
-        {
-          $replaceRoot: {
-            newRoot: {
-              $mergeObjects: ["$plantDataLookup", "$plantRefs"],
-            },
-          },
-        },
-
-        paginateWithCount(args),
-      ],
+      pipeline,
     );
   };
 
