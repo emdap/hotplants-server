@@ -120,7 +120,6 @@ export const userGardenPlantsResolver: QueryResolvers["userGardenPlants"] =
     ];
 
     where && pipeline.push({ $match: extractPlantFilter(where) });
-    console.log(pipeline);
     pipeline.push(paginateWithCount(args));
 
     return aggregateAndProject<UserGardenDocument, GardenPlantData>(
