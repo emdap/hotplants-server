@@ -7,6 +7,20 @@
 		"requestBodies": {},
 		"responses": {},
 		"schemas": {
+			"Maybe_number-Array-Array-Array_": {
+				"items": {
+					"items": {
+						"items": {
+							"type": "number",
+							"format": "double"
+						},
+						"type": "array"
+					},
+					"type": "array"
+				},
+				"type": "array",
+				"nullable": true
+			},
 			"Maybe_string_": {
 				"type": "string",
 				"nullable": true
@@ -22,6 +36,14 @@
 					"custom",
 					"search"
 				]
+			},
+			"Maybe_LocationSource_": {
+				"allOf": [
+					{
+						"$ref": "#/components/schemas/LocationSource"
+					}
+				],
+				"nullable": true
 			},
 			"SearchRecordStatus": {
 				"type": "string",
@@ -47,17 +69,7 @@
 						]
 					},
 					"boundingPolyCoords": {
-						"items": {
-							"items": {
-								"items": {
-									"type": "number",
-									"format": "double"
-								},
-								"type": "array"
-							},
-							"type": "array"
-						},
-						"type": "array"
+						"$ref": "#/components/schemas/Maybe_number-Array-Array-Array_"
 					},
 					"commonName": {
 						"$ref": "#/components/schemas/Maybe_string_"
@@ -70,10 +82,10 @@
 						"$ref": "#/components/schemas/Maybe_number_"
 					},
 					"locationName": {
-						"type": "string"
+						"$ref": "#/components/schemas/Maybe_string_"
 					},
 					"locationSource": {
-						"$ref": "#/components/schemas/LocationSource"
+						"$ref": "#/components/schemas/Maybe_LocationSource_"
 					},
 					"occurrencesOffset": {
 						"type": "number",
@@ -91,10 +103,7 @@
 					}
 				},
 				"required": [
-					"boundingPolyCoords",
 					"createdTimestamp",
-					"locationName",
-					"locationSource",
 					"occurrencesOffset",
 					"status",
 					"totalOccurrences"
@@ -124,7 +133,7 @@
 					}
 				]
 			},
-			"Pick_SearchRecordDocument.locationName-or-locationSource-or-boundingPolyCoords-or-commonName-or-scientificName_": {
+			"PlantSearchLocationParams": {
 				"properties": {
 					"boundingPolyCoords": {
 						"items": {
@@ -139,29 +148,60 @@
 						},
 						"type": "array"
 					},
-					"commonName": {
-						"$ref": "#/components/schemas/Maybe_string_"
+					"locationSource": {
+						"type": "string",
+						"enum": [
+							"search",
+							"custom"
+						]
 					},
 					"locationName": {
 						"type": "string"
-					},
-					"locationSource": {
-						"$ref": "#/components/schemas/LocationSource"
-					},
-					"scientificName": {
-						"$ref": "#/components/schemas/Maybe_string_"
 					}
 				},
 				"required": [
 					"boundingPolyCoords",
-					"locationName",
-					"locationSource"
+					"locationSource",
+					"locationName"
 				],
-				"type": "object",
-				"description": "From T, pick a set of properties whose keys are in the union K"
+				"type": "object"
+			},
+			"PlantSearchNameParams": {
+				"anyOf": [
+					{
+						"properties": {
+							"commonName": {
+								"type": "string"
+							}
+						},
+						"required": [
+							"commonName"
+						],
+						"type": "object"
+					},
+					{
+						"properties": {
+							"scientificName": {
+								"type": "string"
+							}
+						},
+						"required": [
+							"scientificName"
+						],
+						"type": "object"
+					}
+				]
 			},
 			"PlantSearchParams": {
-				"$ref": "#/components/schemas/Pick_SearchRecordDocument.locationName-or-locationSource-or-boundingPolyCoords-or-commonName-or-scientificName_"
+				"properties": {
+					"plantName": {
+						"$ref": "#/components/schemas/PlantSearchNameParams"
+					},
+					"location": {
+						"$ref": "#/components/schemas/PlantSearchLocationParams"
+					}
+				},
+				"type": "object"
 			},
 			"Maybe_string-Array_": {
 				"items": {
@@ -223,6 +263,16 @@
 							"application/json": {
 								"schema": {
 									"$ref": "#/components/schemas/SearchRecordSummary"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "string"
 								}
 							}
 						}

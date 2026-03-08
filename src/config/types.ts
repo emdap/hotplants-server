@@ -38,19 +38,27 @@ export type PartialPlantData = Omit<
   "_id" | "addedTimestamp" | "updatedTimestamp"
 >;
 
+// Redefining these because graphql generated type using Maybe wrapper makes it too difficult to extract
+// the non-null form of these properties
+export type PlantSearchLocationParams = {
+  locationName: string;
+  locationSource: "search" | "custom";
+  boundingPolyCoords: number[][][];
+};
+
+export type PlantSearchNameParams =
+  | { commonName: string }
+  | { scientificName: string };
+
+export type PlantSearchParams = {
+  location?: PlantSearchLocationParams;
+  plantName?: PlantSearchNameParams;
+};
+
 export type SearchRecordDocument = Omit<SearchRecord, "_id" | "taxonKeys"> & {
   _id: ObjectId;
   taxonKeys?: number[];
 };
-
-export type PlantSearchParams = Pick<
-  SearchRecordDocument,
-  | "locationName"
-  | "locationSource"
-  | "boundingPolyCoords"
-  | "commonName"
-  | "scientificName"
->;
 
 export type GardenPlantRefDocument = Omit<GardenPlantRef, "_id"> & {
   _id: ObjectId;

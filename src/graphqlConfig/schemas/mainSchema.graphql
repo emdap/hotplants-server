@@ -15,9 +15,9 @@ type SearchRecord {
   status: SearchRecordStatus!
   lastRanTimestamp: Float
 
-  locationName: String!
-  locationSource: LocationSource!
-  boundingPolyCoords: [[[Float!]!]!]!
+  locationName: String
+  locationSource: LocationSource
+  boundingPolyCoords: [[[Float!]!]!]
   scientificName: String
   commonName: String
 
@@ -64,9 +64,19 @@ type SearchRecordQueryResults {
   results: [SearchRecord!]!
 }
 
+# Excerpt from PlantData
+type PlantDataExcerpt {
+  _id: String!
+  occurrenceId: Float!
+  thumbnailUrl: String
+  url: String!
+  isProxyUrl: Boolean
+}
+
 type SearchRecordPlantCountResults {
   plantCount: Float!
   occurrenceCount: Float!
+  firstPlant: PlantDataExcerpt
 }
 
 type Query {

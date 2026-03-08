@@ -18,10 +18,26 @@ export class PlantController {
   @Post("searchRecord")
   public async getSearchRecord(
     @Body() plantSearch: PlantSearchParams,
-    @Res() errorResponse: TsoaResponse<500, string>,
+    @Res() errorResponse: TsoaResponse<400 | 500, string>,
   ): Promise<SearchRecordSummary> {
-    const existingSearchRecord =
-      await gbifSearchesCollection.findOne(plantSearch);
+    if (!plantSearch.location && !plantSearch.plantName) {
+      errorResponse(
+        500,
+        "Must include a location or plantName to create search record",
+      );
+    }
+
+    const existingSearchRecord = await gbifSearchesCollection.findOne({
+      // Default out all properties so that exact match is found
+      locationName: undefined,
+      locationSource: undefined,
+      boundingPolyCoords: undefined,
+      commonName: undefined,
+      scientificName: undefined,
+
+      ...plantSearch.location,
+      ...plantSearch.plantName,
+    });
 
     if (existingSearchRecord) {
       return normalizeSearchRecord(existingSearchRecord);

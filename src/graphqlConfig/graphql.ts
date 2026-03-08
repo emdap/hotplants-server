@@ -126,6 +126,15 @@ export type PlantData = PlantDataInterface & {
   uses?: Maybe<Array<Scalars['String']['output']>>;
 };
 
+export type PlantDataExcerpt = {
+  __typename?: 'PlantDataExcerpt';
+  _id: Scalars['String']['output'];
+  isProxyUrl?: Maybe<Scalars['Boolean']['output']>;
+  occurrenceId: Scalars['Float']['output'];
+  thumbnailUrl?: Maybe<Scalars['String']['output']>;
+  url: Scalars['String']['output'];
+};
+
 export type PlantDataInput = {
   addedTimestamp?: InputMaybe<Scalars['Float']['input']>;
   bloomColors?: InputMaybe<PlantArrayFilterStringInput>;
@@ -300,12 +309,12 @@ export type QueryUserGardenPlantsArgs = {
 export type SearchRecord = {
   __typename?: 'SearchRecord';
   _id: Scalars['ObjectId']['output'];
-  boundingPolyCoords: Array<Array<Array<Scalars['Float']['output']>>>;
+  boundingPolyCoords?: Maybe<Array<Array<Array<Scalars['Float']['output']>>>>;
   commonName?: Maybe<Scalars['String']['output']>;
   createdTimestamp: Scalars['Float']['output'];
   lastRanTimestamp?: Maybe<Scalars['Float']['output']>;
-  locationName: Scalars['String']['output'];
-  locationSource: LocationSource;
+  locationName?: Maybe<Scalars['String']['output']>;
+  locationSource?: Maybe<LocationSource>;
   occurrencesOffset: Scalars['Int']['output'];
   scientificName?: Maybe<Scalars['String']['output']>;
   status: SearchRecordStatus;
@@ -324,6 +333,7 @@ export type SearchRecordBooleanFilterInput = {
 
 export type SearchRecordPlantCountResults = {
   __typename?: 'SearchRecordPlantCountResults';
+  firstPlant?: Maybe<PlantDataExcerpt>;
   occurrenceCount: Scalars['Float']['output'];
   plantCount: Scalars['Float']['output'];
 };
@@ -462,6 +472,7 @@ export type ResolversTypes = ResolversObject<{
   PlantArrayFilterIntInput: PlantArrayFilterIntInput;
   PlantArrayFilterStringInput: PlantArrayFilterStringInput;
   PlantData: ResolverTypeWrapper<PlantData>;
+  PlantDataExcerpt: ResolverTypeWrapper<PlantDataExcerpt>;
   PlantDataInput: PlantDataInput;
   PlantDataInterface: ResolverTypeWrapper<ResolversInterfaceTypes<ResolversTypes>['PlantDataInterface']>;
   PlantMedia: ResolverTypeWrapper<PlantMedia>;
@@ -501,6 +512,7 @@ export type ResolversParentTypes = ResolversObject<{
   PlantArrayFilterIntInput: PlantArrayFilterIntInput;
   PlantArrayFilterStringInput: PlantArrayFilterStringInput;
   PlantData: PlantData;
+  PlantDataExcerpt: PlantDataExcerpt;
   PlantDataInput: PlantDataInput;
   PlantDataInterface: ResolversInterfaceTypes<ResolversParentTypes>['PlantDataInterface'];
   PlantMedia: PlantMedia;
@@ -593,6 +605,15 @@ export type PlantDataResolvers<ContextType = ApolloContext, ParentType extends R
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
+export type PlantDataExcerptResolvers<ContextType = ApolloContext, ParentType extends ResolversParentTypes['PlantDataExcerpt'] = ResolversParentTypes['PlantDataExcerpt']> = ResolversObject<{
+  _id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  isProxyUrl?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
+  occurrenceId?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  thumbnailUrl?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  url?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
 export type PlantDataInterfaceResolvers<ContextType = ApolloContext, ParentType extends ResolversParentTypes['PlantDataInterface'] = ResolversParentTypes['PlantDataInterface']> = ResolversObject<{
   __resolveType: TypeResolveFn<'GardenPlantData' | 'PlantData', ParentType, ContextType>;
   addedTimestamp?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
@@ -662,12 +683,12 @@ export type QueryResolvers<ContextType = ApolloContext, ParentType extends Resol
 
 export type SearchRecordResolvers<ContextType = ApolloContext, ParentType extends ResolversParentTypes['SearchRecord'] = ResolversParentTypes['SearchRecord']> = ResolversObject<{
   _id?: Resolver<ResolversTypes['ObjectId'], ParentType, ContextType>;
-  boundingPolyCoords?: Resolver<Array<Array<Array<ResolversTypes['Float']>>>, ParentType, ContextType>;
+  boundingPolyCoords?: Resolver<Maybe<Array<Array<Array<ResolversTypes['Float']>>>>, ParentType, ContextType>;
   commonName?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   createdTimestamp?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
   lastRanTimestamp?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
-  locationName?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  locationSource?: Resolver<ResolversTypes['LocationSource'], ParentType, ContextType>;
+  locationName?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  locationSource?: Resolver<Maybe<ResolversTypes['LocationSource']>, ParentType, ContextType>;
   occurrencesOffset?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   scientificName?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   status?: Resolver<ResolversTypes['SearchRecordStatus'], ParentType, ContextType>;
@@ -677,6 +698,7 @@ export type SearchRecordResolvers<ContextType = ApolloContext, ParentType extend
 }>;
 
 export type SearchRecordPlantCountResultsResolvers<ContextType = ApolloContext, ParentType extends ResolversParentTypes['SearchRecordPlantCountResults'] = ResolversParentTypes['SearchRecordPlantCountResults']> = ResolversObject<{
+  firstPlant?: Resolver<Maybe<ResolversTypes['PlantDataExcerpt']>, ParentType, ContextType>;
   occurrenceCount?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
   plantCount?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
@@ -710,6 +732,7 @@ export type Resolvers<ContextType = ApolloContext> = ResolversObject<{
   Mutation?: MutationResolvers<ContextType>;
   ObjectId?: GraphQLScalarType;
   PlantData?: PlantDataResolvers<ContextType>;
+  PlantDataExcerpt?: PlantDataExcerptResolvers<ContextType>;
   PlantDataInterface?: PlantDataInterfaceResolvers<ContextType>;
   PlantMedia?: PlantMediaResolvers<ContextType>;
   PlantOccurrence?: PlantOccurrenceResolvers<ContextType>;

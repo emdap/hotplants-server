@@ -85,6 +85,7 @@ export const shouldStartScraping = ({
 export const searchGbifOccurrences = async (
   searchRecord: SearchRecordDocument,
 ) => {
+  console.log(searchRecord);
   const geometry = convertPolygon(searchRecord.boundingPolyCoords);
   const gbifQueryParams = {
     geometry,
