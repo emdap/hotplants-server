@@ -142,7 +142,10 @@ const updatePlantDataArrayValues = (
       bloomColors: { $each: plantData.bloomColors ?? [] },
       bloomTimes: { $each: plantData.bloomTimes ?? [] },
       hardiness: { $each: plantData.hardiness ?? [] },
-      habitats: { $each: plantData.habitats ?? [] },
+      // TODO: Fix habitat scraping to group into categories -- right now
+      // it's a random sentence
+      habitats: { $each: [] },
+      // habitats: { $each: plantData.habitats ?? [] },
       lightLevels: { $each: plantData.lightLevels ?? [] },
       soilTypes: { $each: plantData.soilTypes ?? [] },
     };
