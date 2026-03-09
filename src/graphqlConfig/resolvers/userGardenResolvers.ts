@@ -128,7 +128,7 @@ export const userGardenPlantsResolver: QueryResolvers["userGardenPlants"] =
     );
   };
 
-export const newGardenResolver: MutationResolvers["newGarden"] = async (
+export const createGardenResolver: MutationResolvers["createGarden"] = async (
   _,
   { gardenName },
   context,
@@ -199,4 +199,16 @@ export const addToGardenResolver: MutationResolvers["addToGarden"] = async (
     },
     { returnDocument: "after", upsert: true },
   ) as Promise<UserGarden> | null;
+};
+
+export const removeFromGardenResolver: MutationResolvers["removeFromGarden"] = (
+  _,
+  { gardenId, plantId },
+  context,
+) => {
+  const user = extractUser(context);
+  return userGardensCollection.findOneAndUpdate(
+    { _id: new ObjectId(gardenId), userId: user.id },
+    { $pull: { plantRefs: { _id: new ObjectId(plantId) } } },
+  );
 };

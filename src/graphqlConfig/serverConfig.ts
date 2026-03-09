@@ -17,7 +17,8 @@ import {
 import {
   addToGardenResolver,
   allUserGardensResolver,
-  newGardenResolver,
+  createGardenResolver,
+  removeFromGardenResolver,
   userGardenPlantsResolver,
   userGardenResolver,
 } from "./resolvers/userGardenResolvers";
@@ -58,8 +59,9 @@ const resolvers: Resolvers = {
   Mutation: {
     replaceWithProxyUrl: replaceWithProxyUrlResolver,
 
-    newGarden: newGardenResolver,
+    createGarden: createGardenResolver,
     addToGarden: addToGardenResolver,
+    removeFromGarden: removeFromGardenResolver,
   },
 };
 

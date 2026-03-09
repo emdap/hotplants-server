@@ -171,8 +171,9 @@ export const dynamicSchema = buildSchema(`
   type Mutation {
     replaceWithProxyUrl(plantId: String!, occurrenceId: Float!, replaceUrl: String!): String
   
-    newGarden(gardenName: String): ObjectId!
+    createGarden(gardenName: String): UserGarden
     addToGarden(gardenId: String, plantId: String!): UserGarden
+    removeFromGarden(gardenId: String!, plantId: String!): UserGarden
     updateGardenPlant(gardenId: String!, plantId: String!, customThumbnailUrl: String, note: String): GardenPlantData
   }
 `);
