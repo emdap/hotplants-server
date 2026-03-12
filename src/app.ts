@@ -25,7 +25,7 @@ app.use(cookieParser());
 
 app.all("/api/auth/*splat", toNodeHandler(auth));
 
-app.get("/health", (_req, res) =>
+app.get(/\/health$/, (_req, res) =>
   res.status(200).json({
     status: "ok",
     uptime: process.uptime(),
