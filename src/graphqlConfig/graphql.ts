@@ -94,7 +94,7 @@ export type MutationReplaceWithProxyUrlArgs = {
 export type MutationUpdateGardenPlantArgs = {
   customThumbnailUrl?: InputMaybe<Scalars['String']['input']>;
   gardenId: Scalars['String']['input'];
-  note?: InputMaybe<Scalars['String']['input']>;
+  notes?: InputMaybe<Scalars['String']['input']>;
   plantId: Scalars['String']['input'];
 };
 

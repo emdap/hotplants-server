@@ -113,7 +113,18 @@ export const userGardenPlantsResolver: QueryResolvers["userGardenPlants"] =
       {
         $replaceRoot: {
           newRoot: {
-            $mergeObjects: ["$plantDataLookup", "$plantRefs"],
+            $mergeObjects: [
+              "$plantDataLookup",
+              "$plantRefs",
+              {
+                thumbnailUrl: {
+                  $ifNull: [
+                    "$plantRefs.customThumbnailUrl",
+                    "$plantDataLookup.thumbnailUrl",
+                  ],
+                },
+              },
+            ],
           },
         },
       },

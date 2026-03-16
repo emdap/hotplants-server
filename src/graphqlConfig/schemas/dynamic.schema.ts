@@ -174,6 +174,6 @@ export const dynamicSchema = buildSchema(`
     createGarden(gardenName: String): UserGarden
     addToGarden(gardenId: String, plantId: String!): UserGarden
     removeFromGarden(gardenId: String!, plantId: String!): UserGarden
-    updateGardenPlant(gardenId: String!, plantId: String!, customThumbnailUrl: String, note: String): GardenPlantData
+    updateGardenPlant(gardenId: String!, plantId: String!, customThumbnailUrl: String, notes: String): GardenPlantData
   }
 `);
