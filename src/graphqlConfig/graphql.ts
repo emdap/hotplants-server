@@ -63,7 +63,7 @@ export type Mutation = {
   createGarden?: Maybe<UserGarden>;
   removeFromGarden?: Maybe<UserGarden>;
   replaceWithProxyUrl?: Maybe<Scalars['String']['output']>;
-  updateGardenPlant?: Maybe<GardenPlantData>;
+  updateGardenPlant?: Maybe<UserGarden>;
 };
 
 
@@ -581,7 +581,7 @@ export type MutationResolvers<ContextType = ApolloContext, ParentType extends Re
   createGarden?: Resolver<Maybe<ResolversTypes['UserGarden']>, ParentType, ContextType, Partial<MutationCreateGardenArgs>>;
   removeFromGarden?: Resolver<Maybe<ResolversTypes['UserGarden']>, ParentType, ContextType, RequireFields<MutationRemoveFromGardenArgs, 'gardenId' | 'plantId'>>;
   replaceWithProxyUrl?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType, RequireFields<MutationReplaceWithProxyUrlArgs, 'occurrenceId' | 'plantId' | 'replaceUrl'>>;
-  updateGardenPlant?: Resolver<Maybe<ResolversTypes['GardenPlantData']>, ParentType, ContextType, RequireFields<MutationUpdateGardenPlantArgs, 'gardenId' | 'plantId'>>;
+  updateGardenPlant?: Resolver<Maybe<ResolversTypes['UserGarden']>, ParentType, ContextType, RequireFields<MutationUpdateGardenPlantArgs, 'gardenId' | 'plantId'>>;
 }>;
 
 export interface ObjectIdScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['ObjectId'], any> {

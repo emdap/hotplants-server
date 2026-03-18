@@ -223,3 +223,34 @@ export const removeFromGardenResolver: MutationResolvers["removeFromGarden"] = (
     { $pull: { plantRefs: { _id: new ObjectId(plantId) } } },
   );
 };
+
+export const updateGardenPlantResolver: MutationResolvers["updateGardenPlant"] =
+  async (_, { gardenId, plantId, notes, customThumbnailUrl }, context) => {
+    const user = extractUser(context);
+
+    const result = await userGardensCollection.findOneAndUpdate(
+      {
+        _id: new ObjectId(gardenId),
+        userId: user.id,
+        "plantRefs._id": new ObjectId(plantId),
+      },
+      {
+        $set: {
+          ...(typeof notes === "string" && {
+            "plantRefs.$.notes": notes ? notes : undefined,
+          }),
+          ...(customThumbnailUrl && {
+            "plantRefs.$.customThumbnailUrl": customThumbnailUrl,
+          }),
+        },
+      },
+    );
+
+    if (!result) {
+      throw new GraphQLError("Plant not updated.", {
+        extensions: { code: 400 },
+      });
+    }
+
+    return result;
+  };

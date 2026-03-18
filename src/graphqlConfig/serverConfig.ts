@@ -19,6 +19,7 @@ import {
   allUserGardensResolver,
   createGardenResolver,
   removeFromGardenResolver,
+  updateGardenPlantResolver,
   userGardenPlantsResolver,
   userGardenResolver,
 } from "./resolvers/userGardenResolvers";
@@ -62,6 +63,7 @@ const resolvers: Resolvers = {
     createGarden: createGardenResolver,
     addToGarden: addToGardenResolver,
     removeFromGarden: removeFromGardenResolver,
+    updateGardenPlant: updateGardenPlantResolver,
   },
 };
 
