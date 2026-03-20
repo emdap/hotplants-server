@@ -31,7 +31,7 @@ const extractSearchRecordFilter = ({
   const filter = {} as Filter<SearchRecordDocument>;
 
   stringFilter?.forEach(({ field, value }) => {
-    filter[field] = { $all: value };
+    filter[field] = { $in: value } as Filter<SearchRecordDocument>;
   });
   booleanFilter?.forEach(({ field, value }) => {
     filter[field] = { [value ? "$ne" : "$eq"]: null };
