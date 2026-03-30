@@ -25,6 +25,8 @@ type SearchRecord {
 
   totalOccurrences: Int!
   occurrencesOffset: Int!
+
+  userIds: [ObjectId!]
 }
 
 enum SearchRecordSortField {
@@ -42,6 +44,7 @@ input SearchRecordSortInput {
 enum SearchRecordBooleanFilterField {
   commonName
   scientificName
+  userSearch
 }
 
 input SearchRecordBooleanFilterInput {

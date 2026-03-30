@@ -55,8 +55,12 @@ export type PlantSearchParams = {
   plantName?: PlantSearchNameParams;
 };
 
-export type SearchRecordDocument = Omit<SearchRecord, "_id" | "taxonKeys"> & {
+export type SearchRecordDocument = Omit<
+  SearchRecord,
+  "_id" | "userIds" | "taxonKeys"
+> & {
   _id: ObjectId;
+  userIds?: ObjectId[];
   taxonKeys?: number[];
 };
 

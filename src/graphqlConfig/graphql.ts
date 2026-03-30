@@ -327,11 +327,13 @@ export type SearchRecord = {
   status: SearchRecordStatus;
   taxonKeys?: Maybe<Array<Scalars['Int']['output']>>;
   totalOccurrences: Scalars['Int']['output'];
+  userIds?: Maybe<Array<Scalars['ObjectId']['output']>>;
 };
 
 export type SearchRecordBooleanFilterField =
   | 'commonName'
-  | 'scientificName';
+  | 'scientificName'
+  | 'userSearch';
 
 export type SearchRecordBooleanFilterInput = {
   field: SearchRecordBooleanFilterField;
@@ -702,6 +704,7 @@ export type SearchRecordResolvers<ContextType = ApolloContext, ParentType extend
   status?: Resolver<ResolversTypes['SearchRecordStatus'], ParentType, ContextType>;
   taxonKeys?: Resolver<Maybe<Array<ResolversTypes['Int']>>, ParentType, ContextType>;
   totalOccurrences?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  userIds?: Resolver<Maybe<Array<ResolversTypes['ObjectId']>>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
