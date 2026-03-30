@@ -1,4 +1,5 @@
 import { SearchRecordDocument } from "@/config/types";
+import { extractUserFromCookie } from "@/plants/util/authUtil";
 import { Filter, ObjectId } from "mongodb";
 import {
   gbifSearchesCollection,
@@ -21,15 +22,28 @@ export const searchRecordResolver: QueryResolvers["searchRecord"] = (
   { id },
 ) => gbifSearchesCollection.findOne(new ObjectId(id));
 
-const extractSearchRecordFilter = ({
+const extractSearchRecordFilter = async ({
   stringFilter,
   booleanFilter,
+  cookie,
 }: {
   stringFilter?: SearchRecordStringFilterInput[] | null;
   booleanFilter?: SearchRecordBooleanFilterInput[] | null;
+  cookie?: string;
 }) => {
   const filter = {} as Filter<SearchRecordDocument>;
 
+  const userFilterIndex = booleanFilter
+    ? booleanFilter.findIndex(({ field }) => field === "userSearch")
+    : -1;
+
+  if (userFilterIndex > -1 && booleanFilter) {
+    booleanFilter.splice(userFilterIndex);
+    const user = await extractUserFromCookie(cookie);
+    if (user) {
+      filter.userIds = new ObjectId(user.id);
+    }
+  }
   stringFilter?.forEach(({ field, value }) => {
     filter[field] = { $in: value } as Filter<SearchRecordDocument>;
   });
@@ -41,9 +55,15 @@ const extractSearchRecordFilter = ({
 };
 
 export const allSearchRecordsResolver: QueryResolvers["allSearchRecords"] =
-  async (_, { stringFilter, booleanFilter, ...args }) => {
+  async (_, { stringFilter, booleanFilter, ...args }, { cookie }) => {
     const aggregations = [
-      { $match: extractSearchRecordFilter({ stringFilter, booleanFilter }) },
+      {
+        $match: await extractSearchRecordFilter({
+          stringFilter,
+          booleanFilter,
+          cookie,
+        }),
+      },
       paginateWithCount(args),
     ];
 
