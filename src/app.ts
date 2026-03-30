@@ -21,6 +21,7 @@ app.use(
 );
 app.use(express.json());
 app.use(express.static("public"));
+
 app.use(cookieParser());
 
 app.all("/api/auth/*splat", toNodeHandler(auth));
@@ -55,14 +56,12 @@ const startGraphQlServer = async () => {
   await apolloServer.start();
   app.use(
     "/graphql",
-    cookieParser(),
     expressMiddleware(apolloServer, {
-      context: async ({ req, res }) => {
-        const session = await auth.api.getSession({
-          headers: req.headers as HeadersInit,
-        });
-        return { req, res, user: session?.user };
-      },
+      context: async ({ req, res }) => ({
+        req,
+        res,
+        cookie: req.headers.cookie,
+      }),
     }),
   );
 };

@@ -1,5 +1,6 @@
 import { userGardensCollection } from "@/config/mongodbClient";
 import { GardenPlantRefDocument, UserGardenDocument } from "@/config/types";
+import { validateCookie } from "@/plants/util/authUtil";
 import { User } from "better-auth";
 import { GraphQLError } from "graphql";
 import { Document, ObjectId } from "mongodb";
@@ -10,7 +11,6 @@ import {
   QueryResolvers,
   UserGarden,
 } from "../graphql";
-import { ApolloContext } from "../types";
 import { extractPlantFilter } from "./plantResolvers";
 import {
   aggregateAndProject,
@@ -22,19 +22,6 @@ import {
 
 const DEFAULT_GARDEN_NAME = (user: User) =>
   `${user.name.slice(0, 10)}'s Garden`;
-
-const extractUser = (context: ApolloContext) => {
-  if (!context.user) {
-    throw new GraphQLError("Unauthorized", {
-      extensions: {
-        code: "UNAUTHENTICATED",
-        http: { status: 401 },
-      },
-    });
-  }
-
-  return context.user;
-};
 
 const userGardenMatch = (
   userId: string,
@@ -56,9 +43,9 @@ const userGardenMatch = (
 export const allUserGardensResolver: QueryResolvers["allUserGardens"] = async (
   _,
   { gardenId, gardenName },
-  context,
+  { cookie },
 ) => {
-  const user = extractUser(context);
+  const user = await validateCookie(cookie);
   return userGardensCollection
     .aggregate<UserGarden>([
       userGardenMatch(user.id, { gardenId, gardenName }),
@@ -92,8 +79,8 @@ export const userGardenResolver: QueryResolvers["userGarden"] = async (
       )[0];
 
 export const userGardenPlantsResolver: QueryResolvers["userGardenPlants"] =
-  async (_, { gardenId, where, ...args }, context) => {
-    const user = extractUser(context);
+  async (_, { gardenId, where, ...args }, { cookie }) => {
+    const user = await validateCookie(cookie);
     const pipeline: Document[] = [
       userGardenMatch(user.id, { gardenId }),
 
@@ -142,9 +129,9 @@ export const userGardenPlantsResolver: QueryResolvers["userGardenPlants"] =
 export const createGardenResolver: MutationResolvers["createGarden"] = async (
   _,
   { gardenName },
-  context,
+  { cookie },
 ) => {
-  const user = extractUser(context);
+  const user = await validateCookie(cookie);
   const newGardenName = gardenName?.trim() ?? DEFAULT_GARDEN_NAME(user);
   const existingGarden = await userGardensCollection.findOne({
     gardenName: newGardenName,
@@ -171,9 +158,9 @@ export const createGardenResolver: MutationResolvers["createGarden"] = async (
 export const addToGardenResolver: MutationResolvers["addToGarden"] = async (
   _,
   { gardenId, plantId },
-  context,
+  { cookie },
 ) => {
-  const user = extractUser(context);
+  const user = await validateCookie(cookie);
   // TODO: Want to require gardenId in future -- FE not ready to specify, fallback to default name
   const existingGarden = await userGardensCollection.findOne(
     gardenId
@@ -212,21 +199,18 @@ export const addToGardenResolver: MutationResolvers["addToGarden"] = async (
   ) as Promise<UserGarden> | null;
 };
 
-export const removeFromGardenResolver: MutationResolvers["removeFromGarden"] = (
-  _,
-  { gardenId, plantId },
-  context,
-) => {
-  const user = extractUser(context);
-  return userGardensCollection.findOneAndUpdate(
-    { _id: new ObjectId(gardenId), userId: user.id },
-    { $pull: { plantRefs: { _id: new ObjectId(plantId) } } },
-  );
-};
+export const removeFromGardenResolver: MutationResolvers["removeFromGarden"] =
+  async (_, { gardenId, plantId }, { cookie }) => {
+    const user = await validateCookie(cookie);
+    return userGardensCollection.findOneAndUpdate(
+      { _id: new ObjectId(gardenId), userId: user.id },
+      { $pull: { plantRefs: { _id: new ObjectId(plantId) } } },
+    );
+  };
 
 export const updateGardenPlantResolver: MutationResolvers["updateGardenPlant"] =
-  async (_, { gardenId, plantId, notes, customThumbnailUrl }, context) => {
-    const user = extractUser(context);
+  async (_, { gardenId, plantId, notes, customThumbnailUrl }, { cookie }) => {
+    const user = await validateCookie(cookie);
 
     const result = await userGardensCollection.findOneAndUpdate(
       {
