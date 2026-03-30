@@ -58,10 +58,10 @@ export const lookupPlantByCoordinates = async ({
     })
     .toArray();
 
-export const createSearchRecord = async ({
-  location,
-  plantName,
-}: PlantSearchParams) => {
+export const createSearchRecord = async (
+  { location, plantName }: PlantSearchParams,
+  userId?: ObjectId,
+) => {
   // Converting polygon will error out with invalid input, test conversion before creating
   convertPolygon(location?.boundingPolyCoords);
   // Don't want to store the converted-polygon, easier to parse raw. Converted style is for GBIF API
@@ -84,6 +84,7 @@ export const createSearchRecord = async ({
 
     ...location,
     ...plantName,
+    ...(userId && { userIds: [userId] }),
   });
 
   return (
@@ -124,11 +125,13 @@ export const finishRunningSearch = (
 export const updateSearchRecord = (
   searchRecordId: ObjectId,
   newData: Partial<SearchRecordDocument>,
+  userId?: ObjectId,
 ) =>
   gbifSearchesCollection.findOneAndUpdate(
     { _id: searchRecordId },
     {
       $set: newData,
+      ...(userId && { $addToSet: { userIds: userId } }),
     },
     { returnDocument: "after" },
   );

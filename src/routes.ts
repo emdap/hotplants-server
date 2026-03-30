@@ -12,6 +12,11 @@ import type { Request as ExRequest, Response as ExResponse, RequestHandler, Rout
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 
 const models: TsoaRoute.Models = {
+    "ObjectId": {
+        "dataType": "refAlias",
+        "type": {"dataType":"string","validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "Maybe_number-Array-Array-Array_": {
         "dataType": "refAlias",
         "type": {"dataType":"union","subSchemas":[{"dataType":"array","array":{"dataType":"array","array":{"dataType":"array","array":{"dataType":"double"}}}},{"dataType":"enum","enums":[null]}],"validators":{}},
@@ -44,7 +49,7 @@ const models: TsoaRoute.Models = {
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "Pick_SearchRecordDocument.Exclude_keyofSearchRecordDocument._id__": {
         "dataType": "refAlias",
-        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"taxonKeys":{"dataType":"union","subSchemas":[{"dataType":"array","array":{"dataType":"double"}},{"dataType":"undefined"}]},"__typename":{"dataType":"union","subSchemas":[{"dataType":"enum","enums":["SearchRecord"]},{"dataType":"undefined"}]},"boundingPolyCoords":{"dataType":"union","subSchemas":[{"ref":"Maybe_number-Array-Array-Array_"},{"dataType":"undefined"}]},"commonName":{"dataType":"union","subSchemas":[{"ref":"Maybe_string_"},{"dataType":"undefined"}]},"createdTimestamp":{"dataType":"double","required":true},"lastRanTimestamp":{"dataType":"union","subSchemas":[{"ref":"Maybe_number_"},{"dataType":"undefined"}]},"locationName":{"dataType":"union","subSchemas":[{"ref":"Maybe_string_"},{"dataType":"undefined"}]},"locationSource":{"dataType":"union","subSchemas":[{"ref":"Maybe_LocationSource_"},{"dataType":"undefined"}]},"occurrencesOffset":{"dataType":"double","required":true},"scientificName":{"dataType":"union","subSchemas":[{"ref":"Maybe_string_"},{"dataType":"undefined"}]},"status":{"ref":"SearchRecordStatus","required":true},"totalOccurrences":{"dataType":"double","required":true}},"validators":{}},
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"userIds":{"dataType":"union","subSchemas":[{"dataType":"array","array":{"dataType":"refAlias","ref":"ObjectId"}},{"dataType":"undefined"}]},"taxonKeys":{"dataType":"union","subSchemas":[{"dataType":"array","array":{"dataType":"double"}},{"dataType":"undefined"}]},"__typename":{"dataType":"union","subSchemas":[{"dataType":"enum","enums":["SearchRecord"]},{"dataType":"undefined"}]},"boundingPolyCoords":{"dataType":"union","subSchemas":[{"ref":"Maybe_number-Array-Array-Array_"},{"dataType":"undefined"}]},"commonName":{"dataType":"union","subSchemas":[{"ref":"Maybe_string_"},{"dataType":"undefined"}]},"createdTimestamp":{"dataType":"double","required":true},"lastRanTimestamp":{"dataType":"union","subSchemas":[{"ref":"Maybe_number_"},{"dataType":"undefined"}]},"locationName":{"dataType":"union","subSchemas":[{"ref":"Maybe_string_"},{"dataType":"undefined"}]},"locationSource":{"dataType":"union","subSchemas":[{"ref":"Maybe_LocationSource_"},{"dataType":"undefined"}]},"occurrencesOffset":{"dataType":"double","required":true},"scientificName":{"dataType":"union","subSchemas":[{"ref":"Maybe_string_"},{"dataType":"undefined"}]},"status":{"ref":"SearchRecordStatus","required":true},"totalOccurrences":{"dataType":"double","required":true}},"validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "Omit_SearchRecordDocument._id_": {
@@ -106,6 +111,7 @@ export function RegisterRoutes(app: Router) {
     
         const argsPlantController_getSearchRecord: Record<string, TsoaRoute.ParameterSchema> = {
                 plantSearch: {"in":"body","name":"plantSearch","required":true,"ref":"PlantSearchParams"},
+                request: {"in":"request","name":"request","required":true,"dataType":"object"},
                 errorResponse: {"in":"res","name":"500","required":true,"dataType":"string"},
         };
         app.post('/plants/searchRecord',
@@ -137,6 +143,7 @@ export function RegisterRoutes(app: Router) {
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsPlantController_runSearch: Record<string, TsoaRoute.ParameterSchema> = {
                 searchRecordId: {"in":"path","name":"searchRecordId","required":true,"dataType":"string"},
+                request: {"in":"request","name":"request","required":true,"dataType":"object"},
                 errorResponse: {"in":"res","name":"500","required":true,"dataType":"string"},
         };
         app.get('/plants/runSearch/:searchRecordId',

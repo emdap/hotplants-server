@@ -7,6 +7,10 @@
 		"requestBodies": {},
 		"responses": {},
 		"schemas": {
+			"ObjectId": {
+				"type": "string",
+				"description": "A class representation of the BSON ObjectId type."
+			},
 			"Maybe_number-Array-Array-Array_": {
 				"items": {
 					"items": {
@@ -55,6 +59,12 @@
 			},
 			"Pick_SearchRecordDocument.Exclude_keyofSearchRecordDocument._id__": {
 				"properties": {
+					"userIds": {
+						"items": {
+							"$ref": "#/components/schemas/ObjectId"
+						},
+						"type": "array"
+					},
 					"taxonKeys": {
 						"items": {
 							"type": "number",

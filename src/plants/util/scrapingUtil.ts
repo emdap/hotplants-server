@@ -56,6 +56,7 @@ export type SearchRecordSummary = { id: string } & Omit<
 
 export const normalizeSearchRecord = ({
   _id,
+  userIds: _userIds,
   ...searchRecord
 }: SearchRecordDocument): SearchRecordSummary => ({
   id: _id.toString(),

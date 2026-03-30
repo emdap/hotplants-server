@@ -1,10 +1,22 @@
+import { Request as ExpressRequest } from "express";
 import { ObjectId } from "mongodb";
-import { Body, Get, Path, Post, Res, Route, TsoaResponse } from "tsoa";
+import {
+  Body,
+  Get,
+  Hidden,
+  Path,
+  Post,
+  Request,
+  Res,
+  Route,
+  TsoaResponse,
+} from "tsoa";
 import {
   gbifSearchesCollection,
   plantArrayValuesCollection,
 } from "../config/mongodbClient";
 import { PlantArrayValuesDocument, PlantSearchParams } from "../config/types";
+import { extractUserFromCookie } from "./util/authUtil";
 import { createSearchRecord, updateSearchRecord } from "./util/mongodbUtil";
 import {
   normalizeSearchRecord,
@@ -18,16 +30,20 @@ export class PlantController {
   @Post("searchRecord")
   public async getSearchRecord(
     @Body() plantSearch: PlantSearchParams,
+    @Request() @Hidden() request: ExpressRequest,
     @Res() errorResponse: TsoaResponse<400 | 500, string>,
   ): Promise<SearchRecordSummary> {
     if (!plantSearch.location && !plantSearch.plantName) {
       errorResponse(
-        500,
-        "Must include a location or plantName to create search record",
+        400,
+        "Request must include 'location' or 'plantName' to create search record",
       );
     }
 
-    const existingSearchRecord = await gbifSearchesCollection.findOne({
+    const user = await extractUserFromCookie(request.headers.cookie);
+    const userId = user && new ObjectId(user.id);
+
+    const findPayload = {
       // Default out all properties so that exact match is found
       locationName: undefined,
       locationSource: undefined,
@@ -37,13 +53,23 @@ export class PlantController {
 
       ...plantSearch.location,
       ...plantSearch.plantName,
-    });
+    };
+
+    const existingSearchRecord = await (userId
+      ? gbifSearchesCollection.findOneAndUpdate(
+          findPayload,
+          {
+            $addToSet: { userIds: userId },
+          },
+          { returnDocument: "after" },
+        )
+      : gbifSearchesCollection.findOne(findPayload));
 
     if (existingSearchRecord) {
       return normalizeSearchRecord(existingSearchRecord);
     }
 
-    const newSearchRecord = await createSearchRecord(plantSearch);
+    const newSearchRecord = await createSearchRecord(plantSearch, userId);
     return newSearchRecord
       ? normalizeSearchRecord(newSearchRecord)
       : errorResponse(500, "Unable to create search record");
@@ -55,6 +81,7 @@ export class PlantController {
   @Get("runSearch/{searchRecordId}")
   public async runSearch(
     @Path() searchRecordId: string,
+    @Request() @Hidden() request: ExpressRequest,
     @Res() errorResponse: TsoaResponse<500, string>,
   ): Promise<SearchRecordSummary> {
     const searchRecord = await gbifSearchesCollection.findOne({
@@ -66,10 +93,16 @@ export class PlantController {
     }
 
     if (shouldStartScraping(searchRecord)) {
-      const updatedSearch = await updateSearchRecord(searchRecord._id, {
-        status: "SCRAPING",
-        lastRanTimestamp: Date.now(),
-      });
+      const user = await extractUserFromCookie(request.headers.cookie);
+
+      const updatedSearch = await updateSearchRecord(
+        searchRecord._id,
+        {
+          status: "SCRAPING",
+          lastRanTimestamp: Date.now(),
+        },
+        user && new ObjectId(user.id),
+      );
 
       if (!updatedSearch) {
         return errorResponse(
