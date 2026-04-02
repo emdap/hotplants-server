@@ -172,6 +172,7 @@ export const dynamicSchema = buildSchema(`
     replaceWithProxyUrl(plantId: String!, occurrenceId: Float!, replaceUrl: String!): String
   
     createGarden(gardenName: String): UserGarden
+    deleteGarden(gardenId: String!): Boolean!
     addToGarden(gardenId: String, plantId: String!): UserGarden
     removeFromGarden(gardenId: String!, plantId: String!): UserGarden
     updateGardenPlant(gardenId: String!, plantId: String!, customThumbnailUrl: String, notes: String): UserGarden

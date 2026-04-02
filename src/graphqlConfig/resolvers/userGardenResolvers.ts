@@ -132,11 +132,12 @@ export const createGardenResolver: MutationResolvers["createGarden"] = async (
   { cookie },
 ) => {
   const user = await validateCookie(cookie);
-  const newGardenName = gardenName?.trim() ?? DEFAULT_GARDEN_NAME(user);
-  caseInsensitiveStringRegex;
+  const newGardenName = gardenName?.trim() || DEFAULT_GARDEN_NAME(user);
   const existingGarden = await userGardensCollection.findOne({
     gardenName: caseInsensitiveStringRegex(newGardenName),
+    userId: user.id,
   });
+
   if (existingGarden) {
     throw new GraphQLError(
       `Duplicate garden name "${existingGarden.gardenName}"`,
@@ -157,6 +158,19 @@ export const createGardenResolver: MutationResolvers["createGarden"] = async (
   const result = await userGardensCollection.insertOne(newGardenData);
 
   return result.acknowledged ? newGardenData : null;
+};
+
+export const deleteGardenResolver: MutationResolvers["deleteGarden"] = async (
+  _,
+  { gardenId },
+  { cookie },
+) => {
+  const user = await validateCookie(cookie);
+  const { acknowledged } = await userGardensCollection.deleteOne({
+    gardenId: new ObjectId(gardenId),
+    userId: user.id,
+  });
+  return acknowledged;
 };
 
 export const addToGardenResolver: MutationResolvers["addToGarden"] = async (

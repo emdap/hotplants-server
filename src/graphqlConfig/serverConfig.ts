@@ -18,6 +18,7 @@ import {
   addToGardenResolver,
   allUserGardensResolver,
   createGardenResolver,
+  deleteGardenResolver,
   removeFromGardenResolver,
   updateGardenPlantResolver,
   userGardenPlantsResolver,
@@ -61,6 +62,7 @@ const resolvers: Resolvers = {
     replaceWithProxyUrl: replaceWithProxyUrlResolver,
 
     createGarden: createGardenResolver,
+    deleteGarden: deleteGardenResolver,
     addToGarden: addToGardenResolver,
     removeFromGarden: removeFromGardenResolver,
     updateGardenPlant: updateGardenPlantResolver,
