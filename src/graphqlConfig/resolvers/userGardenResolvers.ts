@@ -133,13 +133,17 @@ export const createGardenResolver: MutationResolvers["createGarden"] = async (
 ) => {
   const user = await validateCookie(cookie);
   const newGardenName = gardenName?.trim() ?? DEFAULT_GARDEN_NAME(user);
+  caseInsensitiveStringRegex;
   const existingGarden = await userGardensCollection.findOne({
-    gardenName: newGardenName,
+    gardenName: caseInsensitiveStringRegex(newGardenName),
   });
   if (existingGarden) {
-    throw new GraphQLError(`Duplicate garden name "${newGardenName}"`, {
-      extensions: { code: 400 },
-    });
+    throw new GraphQLError(
+      `Duplicate garden name "${existingGarden.gardenName}"`,
+      {
+        extensions: { code: 400 },
+      },
+    );
   }
 
   const newGardenData = {
