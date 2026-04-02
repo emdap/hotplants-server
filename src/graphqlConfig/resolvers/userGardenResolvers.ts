@@ -166,11 +166,11 @@ export const deleteGardenResolver: MutationResolvers["deleteGarden"] = async (
   { cookie },
 ) => {
   const user = await validateCookie(cookie);
-  const { acknowledged } = await userGardensCollection.deleteOne({
-    gardenId: new ObjectId(gardenId),
+  const { deletedCount } = await userGardensCollection.deleteOne({
+    _id: new ObjectId(gardenId),
     userId: user.id,
   });
-  return acknowledged;
+  return Boolean(deletedCount);
 };
 
 export const addToGardenResolver: MutationResolvers["addToGarden"] = async (
