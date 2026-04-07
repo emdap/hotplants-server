@@ -17,20 +17,21 @@ app.use(
   cors({
     origin: trustedOrigins,
     credentials: true,
-  })
+  }),
 );
 app.use(express.json());
 app.use(express.static("public"));
+
 app.use(cookieParser());
 
 app.all("/api/auth/*splat", toNodeHandler(auth));
 
-app.get("/", (_req, res) =>
+app.get(/\/health$/, (_req, res) =>
   res.status(200).json({
     status: "ok",
     uptime: process.uptime(),
     timestamp: new Date().toISOString(),
-  })
+  }),
 );
 
 const router = express.Router();
@@ -48,22 +49,20 @@ app.use(
     swaggerOptions: {
       url: "/swagger.json",
     },
-  })
+  }),
 );
 
 const startGraphQlServer = async () => {
   await apolloServer.start();
   app.use(
     "/graphql",
-    cookieParser(),
     expressMiddleware(apolloServer, {
-      context: async ({ req, res }) => {
-        const session = await auth.api.getSession({
-          headers: req.headers as HeadersInit,
-        });
-        return { req, res, user: session?.user };
-      },
-    })
+      context: async ({ req, res }) => ({
+        req,
+        res,
+        cookie: req.headers.cookie,
+      }),
+    }),
   );
 };
 

@@ -1,8 +1,9 @@
 import { userGardensCollection } from "@/config/mongodbClient";
 import { GardenPlantRefDocument, UserGardenDocument } from "@/config/types";
+import { validateCookie } from "@/plants/util/authUtil";
 import { User } from "better-auth";
 import { GraphQLError } from "graphql";
-import { ObjectId } from "mongodb";
+import { Document, ObjectId } from "mongodb";
 import {
   GardenPlantData,
   GardenPlantRef,
@@ -10,7 +11,7 @@ import {
   QueryResolvers,
   UserGarden,
 } from "../graphql";
-import { ApolloContext } from "../types";
+import { extractPlantFilter } from "./plantResolvers";
 import {
   aggregateAndProject,
   caseInsensitiveStringRegex,
@@ -21,19 +22,6 @@ import {
 
 const DEFAULT_GARDEN_NAME = (user: User) =>
   `${user.name.slice(0, 10)}'s Garden`;
-
-const extractUser = (context: ApolloContext) => {
-  if (!context.user) {
-    throw new GraphQLError("Unauthorized", {
-      extensions: {
-        code: "UNAUTHENTICATED",
-        http: { status: 401 },
-      },
-    });
-  }
-
-  return context.user;
-};
 
 const userGardenMatch = (
   userId: string,
@@ -55,9 +43,9 @@ const userGardenMatch = (
 export const allUserGardensResolver: QueryResolvers["allUserGardens"] = async (
   _,
   { gardenId, gardenName },
-  context,
+  { cookie },
 ) => {
-  const user = extractUser(context);
+  const user = await validateCookie(cookie);
   return userGardensCollection
     .aggregate<UserGarden>([
       userGardenMatch(user.id, { gardenId, gardenName }),
@@ -91,54 +79,72 @@ export const userGardenResolver: QueryResolvers["userGarden"] = async (
       )[0];
 
 export const userGardenPlantsResolver: QueryResolvers["userGardenPlants"] =
-  async (_, { gardenId, ...args }, context) => {
-    const user = extractUser(context);
+  async (_, { gardenId, where, ...args }, { cookie }) => {
+    const user = await validateCookie(cookie);
+    const pipeline: Document[] = [
+      userGardenMatch(user.id, { gardenId }),
+
+      { $unwind: "$plantRefs" },
+
+      {
+        $lookup: {
+          from: "plantData",
+          localField: "plantRefs._id",
+          foreignField: "_id",
+          as: "plantDataLookup",
+        },
+      },
+
+      { $unwind: "$plantDataLookup" },
+
+      {
+        $replaceRoot: {
+          newRoot: {
+            $mergeObjects: [
+              "$plantDataLookup",
+              "$plantRefs",
+              {
+                thumbnailUrl: {
+                  $ifNull: [
+                    "$plantRefs.customThumbnailUrl",
+                    "$plantDataLookup.thumbnailUrl",
+                  ],
+                },
+              },
+            ],
+          },
+        },
+      },
+    ];
+
+    where && pipeline.push({ $match: extractPlantFilter(where) });
+    pipeline.push(paginateWithCount(args));
 
     return aggregateAndProject<UserGardenDocument, GardenPlantData>(
       userGardensCollection,
-      [
-        userGardenMatch(user.id, { gardenId }),
-
-        { $unwind: "$plantRefs" },
-
-        {
-          $lookup: {
-            from: "plantData",
-            localField: "plantRefs._id",
-            foreignField: "_id",
-            as: "plantDataLookup",
-          },
-        },
-
-        { $unwind: "$plantDataLookup" },
-
-        {
-          $replaceRoot: {
-            newRoot: {
-              $mergeObjects: ["$plantDataLookup", "$plantRefs"],
-            },
-          },
-        },
-
-        paginateWithCount(args),
-      ],
+      pipeline,
     );
   };
 
-export const newGardenResolver: MutationResolvers["newGarden"] = async (
+export const createGardenResolver: MutationResolvers["createGarden"] = async (
   _,
   { gardenName },
-  context,
+  { cookie },
 ) => {
-  const user = extractUser(context);
-  const newGardenName = gardenName?.trim() ?? DEFAULT_GARDEN_NAME(user);
+  const user = await validateCookie(cookie);
+  const newGardenName = gardenName?.trim() || DEFAULT_GARDEN_NAME(user);
   const existingGarden = await userGardensCollection.findOne({
-    gardenName: newGardenName,
+    gardenName: caseInsensitiveStringRegex(newGardenName),
+    userId: user.id,
   });
+
   if (existingGarden) {
-    throw new GraphQLError(`Duplicate garden name "${newGardenName}"`, {
-      extensions: { code: 400 },
-    });
+    throw new GraphQLError(
+      `Duplicate garden name "${existingGarden.gardenName}"`,
+      {
+        extensions: { code: 400 },
+      },
+    );
   }
 
   const newGardenData = {
@@ -154,12 +160,25 @@ export const newGardenResolver: MutationResolvers["newGarden"] = async (
   return result.acknowledged ? newGardenData : null;
 };
 
+export const deleteGardenResolver: MutationResolvers["deleteGarden"] = async (
+  _,
+  { gardenId },
+  { cookie },
+) => {
+  const user = await validateCookie(cookie);
+  const { deletedCount } = await userGardensCollection.deleteOne({
+    _id: new ObjectId(gardenId),
+    userId: user.id,
+  });
+  return Boolean(deletedCount);
+};
+
 export const addToGardenResolver: MutationResolvers["addToGarden"] = async (
   _,
   { gardenId, plantId },
-  context,
+  { cookie },
 ) => {
-  const user = extractUser(context);
+  const user = await validateCookie(cookie);
   // TODO: Want to require gardenId in future -- FE not ready to specify, fallback to default name
   const existingGarden = await userGardensCollection.findOne(
     gardenId
@@ -197,3 +216,43 @@ export const addToGardenResolver: MutationResolvers["addToGarden"] = async (
     { returnDocument: "after", upsert: true },
   ) as Promise<UserGarden> | null;
 };
+
+export const removeFromGardenResolver: MutationResolvers["removeFromGarden"] =
+  async (_, { gardenId, plantId }, { cookie }) => {
+    const user = await validateCookie(cookie);
+    return userGardensCollection.findOneAndUpdate(
+      { _id: new ObjectId(gardenId), userId: user.id },
+      { $pull: { plantRefs: { _id: new ObjectId(plantId) } } },
+    );
+  };
+
+export const updateGardenPlantResolver: MutationResolvers["updateGardenPlant"] =
+  async (_, { gardenId, plantId, notes, customThumbnailUrl }, { cookie }) => {
+    const user = await validateCookie(cookie);
+
+    const result = await userGardensCollection.findOneAndUpdate(
+      {
+        _id: new ObjectId(gardenId),
+        userId: user.id,
+        "plantRefs._id": new ObjectId(plantId),
+      },
+      {
+        $set: {
+          ...(typeof notes === "string" && {
+            "plantRefs.$.notes": notes ? notes : undefined,
+          }),
+          ...(customThumbnailUrl && {
+            "plantRefs.$.customThumbnailUrl": customThumbnailUrl,
+          }),
+        },
+      },
+    );
+
+    if (!result) {
+      throw new GraphQLError("Plant not updated.", {
+        extensions: { code: 400 },
+      });
+    }
+
+    return result;
+  };

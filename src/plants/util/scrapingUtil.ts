@@ -56,6 +56,7 @@ export type SearchRecordSummary = { id: string } & Omit<
 
 export const normalizeSearchRecord = ({
   _id,
+  userIds: _userIds,
   ...searchRecord
 }: SearchRecordDocument): SearchRecordSummary => ({
   id: _id.toString(),
@@ -71,7 +72,7 @@ export const shouldStartScraping = ({
       return true;
     case "SCRAPING":
       if (!lastRanTimestamp) {
-        return false;
+        return true;
       }
 
       const now = Date.now();
@@ -85,6 +86,7 @@ export const shouldStartScraping = ({
 export const searchGbifOccurrences = async (
   searchRecord: SearchRecordDocument,
 ) => {
+  console.log(searchRecord);
   const geometry = convertPolygon(searchRecord.boundingPolyCoords);
   const gbifQueryParams = {
     geometry,

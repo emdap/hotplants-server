@@ -1,36 +1,29 @@
 import { buildSchema } from "graphql";
 
-const PlantSize = `
-  amount: Int
-  unit: PlantSizeUnit
-`;
-
 const PlantDataCommonFields = `
-  _id: ObjectId!
-
   scientificName: String!
   addedTimestamp: Float!
   updatedTimestamp: Float!
   scrapeSources: [String!]!
 
-  isPerennial: Boolean
   maturityTime: String
-  habitat: String
   physicalCharactersticsDump: String
+`;
 
+const PlantDataInterface = `
+  ${PlantDataCommonFields}
+
+  isPerennial: Boolean
+  height: PlantSize
+  spread: PlantSize
+
+  habitats: [String!]
   bloomColors: [String!]
   bloomTimes: [String!]
   soilTypes: [String!]
   lightLevels: [String!]
   hardiness: [Int!]
   uses: [String!]
-`;
-
-const PlantDataInterface = `
-  ${PlantDataCommonFields}
-
-  height: PlantSize
-  spread: PlantSize
 
   thumbnailUrl: String
   commonNames: [String!]
@@ -43,9 +36,9 @@ const GardenPlantRef = `
   customThumbnailUrl: String
 `;
 
-const makeFieldsOptional = (str: String) => str.replaceAll(/!$/gm, "");
+const makeFieldsOptional = (str: String) => str.replaceAll("!", "");
 
-export const plantDataSchema = buildSchema(`
+export const dynamicSchema = buildSchema(`
   scalar ObjectId
 
   type PlantMedia {
@@ -64,38 +57,62 @@ export const plantDataSchema = buildSchema(`
   }
 
   type PlantData implements PlantDataInterface {
+    _id: ObjectId!
     ${PlantDataInterface}
   }
 
-  input PlantDataInput {
-    ${makeFieldsOptional(PlantDataCommonFields)}
-
-    height: PlantSizeInput
-    spread: PlantSizeInput
-
-    commonName: String
-    boundingPolyCoords: [[[Float!]!]!]
-  }
-
   enum PlantSizeUnit {
-    m
-    cm
-    in
-    ft
+    meters
+    centimeters
+    inches
+    feet
   }
 
   type PlantSize {
-    ${PlantSize}
+    amount: Float!
+    unit: PlantSizeUnit!
   }
   
-  input PlantSizeInput {
-    ${PlantSize}
+  input PlantSizeRangeInput {
+    minAmount: Float
+    maxAmount: Float
+    unit: PlantSizeUnit!
   }
 
   enum PlantSortField {
     addedTimestamp
     updatedTimestamp
     scientificName
+  }
+
+  input PlantArrayFilterStringInput {
+    value: [String]
+    matchAll: Boolean
+  }
+
+  input PlantArrayFilterIntInput {
+    value: [Int]
+    matchAll: Boolean
+  }
+
+  input PlantDataInput {
+    ${makeFieldsOptional(PlantDataCommonFields)}
+
+    isPerennial: [Boolean]
+    height: PlantSizeRangeInput
+    spread: PlantSizeRangeInput
+
+    commonName: String
+    boundingPolyCoords: [[[Float!]!]!]
+
+    habitats: PlantArrayFilterStringInput
+    bloomColors: PlantArrayFilterStringInput
+    bloomTimes: PlantArrayFilterStringInput
+    soilTypes: PlantArrayFilterStringInput
+    lightLevels: PlantArrayFilterStringInput
+    uses: PlantArrayFilterStringInput
+
+    hardiness: PlantArrayFilterIntInput
   }
 
   input PlantSortInput {
@@ -119,6 +136,7 @@ export const plantDataSchema = buildSchema(`
   }
 
   type GardenPlantData implements PlantDataInterface {
+    _id: ObjectId!
     ${GardenPlantRef}
     ${PlantDataInterface}
 
@@ -147,14 +165,16 @@ export const plantDataSchema = buildSchema(`
   
     allUserGardens(gardenId: String, gardenName: String): [UserGarden!]!
     userGarden(gardenId: String, gardenName: String): UserGarden
-    userGardenPlants(gardenId: String!, sort: [PlantSortInput!], offset: Int, limit: Int): UserGardenPlants
+    userGardenPlants(gardenId: String!, sort: [PlantSortInput!], offset: Int, limit: Int, where: PlantDataInput): UserGardenPlants
   }
 
   type Mutation {
     replaceWithProxyUrl(plantId: String!, occurrenceId: Float!, replaceUrl: String!): String
   
-    newGarden(gardenName: String): ObjectId!
+    createGarden(gardenName: String): UserGarden
+    deleteGarden(gardenId: String!): Boolean!
     addToGarden(gardenId: String, plantId: String!): UserGarden
-    updateGardenPlant(gardenId: String!, plantId: String!, customThumbnailUrl: String, note: String): GardenPlantData
+    removeFromGarden(gardenId: String!, plantId: String!): UserGarden
+    updateGardenPlant(gardenId: String!, plantId: String!, customThumbnailUrl: String, notes: String): UserGarden
   }
 `);

@@ -1,12 +1,14 @@
 import { Feature, Polygon } from "geojson";
-import { ObjectId } from "mongodb";
+import { Document, ObjectId } from "mongodb";
 import {
   gbifSearchesCollection,
+  plantArrayValuesCollection,
   plantsCollection,
 } from "../../config/mongodbClient";
 import {
   PartialPlantData,
   PlantDataDocument,
+  PlantFilterableArrayField,
   PlantSearchParams,
   SearchRecordDocument,
 } from "../../config/types";
@@ -39,9 +41,12 @@ export const storePlantData = async ({
     updatedTimestamp: unixTimestamp,
   };
 
-  return _id
+  const plantPromise = _id
     ? plantsCollection.updateOne({ _id }, { $set: fullData })
     : plantsCollection.insertOne({ _id: new ObjectId(), ...fullData });
+  const arrayValuesPromise = updatePlantDataArrayValues(fullData);
+
+  return Promise.all([plantPromise, arrayValuesPromise]);
 };
 
 export const lookupPlantByCoordinates = async ({
@@ -53,20 +58,18 @@ export const lookupPlantByCoordinates = async ({
     })
     .toArray();
 
-export const createSearchRecord = async ({
-  locationName,
-  locationSource,
-  boundingPolyCoords,
-  commonName,
-  scientificName,
-}: PlantSearchParams) => {
+export const createSearchRecord = async (
+  { location, plantName }: PlantSearchParams,
+  userId?: ObjectId,
+) => {
   // Converting polygon will error out with invalid input, test conversion before creating
-  convertPolygon(boundingPolyCoords);
+  convertPolygon(location?.boundingPolyCoords);
   // Don't want to store the converted-polygon, easier to parse raw. Converted style is for GBIF API
 
   let taxonKeys: number[] | undefined;
-  if (commonName) {
-    taxonKeys = await searchGbifSpecies(commonName.trim());
+
+  if (plantName && "commonName" in plantName) {
+    taxonKeys = await searchGbifSpecies(plantName.commonName.trim());
   }
 
   const insertedRecord = await gbifSearchesCollection.insertOne({
@@ -75,15 +78,13 @@ export const createSearchRecord = async ({
     status: "READY",
     createdTimestamp: Date.now(),
 
-    locationName: locationName.trim(),
-    locationSource,
-    boundingPolyCoords,
-    commonName: commonName?.trim(),
-    scientificName: scientificName?.trim(),
     taxonKeys,
-
     totalOccurrences: 0,
     occurrencesOffset: 0,
+
+    ...location,
+    ...plantName,
+    ...(userId && { userIds: [userId] }),
   });
 
   return (
@@ -124,11 +125,39 @@ export const finishRunningSearch = (
 export const updateSearchRecord = (
   searchRecordId: ObjectId,
   newData: Partial<SearchRecordDocument>,
+  userId?: ObjectId,
 ) =>
   gbifSearchesCollection.findOneAndUpdate(
     { _id: searchRecordId },
     {
       $set: newData,
+      ...(userId && { $addToSet: { userIds: userId } }),
     },
     { returnDocument: "after" },
   );
+
+const updatePlantDataArrayValues = (
+  plantData: Omit<PlantDataDocument, "_id">,
+) => {
+  // TS definition ensures all array fields are present
+  const plantArrayFieldsGrouping: Record<PlantFilterableArrayField, Document> =
+    {
+      bloomColors: { $each: plantData.bloomColors ?? [] },
+      bloomTimes: { $each: plantData.bloomTimes ?? [] },
+      hardiness: { $each: plantData.hardiness ?? [] },
+      // TODO: Fix habitat scraping to group into categories -- right now
+      // it's a random sentence
+      habitats: { $each: [] },
+      // habitats: { $each: plantData.habitats ?? [] },
+      lightLevels: { $each: plantData.lightLevels ?? [] },
+      soilTypes: { $each: plantData.soilTypes ?? [] },
+    };
+
+  return plantArrayValuesCollection.updateOne(
+    {},
+    {
+      $addToSet: plantArrayFieldsGrouping,
+    },
+    { upsert: true },
+  );
+};

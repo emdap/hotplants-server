@@ -17,11 +17,14 @@ import {
 import {
   addToGardenResolver,
   allUserGardensResolver,
-  newGardenResolver,
+  createGardenResolver,
+  deleteGardenResolver,
+  removeFromGardenResolver,
+  updateGardenPlantResolver,
   userGardenPlantsResolver,
   userGardenResolver,
 } from "./resolvers/userGardenResolvers";
-import { plantDataSchema } from "./schemas/plantData.schema";
+import { dynamicSchema } from "./schemas/dynamic.schema";
 import { ApolloContext } from "./types";
 
 const schemaPath = path.join(import.meta.dirname, "schemas/mainSchema.graphql");
@@ -58,13 +61,16 @@ const resolvers: Resolvers = {
   Mutation: {
     replaceWithProxyUrl: replaceWithProxyUrlResolver,
 
-    newGarden: newGardenResolver,
+    createGarden: createGardenResolver,
+    deleteGarden: deleteGardenResolver,
     addToGarden: addToGardenResolver,
+    removeFromGarden: removeFromGardenResolver,
+    updateGardenPlant: updateGardenPlantResolver,
   },
 };
 
 export const apolloServer = new ApolloServer<ApolloContext>({
-  typeDefs: [gql(readFileSync(schemaPath, "utf-8")), plantDataSchema],
+  typeDefs: [gql(readFileSync(schemaPath, "utf-8")), dynamicSchema],
   resolvers,
   introspection: true,
 });

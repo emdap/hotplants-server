@@ -18,24 +18,51 @@ export type PlantDataDocument = Omit<
   _id: ObjectId;
 };
 
+type ArrayField<T> = {
+  [K in keyof T]: NonNullable<T[K]> extends Array<any> ? K : never;
+}[keyof T];
+export type PlantFilterableArrayField = NonNullable<
+  ArrayField<
+    Omit<
+      PlantDataDocument,
+      "occurrences" | "commonNames" | "uses" | "scrapeSources"
+    >
+  >
+>;
+export type PlantArrayValuesDocument = {
+  [K in PlantFilterableArrayField]?: PlantDataDocument[K];
+};
+
 export type PartialPlantData = Omit<
   PlantDataDocument,
   "_id" | "addedTimestamp" | "updatedTimestamp"
 >;
 
-export type SearchRecordDocument = Omit<SearchRecord, "_id" | "taxonKeys"> & {
-  _id: ObjectId;
-  taxonKeys?: number[];
+// Redefining these because graphql generated type using Maybe wrapper makes it too difficult to extract
+// the non-null form of these properties
+export type PlantSearchLocationParams = {
+  locationName: string;
+  locationSource: "search" | "custom";
+  boundingPolyCoords: number[][][];
 };
 
-export type PlantSearchParams = Pick<
-  SearchRecordDocument,
-  | "locationName"
-  | "locationSource"
-  | "boundingPolyCoords"
-  | "commonName"
-  | "scientificName"
->;
+export type PlantSearchNameParams =
+  | { commonName: string }
+  | { scientificName: string };
+
+export type PlantSearchParams = {
+  location?: PlantSearchLocationParams;
+  plantName?: PlantSearchNameParams;
+};
+
+export type SearchRecordDocument = Omit<
+  SearchRecord,
+  "_id" | "userIds" | "taxonKeys"
+> & {
+  _id: ObjectId;
+  userIds?: ObjectId[];
+  taxonKeys?: number[];
+};
 
 export type GardenPlantRefDocument = Omit<GardenPlantRef, "_id"> & {
   _id: ObjectId;
