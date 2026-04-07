@@ -4,12 +4,12 @@ import { client } from "./config/mongodbClient.js";
 
 const ENV_VARS = {
   dev: {
-    trustedOrigins: ["http://localhost:5173"],
+    trustedOrigins: ["http://localhost:5173", "http://localhost:8080"],
     baseURL: "http://localhost:4000",
     dbName: "dev-auth",
   },
   prod: {
-    trustedOrigins: ["https://hotplants.fly.dev"],
+    trustedOrigins: ["https://hotplants.fly.dev", "https://css-garden.fly.dev"],
     baseURL: "https://hotplants.fly.dev",
     dbName: "auth",
   },

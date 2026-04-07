@@ -6,6 +6,7 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import "dotenv/config";
 import express from "express";
+import { createProxyMiddleware } from "http-proxy-middleware";
 import swaggerUi from "swagger-ui-express";
 import { auth, trustedOrigins } from "./auth";
 
@@ -48,6 +49,19 @@ app.use(
   swaggerUi.setup(undefined, {
     swaggerOptions: {
       url: "/swagger.json",
+    },
+  }),
+);
+
+// For css-garden
+app.use(
+  "/trefle",
+  createProxyMiddleware({
+    target: "https://trefle.io",
+    changeOrigin: true,
+    pathRewrite: (path) => {
+      const separator = path.includes("?") ? "&" : "?";
+      return `${path}${separator}token=${process.env.TREFLE_TOKEN}`;
     },
   }),
 );
