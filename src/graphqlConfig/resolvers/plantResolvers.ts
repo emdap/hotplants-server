@@ -113,7 +113,6 @@ export const extractPlantFilter = (filter: PlantDataInput & { _id?: string }) =>
         : null;
 
     if (
-      (filter !== null && !filter) ||
       (typeof filter === "string" && !filter.length) ||
       (simpleArrayFilter && !simpleArrayFilter.length) ||
       (complexArrayFilter && !complexArrayFilter.value?.length)
@@ -127,6 +126,8 @@ export const extractPlantFilter = (filter: PlantDataInput & { _id?: string }) =>
       prev[field] = caseInsensitiveStringRegex(filter);
     } else if (field === "boundingPolyCoords") {
       prev = { ...prev, ...constructBboxFilter(filter as Position[][]) };
+    } else if (field === "hasScrapedData" && typeof filter === "boolean") {
+      prev.scrapeSources = filter ? { $ne: [] } : [];
     } else if (simpleArrayFilter) {
       prev[field] = { $in: simpleArrayFilter } as Filter<PlantDataDocument>;
     } else if (complexArrayFilter?.value) {

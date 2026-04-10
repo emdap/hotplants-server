@@ -156,6 +156,7 @@ export type PlantDataInput = {
   commonName?: InputMaybe<Scalars['String']['input']>;
   habitats?: InputMaybe<PlantArrayFilterStringInput>;
   hardiness?: InputMaybe<PlantArrayFilterIntInput>;
+  hasScrapedData?: InputMaybe<Scalars['Boolean']['input']>;
   height?: InputMaybe<PlantSizeRangeInput>;
   isPerennial?: InputMaybe<Array<InputMaybe<Scalars['Boolean']['input']>>>;
   lightLevels?: InputMaybe<PlantArrayFilterStringInput>;

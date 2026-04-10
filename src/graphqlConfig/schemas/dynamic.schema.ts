@@ -98,6 +98,7 @@ export const dynamicSchema = buildSchema(`
   input PlantDataInput {
     ${makeFieldsOptional(PlantDataCommonFields)}
 
+    hasScrapedData: Boolean
     isPerennial: [Boolean]
     height: PlantSizeRangeInput
     spread: PlantSizeRangeInput
