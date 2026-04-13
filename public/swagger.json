@@ -176,7 +176,7 @@
 				],
 				"type": "object"
 			},
-			"PlantSearchNameParams": {
+			"EntityNameParams": {
 				"anyOf": [
 					{
 						"properties": {
@@ -202,10 +202,10 @@
 					}
 				]
 			},
-			"PlantSearchParams": {
+			"EntitySearchParams": {
 				"properties": {
-					"plantName": {
-						"$ref": "#/components/schemas/PlantSearchNameParams"
+					"entityName": {
+						"$ref": "#/components/schemas/EntityNameParams"
 					},
 					"location": {
 						"$ref": "#/components/schemas/PlantSearchLocationParams"
@@ -263,7 +263,7 @@
 		"contact": {}
 	},
 	"paths": {
-		"/plants/searchRecord": {
+		"/searchRecord": {
 			"post": {
 				"operationId": "GetSearchRecord",
 				"responses": {
@@ -305,14 +305,14 @@
 					"content": {
 						"application/json": {
 							"schema": {
-								"$ref": "#/components/schemas/PlantSearchParams"
+								"$ref": "#/components/schemas/EntitySearchParams"
 							}
 						}
 					}
 				}
 			}
 		},
-		"/plants/runSearch/{searchRecordId}": {
+		"/runSearch/{searchRecordId}": {
 			"get": {
 				"operationId": "RunSearch",
 				"responses": {

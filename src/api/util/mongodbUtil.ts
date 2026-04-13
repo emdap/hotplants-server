@@ -6,10 +6,10 @@ import {
   plantsCollection,
 } from "../../config/mongodbClient";
 import {
+  EntitySearchParams,
   PartialPlantData,
   PlantDataDocument,
   PlantFilterableArrayField,
-  PlantSearchParams,
   SearchRecordDocument,
 } from "../../config/types";
 import { searchGbifSpecies } from "./gbifUtil";
@@ -59,7 +59,7 @@ export const lookupPlantByCoordinates = async ({
     .toArray();
 
 export const createSearchRecord = async (
-  { location, plantName }: PlantSearchParams,
+  { location, entityName: plantName }: EntitySearchParams,
   userId?: ObjectId,
 ) => {
   // Converting polygon will error out with invalid input, test conversion before creating

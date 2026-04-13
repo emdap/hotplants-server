@@ -1,5 +1,5 @@
+import { extractUserFromCookie } from "@/api/util/authUtil";
 import { SearchRecordDocument } from "@/config/types";
-import { extractUserFromCookie } from "@/plants/util/authUtil";
 import { Filter, ObjectId } from "mongodb";
 import {
   gbifSearchesCollection,

@@ -46,13 +46,13 @@ export type PlantSearchLocationParams = {
   boundingPolyCoords: number[][][];
 };
 
-export type PlantSearchNameParams =
+export type EntityNameParams =
   | { commonName: string }
   | { scientificName: string };
 
-export type PlantSearchParams = {
+export type EntitySearchParams = {
   location?: PlantSearchLocationParams;
-  plantName?: PlantSearchNameParams;
+  entityName?: EntityNameParams;
 };
 
 export type SearchRecordDocument = Omit<

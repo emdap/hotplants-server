@@ -1,4 +1,4 @@
-import { STANDARD_UNIT } from "@/plants/pfafScraper";
+import { STANDARD_UNIT } from "@/api/pfafScraper";
 import { polygon } from "@turf/turf";
 import convert, { Unit } from "convert";
 import { Polygon, Position } from "geojson";

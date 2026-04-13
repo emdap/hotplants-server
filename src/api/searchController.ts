@@ -11,11 +11,8 @@ import {
   Route,
   TsoaResponse,
 } from "tsoa";
-import {
-  gbifSearchesCollection,
-  plantArrayValuesCollection,
-} from "../config/mongodbClient";
-import { PlantArrayValuesDocument, PlantSearchParams } from "../config/types";
+import { gbifSearchesCollection } from "../config/mongodbClient";
+import { EntitySearchParams } from "../config/types";
 import { extractUserFromCookie } from "./util/authUtil";
 import { createSearchRecord, updateSearchRecord } from "./util/mongodbUtil";
 import {
@@ -25,18 +22,18 @@ import {
   shouldStartScraping,
 } from "./util/scrapingUtil";
 
-@Route("plants")
-export class PlantController {
+@Route()
+export class SearchController {
   @Post("searchRecord")
   public async getSearchRecord(
-    @Body() plantSearch: PlantSearchParams,
+    @Body() searchParams: EntitySearchParams,
     @Request() @Hidden() request: ExpressRequest,
     @Res() errorResponse: TsoaResponse<400 | 500, string>,
   ): Promise<SearchRecordSummary> {
-    if (!plantSearch.location && !plantSearch.plantName) {
+    if (!searchParams.location && !searchParams.entityName) {
       errorResponse(
         400,
-        "Request must include 'location' or 'plantName' to create search record",
+        "Request must include 'location' or 'entityName' to create search record",
       );
     }
 
@@ -51,8 +48,8 @@ export class PlantController {
       commonName: undefined,
       scientificName: undefined,
 
-      ...plantSearch.location,
-      ...plantSearch.plantName,
+      ...searchParams.location,
+      ...searchParams.entityName,
     };
 
     const existingSearchRecord = await (userId
@@ -69,7 +66,7 @@ export class PlantController {
       return normalizeSearchRecord(existingSearchRecord);
     }
 
-    const newSearchRecord = await createSearchRecord(plantSearch, userId);
+    const newSearchRecord = await createSearchRecord(searchParams, userId);
     return newSearchRecord
       ? normalizeSearchRecord(newSearchRecord)
       : errorResponse(500, "Unable to create search record");
@@ -117,16 +114,5 @@ export class PlantController {
       console.info("Will not start scraping");
       return normalizeSearchRecord(searchRecord);
     }
-  }
-
-  @Get("filterValues")
-  public async getFilterValues(): Promise<PlantArrayValuesDocument> {
-    const valuesDocument = await plantArrayValuesCollection.findOne({});
-    if (valuesDocument) {
-      const { _id, ...values } = valuesDocument;
-      return values;
-    }
-
-    return {};
   }
 }

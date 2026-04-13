@@ -1,6 +1,6 @@
+import { validateCookie } from "@/api/util/authUtil";
 import { userGardensCollection } from "@/config/mongodbClient";
 import { GardenPlantRefDocument, UserGardenDocument } from "@/config/types";
-import { validateCookie } from "@/plants/util/authUtil";
 import { User } from "better-auth";
 import { GraphQLError } from "graphql";
 import { Document, ObjectId } from "mongodb";

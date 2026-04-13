@@ -4,8 +4,8 @@ import {
   GbifOccurrenceSearchParams,
 } from "../../config/gbifClient";
 import {
+  EntitySearchParams,
   PartialPlantData,
-  PlantSearchParams,
   SearchRecordDocument,
 } from "../../config/types";
 import { parseBboxInput } from "../../graphqlConfig/resolvers/plantResolvers";
@@ -16,7 +16,7 @@ import { finishRunningSearch, updateSearchRecord } from "./mongodbUtil";
 
 const DEFAULT_GBIF_SEARCH_PARAMS: Omit<
   GbifOccurrenceSearchParams,
-  keyof PlantSearchParams
+  keyof EntitySearchParams
 > = {
   kingdomKey: [6],
   basisOfRecord: ["HUMAN_OBSERVATION", "OBSERVATION", "MACHINE_OBSERVATION"],
