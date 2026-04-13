@@ -48,6 +48,7 @@ export class SearchController {
       commonName: undefined,
       scientificName: undefined,
 
+      entityType: searchParams.entityType,
       ...searchParams.location,
       ...searchParams.entityName,
     };

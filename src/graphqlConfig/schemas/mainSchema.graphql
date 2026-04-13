@@ -9,6 +9,11 @@ enum LocationSource {
   search
 }
 
+enum EntityType {
+  plant
+  animal
+}
+
 type SearchRecord {
   _id: ObjectId!
   createdTimestamp: Float!
@@ -22,6 +27,7 @@ type SearchRecord {
   commonName: String
 
   taxonKeys: [Int!]
+  entityType: EntityType!
 
   totalOccurrences: Int!
   occurrencesOffset: Int!
@@ -55,6 +61,7 @@ input SearchRecordBooleanFilterInput {
 enum SearchRecordStringFilterField {
   locationSource
   status
+  entityType
 }
 
 input SearchRecordStringFilterInput {

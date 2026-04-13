@@ -11,14 +11,13 @@ import {
 import { parseBboxInput } from "../../graphqlConfig/resolvers/plantResolvers";
 import { scrapePermaPeople } from "../permaPeopleScraper";
 import { scrapePFAF } from "../pfafScraper";
-import { processGbifResults } from "./gbifUtil";
+import { ENTITY_TO_KINGDOM, processGbifResults } from "./gbifUtil";
 import { finishRunningSearch, updateSearchRecord } from "./mongodbUtil";
 
 const DEFAULT_GBIF_SEARCH_PARAMS: Omit<
   GbifOccurrenceSearchParams,
   keyof EntitySearchParams
 > = {
-  kingdomKey: [6],
   basisOfRecord: ["HUMAN_OBSERVATION", "OBSERVATION", "MACHINE_OBSERVATION"],
   limit: 300,
   // @ts-expect-error API spec is incorrect
@@ -86,7 +85,6 @@ export const shouldStartScraping = ({
 export const searchGbifOccurrences = async (
   searchRecord: SearchRecordDocument,
 ) => {
-  console.log(searchRecord);
   const geometry = convertPolygon(searchRecord.boundingPolyCoords);
   const gbifQueryParams = {
     geometry,
@@ -95,6 +93,8 @@ export const searchGbifOccurrences = async (
       ? [searchRecord.scientificName]
       : undefined,
     offset: searchRecord.occurrencesOffset,
+    kingdomKey: [ENTITY_TO_KINGDOM[searchRecord.entityType]],
+
     ...DEFAULT_GBIF_SEARCH_PARAMS,
   };
 

@@ -1,5 +1,6 @@
 import { gbifClient, GbifOccurenceResult } from "../../config/gbifClient";
 import {
+  EntityType,
   PlantData,
   PlantMedia,
   PlantOccurrence,
@@ -12,6 +13,11 @@ type NormalizedGbifResult = Omit<
   "media" | "decimalLatitude" | "decimalLongitude"
 > &
   Pick<PlantData, "scrapeSources" | "occurrences">;
+
+export const ENTITY_TO_KINGDOM: Record<EntityType, number> = {
+  plant: 6,
+  animal: 5,
+};
 
 /**
  * A dictionary where the key is the plants scientific name, and the entry is
@@ -27,13 +33,16 @@ const extractScientificName = ({
     ? scientificName?.split(scientificNameAuthorship)[0].trim()
     : scientificName;
 
-export const searchGbifSpecies = async (commonName: string) => {
+export const searchGbifSpecies = async (
+  commonName: string,
+  entityType: EntityType,
+) => {
   // TODO: Create way to get all species instead of capping out at 20 limit
   const { data } = await gbifClient.GET("/species/search", {
     params: {
       query: {
         limit: 20,
-        higherTaxonKey: "6",
+        higherTaxonKey: String(ENTITY_TO_KINGDOM[entityType]),
         q: commonName,
       },
     },

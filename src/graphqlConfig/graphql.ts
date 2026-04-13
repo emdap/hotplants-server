@@ -18,6 +18,10 @@ export type Scalars = {
   ObjectId: { input: any; output: any; }
 };
 
+export type EntityType =
+  | 'animal'
+  | 'plant';
+
 export type GardenPlantData = PlantDataInterface & {
   __typename?: 'GardenPlantData';
   _id: Scalars['ObjectId']['output'];
@@ -326,6 +330,7 @@ export type SearchRecord = {
   boundingPolyCoords?: Maybe<Array<Array<Array<Scalars['Float']['output']>>>>;
   commonName?: Maybe<Scalars['String']['output']>;
   createdTimestamp: Scalars['Float']['output'];
+  entityType: EntityType;
   lastRanTimestamp?: Maybe<Scalars['Float']['output']>;
   locationName?: Maybe<Scalars['String']['output']>;
   locationSource?: Maybe<LocationSource>;
@@ -377,6 +382,7 @@ export type SearchRecordStatus =
   | 'SCRAPING';
 
 export type SearchRecordStringFilterField =
+  | 'entityType'
   | 'locationSource'
   | 'status';
 
@@ -478,6 +484,7 @@ export type ResolversInterfaceTypes<_RefType extends Record<string, unknown>> = 
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = ResolversObject<{
   Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
+  EntityType: EntityType;
   Float: ResolverTypeWrapper<Scalars['Float']['output']>;
   GardenPlantData: ResolverTypeWrapper<GardenPlantData>;
   GardenPlantRef: ResolverTypeWrapper<GardenPlantRef>;
@@ -704,6 +711,7 @@ export type SearchRecordResolvers<ContextType = ApolloContext, ParentType extend
   boundingPolyCoords?: Resolver<Maybe<Array<Array<Array<ResolversTypes['Float']>>>>, ParentType, ContextType>;
   commonName?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   createdTimestamp?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  entityType?: Resolver<ResolversTypes['EntityType'], ParentType, ContextType>;
   lastRanTimestamp?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   locationName?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   locationSource?: Resolver<Maybe<ResolversTypes['LocationSource']>, ParentType, ContextType>;

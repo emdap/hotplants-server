@@ -29,6 +29,13 @@
 				"type": "string",
 				"nullable": true
 			},
+			"EntityType": {
+				"type": "string",
+				"enum": [
+					"animal",
+					"plant"
+				]
+			},
 			"Maybe_number_": {
 				"type": "number",
 				"format": "double",
@@ -88,6 +95,9 @@
 						"type": "number",
 						"format": "double"
 					},
+					"entityType": {
+						"$ref": "#/components/schemas/EntityType"
+					},
 					"lastRanTimestamp": {
 						"$ref": "#/components/schemas/Maybe_number_"
 					},
@@ -114,6 +124,7 @@
 				},
 				"required": [
 					"createdTimestamp",
+					"entityType",
 					"occurrencesOffset",
 					"status",
 					"totalOccurrences"
@@ -204,6 +215,9 @@
 			},
 			"EntitySearchParams": {
 				"properties": {
+					"entityType": {
+						"$ref": "#/components/schemas/EntityType"
+					},
 					"entityName": {
 						"$ref": "#/components/schemas/EntityNameParams"
 					},
@@ -211,6 +225,9 @@
 						"$ref": "#/components/schemas/PlantSearchLocationParams"
 					}
 				},
+				"required": [
+					"entityType"
+				],
 				"type": "object"
 			},
 			"Maybe_string-Array_": {

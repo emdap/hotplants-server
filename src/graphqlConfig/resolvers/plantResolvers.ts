@@ -114,6 +114,7 @@ export const extractPlantFilter = (filter: PlantDataInput & { _id?: string }) =>
 
     if (
       (typeof filter === "string" && !filter.length) ||
+      (property === "boundingPolyCoords" && !filter) ||
       (simpleArrayFilter && !simpleArrayFilter.length) ||
       (complexArrayFilter && !complexArrayFilter.value?.length)
     ) {

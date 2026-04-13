@@ -1,5 +1,6 @@
 import { ObjectId } from "mongodb";
 import {
+  EntityType,
   GardenPlantRef,
   PlantData,
   SearchRecord,
@@ -53,6 +54,7 @@ export type EntityNameParams =
 export type EntitySearchParams = {
   location?: PlantSearchLocationParams;
   entityName?: EntityNameParams;
+  entityType: EntityType;
 };
 
 export type SearchRecordDocument = Omit<

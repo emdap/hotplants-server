@@ -59,7 +59,7 @@ export const lookupPlantByCoordinates = async ({
     .toArray();
 
 export const createSearchRecord = async (
-  { location, entityName: plantName }: EntitySearchParams,
+  { location, entityName, entityType }: EntitySearchParams,
   userId?: ObjectId,
 ) => {
   // Converting polygon will error out with invalid input, test conversion before creating
@@ -68,8 +68,11 @@ export const createSearchRecord = async (
 
   let taxonKeys: number[] | undefined;
 
-  if (plantName && "commonName" in plantName) {
-    taxonKeys = await searchGbifSpecies(plantName.commonName.trim());
+  if (entityName && "commonName" in entityName) {
+    taxonKeys = await searchGbifSpecies(
+      entityName.commonName.trim(),
+      entityType,
+    );
   }
 
   const insertedRecord = await gbifSearchesCollection.insertOne({
@@ -81,9 +84,10 @@ export const createSearchRecord = async (
     taxonKeys,
     totalOccurrences: 0,
     occurrencesOffset: 0,
+    entityType,
 
     ...location,
-    ...plantName,
+    ...entityName,
     ...(userId && { userIds: [userId] }),
   });
 
