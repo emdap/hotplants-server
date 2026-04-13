@@ -1,5 +1,7 @@
 import { buildSchema } from "graphql";
 
+// TODO: Separate common entity data fields/types from plant-specific ones. Make queries entity agnostic.
+
 const PlantDataCommonFields = `
   scientificName: String!
   addedTimestamp: Float!
@@ -40,6 +42,11 @@ const makeFieldsOptional = (str: String) => str.replaceAll("!", "");
 
 export const dynamicSchema = buildSchema(`
   scalar ObjectId
+
+  enum EntityType {
+    plant
+    animal
+  }
 
   type PlantMedia {
     url: String!
@@ -162,7 +169,7 @@ export const dynamicSchema = buildSchema(`
   type Query {
     plant(id: String!, boundingPolyCoords: [[[Float!]!]!]): PlantData
     plantOccurrences(id: String!, offset: Int, limit: Int): PlantOccurrencesResults
-    plantSearch(sort: [PlantSortInput!], limit: Int, offset: Int, where: PlantDataInput): PlantSearchQueryResults!
+    plantSearch(entityType: EntityType!, sort: [PlantSortInput!], limit: Int, offset: Int, where: PlantDataInput): PlantSearchQueryResults!
   
     allUserGardens(gardenId: String, gardenName: String): [UserGarden!]!
     userGarden(gardenId: String, gardenName: String): UserGarden

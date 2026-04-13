@@ -5,8 +5,12 @@ import {
   PlantMedia,
   PlantOccurrence,
 } from "../../graphqlConfig/graphql";
-import { getPlantByName, storePlantData } from "./mongodbUtil";
-import { combineScrapedData, iteratePlantScrapers } from "./scrapingUtil";
+import { getEntityByName, storeEntityData } from "./mongodbUtil";
+import {
+  combineScrapedData,
+  iteratePlantScrapers,
+  WebsiteScrapedData,
+} from "./scrapingUtil";
 
 type NormalizedGbifResult = Omit<
   GbifOccurenceResult,
@@ -16,7 +20,7 @@ type NormalizedGbifResult = Omit<
 
 export const ENTITY_TO_KINGDOM: Record<EntityType, number> = {
   plant: 6,
-  animal: 5,
+  animal: 1,
 };
 
 /**
@@ -50,7 +54,7 @@ export const searchGbifSpecies = async (
   return data?.results?.flatMap(({ key }) => key ?? []);
 };
 
-const normalizePlant = (gbifOccurrence: GbifOccurenceResult) => {
+const normalizeOccurrence = (gbifOccurrence: GbifOccurenceResult) => {
   const { media, decimalLatitude, decimalLongitude, ...rest } = gbifOccurrence;
 
   const mediaObjects: PlantMedia[] = media.map(({ identifier }) => ({
@@ -62,7 +66,7 @@ const normalizePlant = (gbifOccurrence: GbifOccurenceResult) => {
       ? [decimalLongitude, decimalLatitude]
       : [];
 
-  const normalizedPlant: NormalizedGbifResult = {
+  const normalizedOccurence: NormalizedGbifResult = {
     ...rest,
     scrapeSources: [],
     occurrences: [
@@ -74,7 +78,7 @@ const normalizePlant = (gbifOccurrence: GbifOccurenceResult) => {
     ],
   };
 
-  return normalizedPlant;
+  return normalizedOccurence;
 };
 
 const extractOccurrenceIds = (occurrences?: PlantOccurrence[]) =>
@@ -103,14 +107,14 @@ const reduceGbifResults = (gbifResults: GbifOccurenceResult[]) =>
     );
 
     if (!existingOccurrenceIds.includes(result.key)) {
-      const normalizedGbifPlant = normalizePlant(result);
+      const normalizedOccurrence = normalizeOccurrence(result);
       if (prev[scientificName]) {
         prev[scientificName] = combineOccurrences(
           prev[scientificName],
-          normalizedGbifPlant,
+          normalizedOccurrence,
         );
       } else {
-        prev[scientificName] = normalizedGbifPlant;
+        prev[scientificName] = normalizedOccurrence;
       }
     }
 
@@ -156,23 +160,27 @@ const combineOccurrences = <
  */
 export const processGbifResults = async (
   gbifResults: GbifOccurenceResult[],
+  entityType: EntityType,
 ) => {
-  const processGbifPlant = async (
+  const processGbifEntity = async (
     scientificName: string,
     occurrenceData: NormalizedGbifResult,
   ) => {
-    const existingPlantData = await getPlantByName(scientificName);
+    const existingData = await getEntityByName(scientificName, entityType);
+    let combinedScrapedData: WebsiteScrapedData | null = null;
 
-    const scrapedData = await Promise.all(
-      iteratePlantScrapers(scientificName, existingPlantData?.scrapeSources),
-    );
-    const combinedScrapedData = combineScrapedData(scrapedData);
+    if (entityType === "plant") {
+      const scrapedData = await Promise.all(
+        iteratePlantScrapers(scientificName, existingData?.scrapeSources),
+      );
+      combinedScrapedData = combineScrapedData(scrapedData);
+    }
 
     const normalizedData = {
       scientificName,
       occurrences: [],
       scrapeSources: [],
-      ...existingPlantData,
+      ...existingData,
       ...combinedScrapedData,
     };
 
@@ -182,7 +190,7 @@ export const processGbifResults = async (
     );
 
     if (hasNewData) {
-      await storePlantData(combinedData);
+      await storeEntityData(combinedData, entityType);
     }
 
     return combinedData;
@@ -192,7 +200,7 @@ export const processGbifResults = async (
 
   return Promise.all(
     Object.entries(resultDict).map((plantEntry) =>
-      processGbifPlant(...plantEntry),
+      processGbifEntity(...plantEntry),
     ),
   );
 };

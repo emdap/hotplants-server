@@ -7,7 +7,7 @@ import {
   plantOccurrencesResolver,
   plantResolver,
   plantSearchResolver,
-} from "./resolvers/plantResolvers";
+} from "./resolvers/entityResolvers";
 import { replaceWithProxyUrlResolver } from "./resolvers/replaceWithProxyUrlResolver";
 import {
   allSearchRecordsResolver,

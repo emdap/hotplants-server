@@ -11,7 +11,7 @@ import {
   QueryResolvers,
   UserGarden,
 } from "../graphql";
-import { extractPlantFilter } from "./plantResolvers";
+import { extractPlantFilter } from "./entityResolvers";
 import {
   aggregateAndProject,
   caseInsensitiveStringRegex,

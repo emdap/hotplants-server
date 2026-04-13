@@ -1,6 +1,8 @@
+import { EntityType } from "@/graphqlConfig/graphql";
 import { Feature, Polygon } from "geojson";
 import { Document, ObjectId } from "mongodb";
 import {
+  animalsCollection,
   gbifSearchesCollection,
   plantArrayValuesCollection,
   plantsCollection,
@@ -15,6 +17,9 @@ import {
 import { searchGbifSpecies } from "./gbifUtil";
 import { convertPolygon } from "./scrapingUtil";
 
+export const getEntityCollection = (entityType: EntityType) =>
+  entityType === "plant" ? plantsCollection : animalsCollection;
+
 /**
  *
  * Helper function to return existing plant data from mongodb.
@@ -22,31 +27,43 @@ import { convertPolygon } from "./scrapingUtil";
  * @param scientificName The plant name to search for
  * @returns Data for the plant
  */
-export const getPlantByName = (scientificName: string) => {
+export const getEntityByName = (
+  scientificName: string,
+  entityType: EntityType,
+) => {
   const lowercaseName = scientificName.toLowerCase();
-  return plantsCollection.findOne({
+
+  return getEntityCollection(entityType).findOne({
     scientificName: lowercaseName,
   });
 };
 
-export const storePlantData = async ({
-  _id,
-  ...plantData
-}: PartialPlantData & { _id?: ObjectId; addedTimestamp?: number }) => {
+export const storeEntityData = async (
+  {
+    _id,
+    ...entityData
+  }: PartialPlantData & { _id?: ObjectId; addedTimestamp?: number },
+  entityType: EntityType,
+) => {
   const unixTimestamp = Date.now();
   // Enforce strict typechecking
   const fullData: Omit<PlantDataDocument, "_id"> = {
-    ...plantData,
-    addedTimestamp: plantData.addedTimestamp ?? unixTimestamp,
+    ...entityData,
+    addedTimestamp: entityData.addedTimestamp ?? unixTimestamp,
     updatedTimestamp: unixTimestamp,
   };
 
-  const plantPromise = _id
-    ? plantsCollection.updateOne({ _id }, { $set: fullData })
-    : plantsCollection.insertOne({ _id: new ObjectId(), ...fullData });
-  const arrayValuesPromise = updatePlantDataArrayValues(fullData);
+  const storagePromise = _id
+    ? getEntityCollection(entityType).updateOne({ _id }, { $set: fullData })
+    : getEntityCollection(entityType).insertOne({
+        _id: new ObjectId(),
+        ...fullData,
+      });
 
-  return Promise.all([plantPromise, arrayValuesPromise]);
+  const arrayValuesPromise =
+    entityType === "plant" && updatePlantDataArrayValues(fullData);
+
+  return Promise.all([storagePromise, arrayValuesPromise]);
 };
 
 export const lookupPlantByCoordinates = async ({

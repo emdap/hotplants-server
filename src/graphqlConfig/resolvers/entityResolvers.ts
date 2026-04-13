@@ -1,4 +1,5 @@
 import { STANDARD_UNIT } from "@/api/pfafScraper";
+import { getEntityCollection } from "@/api/util/mongodbUtil";
 import { polygon } from "@turf/turf";
 import convert, { Unit } from "convert";
 import { Polygon, Position } from "geojson";
@@ -17,6 +18,8 @@ import {
   caseInsensitiveStringRegex,
   paginateWithCount,
 } from "./resolverUtils";
+
+// TODO: Need to rename/refactor all these/rename schema to be entity agnostic
 
 export const plantResolver: QueryResolvers["plant"] = async (
   _,
@@ -44,9 +47,10 @@ export const plantOccurrencesResolver: QueryResolvers["plantOccurrences"] =
     );
   };
 
+// TODO: Serving dual purpose for animal/plant, rename later
 export const plantSearchResolver: QueryResolvers["plantSearch"] = async (
   _,
-  { where, ...args },
+  { entityType, where, ...args },
 ) => {
   const aggregation: Document = where
     ? [{ $match: extractPlantFilter(where) }]
@@ -97,7 +101,7 @@ export const plantSearchResolver: QueryResolvers["plantSearch"] = async (
     );
   }
 
-  return aggregateAndProject(plantsCollection, aggregation);
+  return aggregateAndProject(getEntityCollection(entityType), aggregation);
 };
 
 export const extractPlantFilter = (filter: PlantDataInput & { _id?: string }) =>

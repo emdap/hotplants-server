@@ -14,6 +14,9 @@ const plantsDb = client.db("plants");
 export const plantsCollection =
   plantsDb.collection<PlantDataDocument>("plantData");
 
+export const animalsCollection =
+  plantsDb.collection<PlantDataDocument>("animalData");
+
 export const userGardensCollection =
   plantsDb.collection<UserGardenDocument>("userGardens");
 

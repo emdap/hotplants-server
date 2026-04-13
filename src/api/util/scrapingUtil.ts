@@ -8,7 +8,7 @@ import {
   PartialPlantData,
   SearchRecordDocument,
 } from "../../config/types";
-import { parseBboxInput } from "../../graphqlConfig/resolvers/plantResolvers";
+import { parseBboxInput } from "../../graphqlConfig/resolvers/entityResolvers";
 import { scrapePermaPeople } from "../permaPeopleScraper";
 import { scrapePFAF } from "../pfafScraper";
 import { ENTITY_TO_KINGDOM, processGbifResults } from "./gbifUtil";
@@ -26,7 +26,7 @@ const DEFAULT_GBIF_SEARCH_PARAMS: Omit<
 
 const MAX_STALE_SEARCH_MILLISECONDS = 300000; // 5 minutes
 
-type WebsiteScrapedData = Omit<
+export type WebsiteScrapedData = Omit<
   PartialPlantData,
   "scientificName" | "occurrences"
 >;
@@ -110,7 +110,7 @@ export const searchGbifOccurrences = async (
     if (data?.results) {
       await Promise.all([
         updateSearchRecord(searchRecord._id, { totalOccurrences: data?.count }),
-        processGbifResults(data.results),
+        processGbifResults(data.results, searchRecord.entityType),
       ]);
 
       finishRunningSearch(

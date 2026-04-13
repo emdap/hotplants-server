@@ -293,6 +293,7 @@ export type QueryPlantOccurrencesArgs = {
 
 
 export type QueryPlantSearchArgs = {
+  entityType: EntityType;
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<PlantSortInput>>;
@@ -699,7 +700,7 @@ export type QueryResolvers<ContextType = ApolloContext, ParentType extends Resol
   allUserGardens?: Resolver<Array<ResolversTypes['UserGarden']>, ParentType, ContextType, Partial<QueryAllUserGardensArgs>>;
   plant?: Resolver<Maybe<ResolversTypes['PlantData']>, ParentType, ContextType, RequireFields<QueryPlantArgs, 'id'>>;
   plantOccurrences?: Resolver<Maybe<ResolversTypes['PlantOccurrencesResults']>, ParentType, ContextType, RequireFields<QueryPlantOccurrencesArgs, 'id'>>;
-  plantSearch?: Resolver<ResolversTypes['PlantSearchQueryResults'], ParentType, ContextType, Partial<QueryPlantSearchArgs>>;
+  plantSearch?: Resolver<ResolversTypes['PlantSearchQueryResults'], ParentType, ContextType, RequireFields<QueryPlantSearchArgs, 'entityType'>>;
   searchRecord?: Resolver<Maybe<ResolversTypes['SearchRecord']>, ParentType, ContextType, RequireFields<QuerySearchRecordArgs, 'id'>>;
   searchRecordDataCounts?: Resolver<ResolversTypes['SearchRecordPlantCountResults'], ParentType, ContextType, RequireFields<QuerySearchRecordDataCountsArgs, 'id'>>;
   userGarden?: Resolver<Maybe<ResolversTypes['UserGarden']>, ParentType, ContextType, Partial<QueryUserGardenArgs>>;
