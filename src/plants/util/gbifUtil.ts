@@ -77,6 +77,13 @@ const extractOccurrenceIds = (occurrences?: PlantOccurrence[]) =>
  */
 const reduceGbifResults = (gbifResults: GbifOccurenceResult[]) =>
   gbifResults.reduce<GbifResultDict>((prev, result) => {
+    if (
+      result.establishmentMeans === "vagrant" ||
+      result.degreeOfEstablishment === "spreading"
+    ) {
+      return prev;
+    }
+
     const scientificName = extractScientificName(result)?.toLowerCase();
     if (!scientificName) {
       return prev;
