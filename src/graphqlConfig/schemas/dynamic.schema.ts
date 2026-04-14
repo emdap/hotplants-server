@@ -111,6 +111,9 @@ export const dynamicSchema = buildSchema(`
     spread: PlantSizeRangeInput
 
     commonName: String
+    
+    commonNameIncludes: String
+    scientificNameIncludes: String
     boundingPolyCoords: [[[Float!]!]!]
 
     habitats: PlantArrayFilterStringInput

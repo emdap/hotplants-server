@@ -104,8 +104,10 @@ export const plantSearchResolver: QueryResolvers["plantSearch"] = async (
   return aggregateAndProject(getEntityCollection(entityType), aggregation);
 };
 
-export const extractPlantFilter = (filter: PlantDataInput & { _id?: string }) =>
-  (Object.entries(filter) as Entries<typeof filter>).reduce<
+export const extractPlantFilter = (
+  filter: PlantDataInput & { _id?: string },
+) => {
+  const plantFilter = (Object.entries(filter) as Entries<typeof filter>).reduce<
     Filter<PlantDataDocument>
   >((prev, [property, filter]) => {
     const simpleArrayFilter = Array.isArray(filter) ? filter : null;
@@ -117,6 +119,10 @@ export const extractPlantFilter = (filter: PlantDataInput & { _id?: string }) =>
         : null;
 
     if (
+      // Handle name filters separately
+      property.includes("commonName") ||
+      property.includes("scientificName") ||
+      // Ignore missing filters
       (typeof filter === "string" && !filter.length) ||
       (property === "boundingPolyCoords" && !filter) ||
       (simpleArrayFilter && !simpleArrayFilter.length) ||
@@ -152,6 +158,41 @@ export const extractPlantFilter = (filter: PlantDataInput & { _id?: string }) =>
 
     return prev;
   }, {});
+
+  const nameFilters = combineNameFilters(filter);
+
+  return { ...plantFilter, ...nameFilters };
+};
+
+// TODO: Messy - rushed this to get working
+const combineNameFilters = (filter: PlantDataInput) => {
+  const nameFilters: Filter<PlantDataDocument> = {};
+
+  (["commonName", "scientificName"] as const).forEach((property) => {
+    const exactFilter = filter[property]
+      ? caseInsensitiveStringRegex(filter[property])
+      : undefined;
+    const includesFilter = filter[`${property}Includes`]
+      ? caseInsensitiveStringRegex(filter[`${property}Includes`]!)
+      : undefined;
+
+    const field = property === "commonName" ? "commonNames" : property;
+
+    if (exactFilter && includesFilter) {
+      nameFilters.$and = [
+        { [field]: exactFilter },
+        { [field]: includesFilter },
+      ];
+      // nameFilters[field] = { $and: [exactFilter, includesFilter] };
+    } else if (exactFilter) {
+      nameFilters[field] = exactFilter;
+    } else if (includesFilter) {
+      nameFilters[field] = includesFilter;
+    }
+  });
+
+  return nameFilters;
+};
 
 export const parseBboxInput = (bbox: Position[][]) => {
   try {

@@ -14,7 +14,11 @@ import {
 import { gbifSearchesCollection } from "../config/mongodbClient";
 import { EntitySearchParams } from "../config/types";
 import { extractUserFromCookie } from "./util/authUtil";
-import { createSearchRecord, updateSearchRecord } from "./util/mongodbUtil";
+import {
+  createSearchRecord,
+  trimEntityName,
+  updateSearchRecord,
+} from "./util/mongodbUtil";
 import {
   normalizeSearchRecord,
   searchGbifOccurrences,
@@ -51,8 +55,7 @@ export class SearchController {
       entityType: searchParams.entityType,
 
       ...searchParams.location,
-      ...searchParams.entityName,
-      // ...trimEntityName(searchParams.entityName),
+      ...trimEntityName(searchParams.entityName),
     };
 
     const existingSearchRecord = await (userId

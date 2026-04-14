@@ -158,6 +158,7 @@ export type PlantDataInput = {
   bloomTimes?: InputMaybe<PlantArrayFilterStringInput>;
   boundingPolyCoords?: InputMaybe<Array<Array<Array<Scalars['Float']['input']>>>>;
   commonName?: InputMaybe<Scalars['String']['input']>;
+  commonNameIncludes?: InputMaybe<Scalars['String']['input']>;
   habitats?: InputMaybe<PlantArrayFilterStringInput>;
   hardiness?: InputMaybe<PlantArrayFilterIntInput>;
   hasScrapedData?: InputMaybe<Scalars['Boolean']['input']>;
@@ -167,6 +168,7 @@ export type PlantDataInput = {
   maturityTime?: InputMaybe<Scalars['String']['input']>;
   physicalCharactersticsDump?: InputMaybe<Scalars['String']['input']>;
   scientificName?: InputMaybe<Scalars['String']['input']>;
+  scientificNameIncludes?: InputMaybe<Scalars['String']['input']>;
   scrapeSources?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   soilTypes?: InputMaybe<PlantArrayFilterStringInput>;
   spread?: InputMaybe<PlantSizeRangeInput>;
