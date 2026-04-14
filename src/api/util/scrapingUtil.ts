@@ -110,7 +110,11 @@ export const searchGbifOccurrences = async (
     if (data?.results) {
       await Promise.all([
         updateSearchRecord(searchRecord._id, { totalOccurrences: data?.count }),
-        processGbifResults(data.results, searchRecord.entityType),
+        processGbifResults(
+          data.results,
+          searchRecord.entityType,
+          searchRecord.commonName,
+        ),
       ]);
 
       finishRunningSearch(

@@ -1,10 +1,8 @@
 import { extractUserFromCookie } from "@/api/util/authUtil";
+import { getEntityCollection } from "@/api/util/mongodbUtil";
 import { SearchRecordDocument } from "@/config/types";
 import { Filter, ObjectId } from "mongodb";
-import {
-  gbifSearchesCollection,
-  plantsCollection,
-} from "../../config/mongodbClient";
+import { gbifSearchesCollection } from "../../config/mongodbClient";
 import {
   QueryResolvers,
   SearchRecordBooleanFilterInput,
@@ -82,11 +80,13 @@ export const searchRecordDataCountsResolver: QueryResolvers["searchRecordDataCou
         scientificName,
       });
 
-      const plantCountPromise = plantsCollection.countDocuments(plantFilter);
+      const entityCollection = getEntityCollection(searchRecord.entityType);
+
+      const plantCountPromise = entityCollection.countDocuments(plantFilter);
       const firstPlantPromise =
         !searchRecord.boundingPolyCoords &&
         (searchRecord.commonName || searchRecord.scientificName)
-          ? plantsCollection.findOne(
+          ? entityCollection.findOne(
               searchRecord.commonName
                 ? {
                     commonNames: caseInsensitiveStringRegex(
@@ -101,7 +101,7 @@ export const searchRecordDataCountsResolver: QueryResolvers["searchRecordDataCou
             )
           : null;
 
-      const occurrenceCountPromise = plantsCollection
+      const occurrenceCountPromise = entityCollection
         .aggregate([{ $match: plantFilter }, { $unwind: "$occurrences" }])
         .toArray();
 

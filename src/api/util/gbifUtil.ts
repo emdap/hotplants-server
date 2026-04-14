@@ -29,6 +29,28 @@ export const ENTITY_TO_KINGDOM: Record<EntityType, number> = {
  */
 export type GbifResultDict = Record<string, NormalizedGbifResult>;
 
+const initCommonNamesArray = (
+  gbifData: NormalizedGbifResult,
+  commonNameSearch?: string | null,
+) => {
+  const commonNames: string[] = [];
+  const trimmedSearch = commonNameSearch?.toLowerCase().trim();
+
+  if (gbifData.genericName) {
+    commonNames.push(gbifData.genericName.toLowerCase().trim());
+  } else if (trimmedSearch && gbifData.genus) {
+    commonNames.push(
+      `${trimmedSearch} - ${gbifData.genus.toLowerCase().trim()}`,
+    );
+  }
+
+  if (trimmedSearch) {
+    commonNames.push(trimmedSearch.trim());
+  }
+
+  return commonNames;
+};
+
 const extractScientificName = ({
   scientificName,
   scientificNameAuthorship,
@@ -161,6 +183,7 @@ const combineOccurrences = <
 export const processGbifResults = async (
   gbifResults: GbifOccurenceResult[],
   entityType: EntityType,
+  commonNameSearch?: string | null,
 ) => {
   const processGbifEntity = async (
     scientificName: string,
@@ -180,6 +203,8 @@ export const processGbifResults = async (
       scientificName,
       occurrences: [],
       scrapeSources: [],
+      // TODO: TEMP - want way to store the common name search that revealed this GBIF result for animals (no scraped data to get accurate commonNames)
+      commonNames: initCommonNamesArray(occurrenceData, commonNameSearch),
       ...existingData,
       ...combinedScrapedData,
     };

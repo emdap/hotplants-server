@@ -20,6 +20,20 @@ import { convertPolygon } from "./scrapingUtil";
 export const getEntityCollection = (entityType: EntityType) =>
   entityType === "plant" ? plantsCollection : animalsCollection;
 
+export const trimEntityName = (
+  entityName: EntitySearchParams["entityName"],
+) => {
+  if (!entityName) {
+    return entityName;
+  }
+
+  if ("scientificName" in entityName) {
+    return { scientificName: entityName.scientificName.toLowerCase().trim() };
+  } else if ("commonName" in entityName) {
+    return { commonName: entityName.commonName.toLowerCase().trim() };
+  }
+};
+
 /**
  *
  * Helper function to return existing plant data from mongodb.

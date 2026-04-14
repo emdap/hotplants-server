@@ -49,8 +49,10 @@ export class SearchController {
       scientificName: undefined,
 
       entityType: searchParams.entityType,
+
       ...searchParams.location,
       ...searchParams.entityName,
+      // ...trimEntityName(searchParams.entityName),
     };
 
     const existingSearchRecord = await (userId
