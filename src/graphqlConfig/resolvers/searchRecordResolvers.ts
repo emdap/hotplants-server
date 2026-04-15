@@ -36,7 +36,7 @@ const extractSearchRecordFilter = async ({
     : -1;
 
   if (userFilterIndex > -1 && booleanFilter) {
-    booleanFilter.splice(userFilterIndex);
+    booleanFilter.splice(userFilterIndex, 1);
     const user = await extractUserFromCookie(cookie);
     if (user) {
       filter.userIds = new ObjectId(user.id);
