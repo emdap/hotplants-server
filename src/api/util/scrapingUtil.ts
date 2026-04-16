@@ -1,3 +1,5 @@
+import { EntityType } from "@/graphqlConfig/graphql";
+import { Entries } from "type-fest";
 import { stringify } from "wkt";
 import {
   gbifClient,
@@ -157,30 +159,31 @@ export const createGbifQuery = async ({
   };
 };
 
-export const iteratePlantScrapers = (
+export const getScrapeUrls = (
   scientificName: string,
   previousScrapeSources?: string[],
 ) =>
-  Object.keys(SCRAPE_SOURCE_INFO).map((source) => {
-    const scrapeSource = source as ScrapeSource;
-    const scrapeUrl = getScrapeUrl(scientificName, scrapeSource);
+  (
+    Object.entries(SCRAPE_SOURCE_INFO) as Entries<typeof SCRAPE_SOURCE_INFO>
+  ).flatMap(([source, { url, spaceReplacement }]) => {
+    const fullUrl = `${url}${scientificName.replace(/ /g, spaceReplacement)}`;
 
-    if (!previousScrapeSources?.includes(scrapeUrl)) {
-      return scrapePlantByName(scientificName, scrapeSource);
+    if (previousScrapeSources?.includes(fullUrl)) {
+      return [];
     }
 
-    return null;
+    return { source, fullUrl };
   });
 
-export const scrapePlantByName = async (
-  scientificName: string,
-  scrapeFrom: ScrapeSource,
+export const scrapePlantData = async (
+  source: ScrapeSource,
+  scrapeUrl: string,
 ) => {
-  switch (scrapeFrom) {
+  switch (source) {
     case "perma":
-      return scrapePermaPeople(scientificName);
+      return scrapePermaPeople(scrapeUrl);
     case "pfaf":
-      return scrapePFAF(scientificName);
+      return scrapePFAF(scrapeUrl);
   }
 };
 
@@ -216,3 +219,21 @@ export const combineScrapedData = (
 
     return prev;
   }, null);
+
+export const getScrapedData = async (
+  scientificName: string,
+  entityType: EntityType,
+  scrapeSources?: string[],
+) => {
+  if (entityType === "plant") {
+    const scrapeUrls = getScrapeUrls(scientificName, scrapeSources);
+
+    const resolvedScrapes = await Promise.all(
+      scrapeUrls.map(({ source, fullUrl }) => scrapePlantData(source, fullUrl)),
+    );
+
+    return combineScrapedData(resolvedScrapes);
+  }
+
+  return null;
+};

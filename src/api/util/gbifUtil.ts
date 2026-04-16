@@ -1,3 +1,4 @@
+import { PlantDataDocument } from "@/config/types";
 import { gbifClient, GbifOccurenceResult } from "../../config/gbifClient";
 import {
   EntityType,
@@ -6,17 +7,12 @@ import {
   PlantOccurrence,
 } from "../../graphqlConfig/graphql";
 import { getEntityByName, storeEntityData } from "./mongodbUtil";
-import {
-  combineScrapedData,
-  iteratePlantScrapers,
-  WebsiteScrapedData,
-} from "./scrapingUtil";
+import { getScrapedData, WebsiteScrapedData } from "./scrapingUtil";
 
 type NormalizedGbifResult = Omit<
   GbifOccurenceResult,
   "media" | "decimalLatitude" | "decimalLongitude"
-> &
-  Pick<PlantData, "scrapeSources" | "occurrences">;
+> & { occurrences: PlantData["occurrences"] };
 
 export const ENTITY_TO_KINGDOM: Record<EntityType, number> = {
   plant: 6,
@@ -28,28 +24,6 @@ export const ENTITY_TO_KINGDOM: Record<EntityType, number> = {
  * combined GBIF occurrence data into a single result object.
  */
 export type GbifResultDict = Record<string, NormalizedGbifResult>;
-
-const initCommonNamesArray = (
-  gbifData: NormalizedGbifResult,
-  commonNameSearch?: string | null,
-) => {
-  const commonNames: string[] = [];
-  const trimmedSearch = commonNameSearch?.toLowerCase().trim();
-
-  if (gbifData.genericName) {
-    commonNames.push(gbifData.genericName.toLowerCase().trim());
-  } else if (trimmedSearch && gbifData.genus) {
-    commonNames.push(
-      `${trimmedSearch} - ${gbifData.genus.toLowerCase().trim()}`,
-    );
-  }
-
-  if (trimmedSearch) {
-    commonNames.push(trimmedSearch.trim());
-  }
-
-  return commonNames;
-};
 
 const extractScientificName = ({
   scientificName,
@@ -76,8 +50,10 @@ export const searchGbifSpecies = async (
   return data?.results?.flatMap(({ key }) => key ?? []);
 };
 
-const normalizeOccurrence = (gbifOccurrence: GbifOccurenceResult) => {
-  const { media, decimalLatitude, decimalLongitude, ...rest } = gbifOccurrence;
+const normalizeOccurrence = (
+  gbifOccurrence: GbifOccurenceResult,
+): NormalizedGbifResult["occurrences"][number] => {
+  const { media, decimalLatitude, decimalLongitude } = gbifOccurrence;
 
   const mediaObjects: PlantMedia[] = media.map(({ identifier }) => ({
     url: identifier,
@@ -88,30 +64,33 @@ const normalizeOccurrence = (gbifOccurrence: GbifOccurenceResult) => {
       ? [decimalLongitude, decimalLatitude]
       : [];
 
-  const normalizedOccurence: NormalizedGbifResult = {
-    ...rest,
-    scrapeSources: [],
-    occurrences: [
-      {
-        occurrenceId: gbifOccurrence.key,
-        occurrenceCoords: coordinates,
-        media: mediaObjects,
-      },
-    ],
+  return {
+    occurrenceId: gbifOccurrence.key,
+    occurrenceCoords: coordinates,
+    media: mediaObjects,
   };
-
-  return normalizedOccurence;
 };
 
-const extractOccurrenceIds = (occurrences?: PlantOccurrence[]) =>
-  occurrences ? occurrences.map(({ occurrenceId }) => occurrenceId) : [];
+const normalizeAndUpdateOccurrences = (
+  existingOccurrences: NormalizedGbifResult["occurrences"],
+  incomingResult: GbifOccurenceResult,
+) => {
+  const existingIds = existingOccurrences.map(
+    ({ occurrenceId }) => occurrenceId,
+  );
 
-/** Combine GBIF occurrence results into a dictionary, where each entry is a unique plant,
- * and the value is all occurrence data for that plant in `gbifResults`, combined
- * into a single object.
+  if (existingIds.includes(incomingResult.key)) {
+    return existingOccurrences;
+  }
+
+  return [...existingOccurrences, normalizeOccurrence(incomingResult)];
+};
+
+/**
+ *  Combine GBIF occurrence results into a dictionary keyed by scientific names.
  */
-const reduceGbifResults = (gbifResults: GbifOccurenceResult[]) =>
-  gbifResults.reduce<GbifResultDict>((prev, result) => {
+const combineGbifResults = (gbifResults: GbifOccurenceResult[]) =>
+  gbifResults.reduce<Record<string, NormalizedGbifResult>>((prev, result) => {
     if (
       result.establishmentMeans === "vagrant" ||
       result.degreeOfEstablishment === "spreading"
@@ -124,51 +103,74 @@ const reduceGbifResults = (gbifResults: GbifOccurenceResult[]) =>
       return prev;
     }
 
-    const existingOccurrenceIds = extractOccurrenceIds(
-      prev[scientificName]?.occurrences,
-    );
-
-    if (!existingOccurrenceIds.includes(result.key)) {
-      const normalizedOccurrence = normalizeOccurrence(result);
-      if (prev[scientificName]) {
-        prev[scientificName] = combineOccurrences(
-          prev[scientificName],
-          normalizedOccurrence,
-        );
-      } else {
-        prev[scientificName] = normalizedOccurrence;
-      }
+    if (prev[scientificName]) {
+      prev[scientificName].occurrences = normalizeAndUpdateOccurrences(
+        prev[scientificName].occurrences,
+        result,
+      );
+    } else if (result) {
+      prev[scientificName] = {
+        ...result,
+        occurrences: [normalizeOccurrence(result)],
+      };
     }
 
     return prev;
   }, {});
 
-const combineOccurrences = <
-  T extends Pick<PlantData, "scrapeSources" | "occurrences">,
->(
-  normalizedData: T,
-  newGbifData: NormalizedGbifResult,
-): T & { hasNewData: boolean } => {
-  const existingOccurrences = normalizedData.occurrences.map(
-    ({ occurrenceId }) => occurrenceId,
-  );
-  const newOccurrences = newGbifData.occurrences.filter(
-    ({ occurrenceId }) => !existingOccurrences.includes(occurrenceId),
+/**
+ * GBIF species search based on a common name does not include a list of
+ * matched common names for the returned species.
+ * Manually add the searched common name to the entity.
+ */
+const getUpdatedCommonNames = (
+  { genericName, genus }: NormalizedGbifResult,
+  commonNameSearch: string | null | undefined,
+  {
+    existingData,
+    scrapedData,
+  }: {
+    existingData?: Pick<PlantDataDocument, "commonNames"> | null;
+    scrapedData?: Pick<WebsiteScrapedData, "commonNames"> | null;
+  },
+) => {
+  const commonNames = new Set<string>(existingData?.commonNames);
+  const startingSize = commonNames.size;
+
+  scrapedData?.commonNames?.forEach((commonName) =>
+    commonNames.add(commonName),
   );
 
-  const combinedData = {
-    ...normalizedData,
-    hasNewData: false,
-  };
+  const trimmedSearch = commonNameSearch?.toLowerCase().trim();
 
-  if (!newOccurrences.length) {
-    return combinedData;
+  if (trimmedSearch) {
+    const nameSuffix = genericName || genus;
+
+    nameSuffix &&
+      commonNames.add(`${trimmedSearch} - ${nameSuffix.toLowerCase().trim()}`);
+
+    commonNames.add(trimmedSearch);
   }
 
-  combinedData.hasNewData = true;
-  combinedData.occurrences.push(...newOccurrences);
+  return startingSize === commonNames.size ? null : [...commonNames];
+};
 
-  return combinedData;
+const getUpdatedOccurrences = (
+  { occurrences }: NormalizedGbifResult,
+  baseOccurrences?: PlantOccurrence[],
+) => {
+  if (!baseOccurrences) {
+    return occurrences;
+  }
+
+  const existingOccurrenceIds = baseOccurrences.map(
+    ({ occurrenceId }) => occurrenceId,
+  );
+  const newOccurrences = occurrences.filter(
+    ({ occurrenceId }) => !existingOccurrenceIds.includes(occurrenceId),
+  );
+
+  return newOccurrences.length ? baseOccurrences.concat(newOccurrences) : null;
 };
 
 /**
@@ -187,45 +189,52 @@ export const processGbifResults = async (
 ) => {
   const processGbifEntity = async (
     scientificName: string,
-    occurrenceData: NormalizedGbifResult,
+    incomingData: NormalizedGbifResult,
   ) => {
     const existingData = await getEntityByName(scientificName, entityType);
-    let combinedScrapedData: WebsiteScrapedData | null = null;
 
-    if (entityType === "plant") {
-      const scrapedData = await Promise.all(
-        iteratePlantScrapers(scientificName, existingData?.scrapeSources),
-      );
-      combinedScrapedData = combineScrapedData(scrapedData);
-    }
-
-    const normalizedData = {
+    const newScrapedData = await getScrapedData(
       scientificName,
-      occurrences: [],
-      scrapeSources: [],
-      // TODO: TEMP - want way to store the common name search that revealed this GBIF result for animals (no scraped data to get accurate commonNames)
-      commonNames: initCommonNamesArray(occurrenceData, commonNameSearch),
-      ...existingData,
-      ...combinedScrapedData,
-    };
-
-    const { hasNewData, ...combinedData } = combineOccurrences(
-      normalizedData,
-      occurrenceData,
+      entityType,
+      existingData?.scrapeSources,
     );
 
-    if (hasNewData) {
+    const updatedCommonNames = getUpdatedCommonNames(
+      incomingData,
+      commonNameSearch,
+      {
+        existingData,
+        scrapedData: newScrapedData,
+      },
+    );
+
+    const updatedOccurrences = getUpdatedOccurrences(
+      incomingData,
+      existingData?.occurrences,
+    );
+
+    const combinedData = {
+      scrapeSources: [],
+      ...existingData,
+      ...newScrapedData,
+
+      scientificName,
+      commonNames: updatedCommonNames ?? existingData?.commonNames ?? undefined,
+      occurrences: updatedOccurrences ?? existingData?.occurrences ?? [],
+    };
+
+    if (newScrapedData || updatedCommonNames || updatedOccurrences) {
       await storeEntityData(combinedData, entityType);
     }
 
     return combinedData;
   };
 
-  const resultDict = reduceGbifResults(gbifResults);
+  const resultDict = combineGbifResults(gbifResults);
 
   return Promise.all(
-    Object.entries(resultDict).map((plantEntry) =>
-      processGbifEntity(...plantEntry),
+    Object.entries(resultDict).map(([scientificName, data]) =>
+      processGbifEntity(scientificName, data),
     ),
   );
 };

@@ -1,13 +1,9 @@
 import { JSDOM } from "jsdom";
-import {
-  getScrapeUrl,
-  WebsiteScrapedDataWithSource,
-} from "./util/scrapingUtil";
+import { WebsiteScrapedDataWithSource } from "./util/scrapingUtil";
 
 export const scrapePermaPeople = async (
-  scientificName: string
+  scrapeUrl: string,
 ): Promise<WebsiteScrapedDataWithSource | null> => {
-  const scrapeUrl = getScrapeUrl(scientificName, "perma");
   const response = await fetch(scrapeUrl);
 
   if (response.status === 404) {

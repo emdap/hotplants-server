@@ -1,10 +1,7 @@
 import { convert, Unit } from "convert";
 import { JSDOM } from "jsdom";
 import { PartialPlantData } from "../config/types";
-import {
-  getScrapeUrl,
-  WebsiteScrapedDataWithSource,
-} from "./util/scrapingUtil";
+import { WebsiteScrapedDataWithSource } from "./util/scrapingUtil";
 
 export const STANDARD_UNIT: Unit = "meters";
 
@@ -161,9 +158,8 @@ const PFAFPageFound = (document: Document) => {
 };
 
 export const scrapePFAF = async (
-  scientificName: string,
+  scrapeUrl: string,
 ): Promise<WebsiteScrapedDataWithSource | null> => {
-  const scrapeUrl = getScrapeUrl(scientificName, "pfaf");
   const response = await fetch(scrapeUrl);
 
   const html = (await response.text()).toLowerCase();

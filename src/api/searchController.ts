@@ -16,7 +16,7 @@ import { EntitySearchParams } from "../config/types";
 import { extractUserFromCookie } from "./util/authUtil";
 import {
   createSearchRecord,
-  trimEntityName,
+  getSearchRecordFilter,
   updateSearchRecord,
 } from "./util/mongodbUtil";
 import {
@@ -44,6 +44,8 @@ export class SearchController {
     const user = await extractUserFromCookie(request.headers.cookie);
     const userId = user && new ObjectId(user.id);
 
+    const searchRecordFields = getSearchRecordFilter(searchParams);
+
     const findPayload = {
       // Default out all properties so that exact match is found
       locationName: undefined,
@@ -52,10 +54,7 @@ export class SearchController {
       commonName: undefined,
       scientificName: undefined,
 
-      entityType: searchParams.entityType,
-
-      ...searchParams.location,
-      ...trimEntityName(searchParams.entityName),
+      ...searchRecordFields,
     };
 
     const existingSearchRecord = await (userId
@@ -72,7 +71,10 @@ export class SearchController {
       return normalizeSearchRecord(existingSearchRecord);
     }
 
-    const newSearchRecord = await createSearchRecord(searchParams, userId);
+    const newSearchRecord = await createSearchRecord(
+      searchRecordFields,
+      userId,
+    );
     return newSearchRecord
       ? normalizeSearchRecord(newSearchRecord)
       : errorResponse(500, "Unable to create search record");
