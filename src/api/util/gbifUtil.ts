@@ -19,12 +19,6 @@ export const ENTITY_TO_KINGDOM: Record<EntityType, number> = {
   animal: 1,
 };
 
-/**
- * A dictionary where the key is the plants scientific name, and the entry is
- * combined GBIF occurrence data into a single result object.
- */
-export type GbifResultDict = Record<string, NormalizedGbifResult>;
-
 const extractScientificName = ({
   scientificName,
   scientificNameAuthorship,
