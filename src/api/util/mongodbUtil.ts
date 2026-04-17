@@ -17,14 +17,30 @@ import {
 import { searchGbifSpecies } from "./gbifUtil";
 import { convertPolygon } from "./scrapingUtil";
 
+type SearchRecordCreationFields = Pick<
+  SearchRecordDocument,
+  | "entityType"
+  | "locationName"
+  | "locationSource"
+  | "boundingPolyCoords"
+  | "commonName"
+  | "scientificName"
+>;
+
 export const getEntityCollection = (entityType: EntityType) =>
   entityType === "plant" ? plantsCollection : animalsCollection;
 
-export const trimEntityName = (
-  entityName: EntitySearchParams["entityName"],
-) => {
+export const getSearchRecordFilter = (
+  searchParams: EntitySearchParams,
+): SearchRecordCreationFields => ({
+  entityType: searchParams.entityType,
+  ...searchParams.location,
+  ...normalizeEntityName(searchParams.entityName),
+});
+
+const normalizeEntityName = (entityName: EntitySearchParams["entityName"]) => {
   if (!entityName) {
-    return entityName;
+    return undefined;
   }
 
   if ("scientificName" in entityName) {
@@ -90,19 +106,19 @@ export const lookupPlantByCoordinates = async ({
     .toArray();
 
 export const createSearchRecord = async (
-  { location, entityName, entityType }: EntitySearchParams,
+  initSearchRecord: SearchRecordCreationFields,
   userId?: ObjectId,
 ) => {
   // Converting polygon will error out with invalid input, test conversion before creating
-  convertPolygon(location?.boundingPolyCoords);
+  convertPolygon(initSearchRecord?.boundingPolyCoords);
   // Don't want to store the converted-polygon, easier to parse raw. Converted style is for GBIF API
 
   let taxonKeys: number[] | undefined;
 
-  if (entityName && "commonName" in entityName) {
+  if (initSearchRecord.commonName) {
     taxonKeys = await searchGbifSpecies(
-      entityName.commonName.trim(),
-      entityType,
+      initSearchRecord.commonName.trim(),
+      initSearchRecord.entityType,
     );
   }
 
@@ -115,10 +131,8 @@ export const createSearchRecord = async (
     taxonKeys,
     totalOccurrences: 0,
     occurrencesOffset: 0,
-    entityType,
 
-    ...location,
-    ...entityName,
+    ...initSearchRecord,
     ...(userId && { userIds: [userId] }),
   });
 
