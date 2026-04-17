@@ -4,6 +4,9 @@ import { PlantArrayValuesDocument } from "../config/types";
 
 @Route("/plants")
 export class PlantsController {
+  /**
+   * Get the possible values for plant properties that are arrays.
+   */
   @Get("filterValues")
   public async getFilterValues(): Promise<PlantArrayValuesDocument> {
     const valuesDocument = await plantArrayValuesCollection.findOne({});

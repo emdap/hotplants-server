@@ -28,6 +28,9 @@ import {
 
 @Route()
 export class SearchController {
+  /**
+   * Returns the search record that tracks data scraping for the given search params.
+   */
   @Post("searchRecord")
   public async getSearchRecord(
     @Body() searchParams: EntitySearchParams,
@@ -81,7 +84,7 @@ export class SearchController {
   }
 
   /**
-   * Initiate a new search of occurrences from GBIF and combine with PFAF data.
+   * Start a new search/scrape for the given search record.
    */
   @Get("runSearch/{searchRecordId}")
   public async runSearch(
