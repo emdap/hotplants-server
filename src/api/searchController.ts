@@ -14,6 +14,7 @@ import {
 import { gbifSearchesCollection } from "../config/mongodbClient";
 import { EntitySearchParams } from "../config/types";
 import { extractUserFromCookie } from "./util/authUtil";
+import { searchGbifOccurrences } from "./util/gbifUtil";
 import {
   createSearchRecord,
   getSearchRecordFilter,
@@ -21,7 +22,6 @@ import {
 } from "./util/mongodbUtil";
 import {
   normalizeSearchRecord,
-  searchGbifOccurrences,
   SearchRecordSummary,
   shouldStartScraping,
 } from "./util/scrapingUtil";

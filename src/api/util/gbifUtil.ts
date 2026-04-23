@@ -1,22 +1,99 @@
-import { PlantDataDocument } from "@/config/types";
-import { gbifClient, GbifOccurenceResult } from "../../config/gbifClient";
+import {
+  EntitySearchParams,
+  PlantDataDocument,
+  SearchRecordDocument,
+} from "@/config/types";
+import {
+  gbifClient,
+  GbifOccurenceResult,
+  GbifOccurrenceSearchParams,
+} from "../../config/gbifClient";
 import {
   EntityType,
   PlantData,
   PlantMedia,
   PlantOccurrence,
 } from "../../graphqlConfig/graphql";
-import { getEntityByName, storeEntityData } from "./mongodbUtil";
-import { getScrapedData, WebsiteScrapedData } from "./scrapingUtil";
+import {
+  finishRunningSearch,
+  getEntityByName,
+  storeEntityData,
+  updateSearchRecord,
+} from "./mongodbUtil";
+import { convertPolygon, getScrapedData } from "./scrapingUtil";
 
 type NormalizedGbifResult = Omit<
   GbifOccurenceResult,
   "media" | "decimalLatitude" | "decimalLongitude"
 > & { occurrences: PlantData["occurrences"] };
 
-export const ENTITY_TO_KINGDOM: Record<EntityType, number> = {
+const ENTITY_TO_KINGDOM: Record<EntityType, number> = {
   plant: 6,
   animal: 1,
+};
+
+const DEFAULT_GBIF_SEARCH_PARAMS: Omit<
+  GbifOccurrenceSearchParams,
+  keyof EntitySearchParams
+> = {
+  basisOfRecord: ["HUMAN_OBSERVATION", "OBSERVATION", "MACHINE_OBSERVATION"],
+  limit: 300,
+  // @ts-expect-error API spec is incorrect
+  mediaType: "StillImage",
+};
+
+export const searchGbifOccurrences = async (
+  searchRecord: SearchRecordDocument,
+) => {
+  const geometry = convertPolygon(searchRecord.boundingPolyCoords);
+  const gbifQueryParams = {
+    geometry,
+    taxonKey: searchRecord.taxonKeys,
+    scientificName: searchRecord.scientificName
+      ? [searchRecord.scientificName]
+      : undefined,
+    offset: searchRecord.occurrencesOffset,
+    kingdomKey: [ENTITY_TO_KINGDOM[searchRecord.entityType]],
+
+    ...DEFAULT_GBIF_SEARCH_PARAMS,
+  };
+
+  console.info("running search with query params:\n", gbifQueryParams);
+
+  try {
+    const { data } = await gbifClient.GET("/occurrence/search", {
+      params: {
+        query: gbifQueryParams,
+      },
+    });
+
+    if (data?.results) {
+      await Promise.all([
+        updateSearchRecord(searchRecord._id, { totalOccurrences: data?.count }),
+        processGbifResults(
+          data.results,
+          searchRecord.entityType,
+          searchRecord.commonName,
+        ),
+      ]);
+
+      finishRunningSearch(
+        searchRecord,
+        {
+          occurrencesProcessed: data.results?.length ?? 0,
+          endOfRecords:
+            data.endOfRecords === undefined ? true : data.endOfRecords,
+        },
+        true,
+      );
+
+      return;
+    }
+  } catch (error) {
+    console.error(error);
+  }
+
+  finishRunningSearch(searchRecord, null, true);
 };
 
 const extractScientificName = ({
@@ -112,6 +189,8 @@ const combineGbifResults = (gbifResults: GbifOccurenceResult[]) =>
     return prev;
   }, {});
 
+type CommonNamesField = Pick<PlantDataDocument, "commonNames">;
+
 /**
  * GBIF species search based on a common name does not include a list of
  * matched common names for the returned species.
@@ -124,8 +203,8 @@ const getUpdatedCommonNames = (
     existingData,
     scrapedData,
   }: {
-    existingData?: Pick<PlantDataDocument, "commonNames"> | null;
-    scrapedData?: Pick<WebsiteScrapedData, "commonNames"> | null;
+    existingData?: CommonNamesField | null;
+    scrapedData?: CommonNamesField | null;
   },
 ) => {
   const commonNames = new Set<string>(existingData?.commonNames);
@@ -176,7 +255,7 @@ const getUpdatedOccurrences = (
  *
  * @returns number of new unique occurences found
  */
-export const processGbifResults = async (
+const processGbifResults = async (
   gbifResults: GbifOccurenceResult[],
   entityType: EntityType,
   commonNameSearch?: string | null,

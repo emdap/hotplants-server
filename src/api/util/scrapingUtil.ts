@@ -1,34 +1,14 @@
 import { EntityType } from "@/graphqlConfig/graphql";
 import { Entries } from "type-fest";
 import { stringify } from "wkt";
-import {
-  gbifClient,
-  GbifOccurrenceSearchParams,
-} from "../../config/gbifClient";
-import {
-  EntitySearchParams,
-  PartialPlantData,
-  SearchRecordDocument,
-} from "../../config/types";
+import { PartialPlantData, SearchRecordDocument } from "../../config/types";
 import { parseBboxInput } from "../../graphqlConfig/resolvers/entityResolvers";
 import { scrapePermaPeople } from "../permaPeopleScraper";
 import { scrapePFAF } from "../pfafScraper";
-import { ENTITY_TO_KINGDOM, processGbifResults } from "./gbifUtil";
-import { finishRunningSearch, updateSearchRecord } from "./mongodbUtil";
-
-const DEFAULT_GBIF_SEARCH_PARAMS: Omit<
-  GbifOccurrenceSearchParams,
-  keyof EntitySearchParams
-> = {
-  basisOfRecord: ["HUMAN_OBSERVATION", "OBSERVATION", "MACHINE_OBSERVATION"],
-  limit: 300,
-  // @ts-expect-error API spec is incorrect
-  mediaType: "StillImage",
-};
 
 const MAX_STALE_SEARCH_MILLISECONDS = 300000; // 5 minutes
 
-export type WebsiteScrapedData = Omit<
+type WebsiteScrapedData = Omit<
   PartialPlantData,
   "scientificName" | "occurrences"
 >;
@@ -37,9 +17,9 @@ export type WebsiteScrapedDataWithSource = WebsiteScrapedData & {
   source: ScrapeSource;
 };
 
-export type ScrapeSource = "pfaf" | "perma";
+type ScrapeSource = "pfaf" | "perma";
 
-export const SCRAPE_SOURCE_INFO: Record<
+const SCRAPE_SOURCE_INFO: Record<
   ScrapeSource,
   { url: string; spaceReplacement: string }
 > = {
@@ -84,82 +64,13 @@ export const shouldStartScraping = ({
   }
 };
 
-export const searchGbifOccurrences = async (
-  searchRecord: SearchRecordDocument,
-) => {
-  const geometry = convertPolygon(searchRecord.boundingPolyCoords);
-  const gbifQueryParams = {
-    geometry,
-    taxonKey: searchRecord.taxonKeys,
-    scientificName: searchRecord.scientificName
-      ? [searchRecord.scientificName]
-      : undefined,
-    offset: searchRecord.occurrencesOffset,
-    kingdomKey: [ENTITY_TO_KINGDOM[searchRecord.entityType]],
-
-    ...DEFAULT_GBIF_SEARCH_PARAMS,
-  };
-
-  console.info("running search with query params:\n", gbifQueryParams);
-
-  try {
-    const { data } = await gbifClient.GET("/occurrence/search", {
-      params: {
-        query: gbifQueryParams,
-      },
-    });
-
-    if (data?.results) {
-      await Promise.all([
-        updateSearchRecord(searchRecord._id, { totalOccurrences: data?.count }),
-        processGbifResults(
-          data.results,
-          searchRecord.entityType,
-          searchRecord.commonName,
-        ),
-      ]);
-
-      finishRunningSearch(
-        searchRecord,
-        {
-          occurrencesProcessed: data.results?.length ?? 0,
-          endOfRecords:
-            data.endOfRecords === undefined ? true : data.endOfRecords,
-        },
-        true,
-      );
-
-      return;
-    }
-  } catch (error) {
-    console.error(error);
-  }
-
-  finishRunningSearch(searchRecord, null, true);
-};
-
 /** Convert the coordinates to a polygon. Will error out if format is incorrect. */
 export const convertPolygon = (boundingPolyCoords?: number[][][] | null) => {
   const validPoly = boundingPolyCoords && parseBboxInput(boundingPolyCoords);
   return validPoly ? ([stringify(validPoly)] as string[]) : undefined;
 };
 
-export const createGbifQuery = async ({
-  scientificName,
-  taxonKeys,
-  boundingPolyCoords,
-}: SearchRecordDocument): Promise<GbifOccurrenceSearchParams> => {
-  const geometry = convertPolygon(boundingPolyCoords);
-
-  return {
-    geometry,
-    taxonKey: taxonKeys,
-    scientificName: scientificName ? [scientificName] : undefined,
-    ...DEFAULT_GBIF_SEARCH_PARAMS,
-  };
-};
-
-export const getScrapeUrls = (
+const getScrapeUrls = (
   scientificName: string,
   previousScrapeSources?: string[],
 ) =>
@@ -175,10 +86,7 @@ export const getScrapeUrls = (
     return { source, fullUrl };
   });
 
-export const scrapePlantData = async (
-  source: ScrapeSource,
-  scrapeUrl: string,
-) => {
+const scrapePlantData = async (source: ScrapeSource, scrapeUrl: string) => {
   switch (source) {
     case "perma":
       return scrapePermaPeople(scrapeUrl);
@@ -187,14 +95,9 @@ export const scrapePlantData = async (
   }
 };
 
-export const getScrapeUrl = (scientificName: string, source: ScrapeSource) => {
-  const { url, spaceReplacement } = SCRAPE_SOURCE_INFO[source];
-  return `${url}${scientificName.replace(/ /g, spaceReplacement)}`;
-};
-
 const PREFERRED_SOURCE: ScrapeSource = "perma";
 
-export const combineScrapedData = (
+const combineScrapedData = (
   scrapedData: (WebsiteScrapedDataWithSource | null)[],
 ) =>
   scrapedData.reduce<WebsiteScrapedData | null>((prev, cur) => {
